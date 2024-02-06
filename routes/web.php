@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TenderController;
+use App\Http\Controllers\LabourController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,13 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('tender/fetch-edit/{id}', [TenderController::class, 'fetch_edit']);
     Route::get('tender/delete/{id}', [TenderController::class, 'delete']);
 
+    Route::get('labours', [LabourController::class, 'index']);
+    Route::post('labours/store', [LabourController::class, 'store']);
+    Route::get('labours/fetch', [LabourController::class, 'fetch']);
+    Route::get('labours/fetch-edit/{id}', [LabourController::class, 'fetch_edit']);
+    Route::get('labours/delete/{id}', [LabourController::class, 'delete']);
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+

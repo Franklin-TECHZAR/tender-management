@@ -5,6 +5,7 @@ $url_segments = request()->segments();
 $dashboard = '';
 $tender = '';
 
+$labours = '';
 $users = '';
 $users_roles = '';
 
@@ -16,6 +17,10 @@ if (isset($url_segments[1]) && $url_segments[1] == 'dashboard') {
 if (isset($url_segments[1]) && $url_segments[1] == 'users') {
     $users_roles = 'active';
     $users = 'active';
+}
+
+if (isset($url_segments[1]) && $url_segments[1] == 'labours') {
+    $labours = 'active';
 }
 
 ?>
@@ -71,7 +76,16 @@ if (isset($url_segments[1]) && $url_segments[1] == 'users') {
                                 href="{{ url('users') }}">Users</a></li>
                     </ul>
                 </li>
-
+                <li class="dropdown @if ($labours) show @endif">
+                    <a href="javascript:;" class="dropdown-toggle">
+                        <span class="micon">
+                            <i class="icon-copy fa fa-users" aria-hidden="true"></i>
+                        </span><span class="mtext">Master</span>
+                    </a>
+                    <ul class="submenu" style="display:@if ($labours) block; @else none; @endif">
+                        <li><a class="@if ($labours) active @endif" href="{{ url('labours') }}">Labour</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>
