@@ -3,6 +3,7 @@
 $url_segments = request()->segments();
 
 $dashboard = '';
+$tender = '';
 
 $users = '';
 $users_roles = '';
@@ -35,6 +36,15 @@ if (isset($url_segments[1]) && $url_segments[1] == 'users') {
                     <a href="{{ url('dashboard') }}"
                         class="@if ($dashboard) active @endif dropdown-toggle no-arrow">
                         <span class="micon bi bi-speedometer"></span><span class="mtext">Dashboard</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('tender') }}"
+                        class="@if ($tender) active @endif dropdown-toggle no-arrow">
+                        <span class="micon">
+                            <i class="icon-copy fa fa-gavel" aria-hidden="true"></i>
+                        </span><span class="mtext">Tender</span>
                     </a>
                 </li>
 
