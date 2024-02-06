@@ -32,6 +32,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('tender/delete/{id}', [TenderController::class, 'delete']);
     Route::get('tender/chage-status', [TenderController::class, 'chage_status']);
 
+    Route::get('tender/payments/{id}', [TenderController::class, 'payments']);
+    Route::post('tender/payment-store', [TenderController::class, 'payment_store']);
+    Route::get('tender/fetch-payment-log', [TenderController::class, 'fetch_payment_log']);
+    Route::get('tender/remove-payment-log/{id}', [TenderController::class, 'remove_payment_log']);
+
+
 
     Route::get('labours', [LabourController::class, 'index']);
     Route::post('labours/store', [LabourController::class, 'store']);

@@ -51,6 +51,11 @@
         textarea.form-control {
             height: 100px;
         }
+        .filter-btn
+        {
+            margin-top: 1.8rem!important;
+            height: 41px;
+        }
     </style>
 </head>
 

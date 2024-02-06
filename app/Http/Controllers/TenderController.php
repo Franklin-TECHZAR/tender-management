@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tender;
+use App\Models\TenderPaymentLog;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -85,6 +86,7 @@ class TenderController extends Controller
                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
                                 <button data-id="' . $row->id . '" class="edit-btn dropdown-item"><i class="dw dw-edit2"></i> Edit</button>
                                 ' . $job_order . $status_btn . '
+                                <a href="' . url('tender/payments') . '/' . $row->id . '" class="dropdown-item"><i class="bi bi-cash-stack"></i> Payments</a>
                                 <button data-id="' . $row->id . '" class="delete-btn dropdown-item"><i class="dw dw-delete-3"></i> Delete</button>
                             </div>
                         </div>';
@@ -103,7 +105,7 @@ class TenderController extends Controller
     public function delete($id)
     {
         Tender::find($id)->delete();
-        return array("status" => 1, "message" => "FAQ deleted successfully");
+        return array("status" => 1, "message" => "Tender deleted successfully");
     }
 
     public function chage_status(Request $request)
@@ -122,5 +124,67 @@ class TenderController extends Controller
         }
         $tender->save();
         return array("status" => 1, "message" => "Status Updated successfully");
+    }
+
+    public function payments($tender_id)
+    {
+        $tender = Tender::find($tender_id);
+        return view('tender.payments', compact('tender'));
+    }
+    public function payment_store(Request $request)
+    {
+        $this->validate($request, [
+            'date' => 'required',
+            'amount' => 'required',
+            'type' => 'required',
+            'description' => 'required',
+            'tender_id' => 'required',
+        ]);
+
+        $payment_log = new TenderPaymentLog();
+        $payment_log->tender_id = $request->tender_id;
+        $payment_log->date = $request->date;
+        $payment_log->amount = $request->amount;
+        $payment_log->type = $request->type;
+        $payment_log->description = $request->description;
+        $payment_log->save();
+
+        return array("status" => 1, "message" => "Payment Created Successfully");
+    }
+    public function fetch_payment_log(Request $request)
+    {
+        $this->validate($request, [
+            'tender_id' => 'required',
+        ]);
+        $tender_id = $request->tender_id;
+        $logs = TenderPaymentLog::where('tender_id', $tender_id)->orderBy('date', "ASC")->get();
+        $data = [];
+        $balance = 0;
+        foreach ($logs as $log) {
+            if ($log->type == "Credit") {
+                $credit = "<span class='pull-right'>₹" . number_format($log->amount, 2) . "</span>";
+                $debit = "";
+                $balance = $balance + $log->amount;
+            } else {
+                $debit = "<span class='pull-right'>₹" . number_format($log->amount, 2) . "</span>";
+                $credit = "";
+                $balance = $balance - $log->amount;
+            }
+            $symbol = '';
+            $temp_balance = $balance;
+            if($temp_balance < 0)
+            {
+                $temp_balance = -($temp_balance);
+                $symbol = "-";
+            }
+            $balance_text = "<span class='pull-right'>" . $symbol . "₹" . number_format($temp_balance, 2) . "</span>";
+            $data[] = array('id' => $log->id, "date" => $log->date, "description" => $log->description, "credit" => $credit, "debit" => $debit, "balance" => $balance_text);
+        }
+        return $data;
+    }
+    public function remove_payment_log($id)
+    {
+        TenderPaymentLog::find($id)->delete();
+        return array("status" => 1, "message" => "Log deleted successfully");
     }
 }
