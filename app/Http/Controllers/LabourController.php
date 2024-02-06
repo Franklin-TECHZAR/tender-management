@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Labour;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class LabourController extends Controller
 {

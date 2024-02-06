@@ -5,21 +5,28 @@ $url_segments = request()->segments();
 $dashboard = '';
 $tender = '';
 
+$masters = '';
 $labours = '';
+
+
 $users = '';
 $users_roles = '';
 
-if (isset($url_segments[1]) && $url_segments[1] == 'dashboard') {
+if (isset($url_segments[0]) && $url_segments[0] == 'dashboard') {
     $dashboard = 'active';
+}
+if (isset($url_segments[0]) && $url_segments[0] == 'tender') {
+    $tender = 'active';
 }
 
 
-if (isset($url_segments[1]) && $url_segments[1] == 'users') {
+if (isset($url_segments[0]) && $url_segments[0] == 'users') {
     $users_roles = 'active';
     $users = 'active';
 }
 
-if (isset($url_segments[1]) && $url_segments[1] == 'labours') {
+if (isset($url_segments[0]) && $url_segments[0] == 'labours') {
+    $masters = 'active';
     $labours = 'active';
 }
 
@@ -45,7 +52,7 @@ if (isset($url_segments[1]) && $url_segments[1] == 'labours') {
                 </li>
 
                 <li>
-                    <a href="{{ url('tender') }}"
+                    <a href="{{ url('tender') }}?show=New"
                         class="@if ($tender) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy fa fa-gavel" aria-hidden="true"></i>
@@ -76,14 +83,14 @@ if (isset($url_segments[1]) && $url_segments[1] == 'labours') {
                                 href="{{ url('users') }}">Users</a></li>
                     </ul>
                 </li>
-                <li class="dropdown @if ($labours) show @endif">
+                <li class="dropdown @if ($masters) show @endif">
                     <a href="javascript:;" class="dropdown-toggle">
                         <span class="micon">
                             <i class="icon-copy fa fa-users" aria-hidden="true"></i>
-                        </span><span class="mtext">Master</span>
+                        </span><span class="mtext">Masters</span>
                     </a>
-                    <ul class="submenu" style="display:@if ($labours) block; @else none; @endif">
-                        <li><a class="@if ($labours) active @endif" href="{{ url('labours') }}">Labour</a></li>
+                    <ul class="submenu" style="display:@if ($masters) block; @else none; @endif">
+                        <li><a class="@if ($labours) active @endif" href="{{ url('labours') }}">Labours</a></li>
                     </ul>
                 </li>
             </ul>

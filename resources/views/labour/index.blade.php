@@ -39,7 +39,7 @@
                             <th>Name</th>
                             <th>Type</th>
                             <th>Mobile</th>
-                            <th>Address</th>
+                            {{-- <th>Address</th> --}}
                             <th width="100px">Action</th>
                         </tr>
                     </thead>
@@ -122,10 +122,10 @@
                 data: 'mobile',
                 name: 'mobile'
             },
-            {
-                data: 'address',
-                name: 'address'
-            },
+            // {
+            //     data: 'address',
+            //     name: 'address'
+            // },
             {
                 data: 'action',
                 name: 'action',
