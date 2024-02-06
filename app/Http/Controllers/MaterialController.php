@@ -2,48 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\Material;
 use Illuminate\Http\Request;
-use App\Models\Labour;
+use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 
-class LabourController extends Controller
+class MaterialController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $show = $request->show;
-        return view('labour.index', compact('show'));
+        return view('material.index', compact('show'));
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
             'name' => 'required',
-            'type' => 'required',
-            'mobile' => 'required',
-            'address' => 'required',
+            'unit_type' => 'required',
         ]);
 
         if ($request->edit_id) {
-            $labour = Labour::find($request->edit_id);
-            $message = "Labour Updated Successfully";
+            $material = Material::find($request->edit_id);
+            $message = "Material Updated Successfully";
         } else {
-            $labour = new Labour();
-            $message = "Labour Created Successfully";
+            $material = new Material();
+            $message = "Material Created Successfully";
         }
 
-        $labour->name = $request->name;
-        $labour->type = $request->type;
-        $labour->mobile = $request->mobile;
-        $labour->address = $request->address;
+        $material->name = $request->name;
+        $material->unit_type = $request->unit_type;
 
-        $labour->save();
+        $material->save();
 
         return array("status" => 1, "message" => $message);
     }
 
     public function fetch()
     {
-        $data = Labour::get();
+        $data = Material::get();
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
@@ -66,13 +63,14 @@ class LabourController extends Controller
 
     public function fetch_edit($id)
     {
-        $labour = Labour::find($id);
-        return $labour;
+        $material = Material::find($id);
+        return $material;
     }
 
     public function delete($id)
     {
-        Labour::find($id)->delete();
-        return array("status" => 1, "message" => "Labour deleted successfully");
+        Material::find($id)->delete();
+        return array("status" => 1, "message" => "Material deleted successfully");
     }
+
 }

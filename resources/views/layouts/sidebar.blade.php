@@ -6,6 +6,7 @@ $dashboard = '';
 $tender = '';
 
 $masters = '';
+$materials = '';
 $labours = '';
 
 
@@ -19,7 +20,6 @@ if (isset($url_segments[0]) && $url_segments[0] == 'tender') {
     $tender = 'active';
 }
 
-
 if (isset($url_segments[0]) && $url_segments[0] == 'users') {
     $users_roles = 'active';
     $users = 'active';
@@ -28,6 +28,10 @@ if (isset($url_segments[0]) && $url_segments[0] == 'users') {
 if (isset($url_segments[0]) && $url_segments[0] == 'labours') {
     $masters = 'active';
     $labours = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'materials') {
+    $materials = 'active';
 }
 
 ?>
@@ -91,6 +95,9 @@ if (isset($url_segments[0]) && $url_segments[0] == 'labours') {
                     </a>
                     <ul class="submenu" style="display:@if ($masters) block; @else none; @endif">
                         <li><a class="@if ($labours) active @endif" href="{{ url('labours') }}">Labours</a></li>
+                    </ul>
+                    <ul class="submenu" style="display:@if ($materials) block; @else none; @endif">
+                        <li><a class="@if ($materials) active @endif" href="{{ url('materials') }}">Material</a></li>
                     </ul>
                 </li>
             </ul>

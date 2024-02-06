@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TenderController;
 use App\Http\Controllers\LabourController;
+use App\Http\Controllers\MaterialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('labours/fetch', [LabourController::class, 'fetch']);
     Route::get('labours/fetch-edit/{id}', [LabourController::class, 'fetch_edit']);
     Route::get('labours/delete/{id}', [LabourController::class, 'delete']);
+
+    Route::get('materials', [MaterialController::class, 'index']);
+    Route::post('materials/store', [MaterialController::class, 'store']);
+    Route::get('materials/fetch', [MaterialController::class, 'fetch']);
+    Route::get('materials/fetch-edit/{id}', [MaterialController::class, 'fetch_edit']);
+    Route::get('materials/delete/{id}', [MaterialController::class, 'delete']);
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
