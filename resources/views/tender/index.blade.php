@@ -32,12 +32,26 @@
                 </div>
                 <div class="pd-20 bg-white border-radius-4 box-shadow">
 
+                    <div class="tab mb-3">
+                        <ul class="nav nav-tabs customtab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link @if ($show == 'New') active @endif" href="?show=New"
+                                    role="tab" aria-selected="true"> <i class="bi bi-check2"></i> New</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @if ($show == 'Job Orders') active @endif" href="?show=Job Orders"
+                                    role="tab" aria-selected="false"> <i class="bi bi-check2-all"></i> Job Orders</a>
+                            </li>
+                        </ul>
+                    </div>
+
                     <table class="table table-bordered data-table">
                         <thead>
                             <tr>
                                 <th>S.NO</th>
                                 <th>Name</th>
                                 <th>City</th>
+                                <th>Budget</th>
                                 <th>Status</th>
                                 <th width="100px">Action</th>
                             </tr>
@@ -86,7 +100,7 @@
                         </div>
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea class="form-control" name="description" id="description" required></textarea>
+                            <textarea class="form-control" name="description" id="description"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -130,10 +144,12 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ url('tender/fetch') }}",
+            ajax: "{{ url('tender/fetch') }}?show={{ $show }}",
             columns: [{
                     data: 'DT_RowIndex',
-                    name: 'id'
+                    name: 'id',
+                    orderable: false,
+                    searchable: false
                 },
                 {
                     data: 'name',
@@ -142,6 +158,10 @@
                 {
                     data: 'city',
                     name: 'city'
+                },
+                {
+                    data: 'budget_text',
+                    name: 'budget'
                 },
                 {
                     data: 'status',
@@ -235,6 +255,47 @@
         });
 
         // Status Change
+
+        $(document).on("click", ".change-status-btn", function() {
+            var edit_id = $(this).data('id');
+            var status = $(this).data('status');
+            $("#edit_id").val(edit_id);
+            $("#edit_status").val(status);
+            $("#status-confirm-text").text("Are you confirm to " + status + " this Tender");
+            $("#status-confirm-modal").modal("show");
+        });
+
+        $(document).on("click", "#status-confirm-btn", function() {
+            var edit_id = $("#edit_id").val();
+            var status = $("#edit_status").val();
+            $("#status-confirm-btn").prop("disabled", true);
+
+            $.ajax({
+                url: "{{ url('tender/chage-status') }}",
+                data: {
+                    edit_id: edit_id,
+                    status: status
+                },
+                method: "GET",
+                dataType: "json",
+                success: function(response) {
+                    table.clear().draw();
+                    $("#status-confirm-btn").prop("disabled", false);
+                },
+                error: function(code) {
+                    alert(code.statusText);
+                },
+            });
+        });
+
+        $(document).on("click", ".job-order-change-btn", function() {
+            var edit_id = $(this).data('id');
+            var status = $(this).data('status');
+            $("#edit_id").val(edit_id);
+            $("#edit_status").val(status);
+            $("#status-confirm-text").text("Are you confirm to " + status + " this Tender");
+            $("#status-confirm-modal").modal("show");
+        });
 
     </script>
 @endsection

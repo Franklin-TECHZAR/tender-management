@@ -29,6 +29,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('tender/fetch', [TenderController::class, 'fetch']);
     Route::get('tender/fetch-edit/{id}', [TenderController::class, 'fetch_edit']);
     Route::get('tender/delete/{id}', [TenderController::class, 'delete']);
+    Route::get('tender/chage-status', [TenderController::class, 'chage_status']);
+
 
     Route::get('labours', [LabourController::class, 'index']);
     Route::post('labours/store', [LabourController::class, 'store']);

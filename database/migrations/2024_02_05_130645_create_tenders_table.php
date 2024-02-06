@@ -17,8 +17,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('city');
             $table->text('address');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->float('budget', 10, 2);
+            $table->integer('job_order');
             $table->integer('status');
 
             $table->timestamps();

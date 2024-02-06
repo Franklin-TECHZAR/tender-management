@@ -8,9 +8,10 @@ use Yajra\DataTables\Facades\DataTables;
 
 class TenderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('tender.index');
+        $show = $request->show;
+        return view('tender.index', compact('show'));
     }
 
     public function store(Request $request)
@@ -20,7 +21,6 @@ class TenderController extends Controller
             'city' => 'required',
             'address' => 'required',
             'budget' => 'required',
-            'description' => 'required',
         ]);
 
         if ($request->edit_id) {
@@ -30,6 +30,7 @@ class TenderController extends Controller
             $tender = new Tender();
             $message = "Tender Created Successfully";
             $tender->status = 1;
+            $tender->job_order = 0;
         }
 
         $tender->name = $request->name;
@@ -43,9 +44,14 @@ class TenderController extends Controller
         return array("status" => 1, "message" => $message);
     }
 
-    public function fetch()
+    public function fetch(Request $request)
     {
-        $data = Tender::get();
+        if ($request->show == 'New') {
+            $job_order = 0;
+        } else {
+            $job_order = 1;
+        }
+        $data = Tender::where('job_order', $job_order)->orderBy('status', "DESC")->get();
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('status', function ($row) {
@@ -55,13 +61,21 @@ class TenderController extends Controller
                     return '<span class="badge badge-danger">InActive</span>';
                 }
             })
+            ->addColumn('budget_text', function ($row) {
+                return "<span class='pull-right'>₹" . number_format($row->budget, 2) . "</span>";
+            })
             ->addColumn('action', function ($row) {
 
-                $status_btn = '';
-                if ($row->status == 1) {
-                    $status_btn = '<button data-id="' . $row->id . '" data-status="InActive" class="change-status-btn dropdown-item"><i class="bi bi-arrow-up-right-circle"></i> Change to Active</button>';
+                if ($row->status == 0) {
+                    $status_btn = '<button data-id="' . $row->id . '" data-status="Active" class="change-status-btn dropdown-item"><i class="bi bi-arrow-up-right-circle"></i> Change to Active</button>';
                 } else {
-                    $status_btn = '<button data-id="' . $row->id . '" data-status="Active" class="change-status-btn dropdown-item"><i class="bi bi-arrow-up-right-circle"></i> Change to InActive</button>';
+                    $status_btn = '<button data-id="' . $row->id . '" data-status="InActive" class="change-status-btn dropdown-item"><i class="bi bi-arrow-up-right-circle"></i> Change to InActive</button>';
+                }
+
+                if ($row->job_order == 0) {
+                    $job_order = '<button data-id="' . $row->id . '" data-status="Add" class="job-order-change-btn dropdown-item"><i class="bi bi-plus-circle"></i> Add to Job Order</button>';
+                } else {
+                    $job_order = '<button data-id="' . $row->id . '" data-status="Remove" class="job-order-change-btn dropdown-item"><i class="bi bi-x-circle"></i> Remove from Job Order</button>';
                 }
 
                 $btn = '<div class="dropdown">
@@ -70,14 +84,14 @@ class TenderController extends Controller
                             </a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
                                 <button data-id="' . $row->id . '" class="edit-btn dropdown-item"><i class="dw dw-edit2"></i> Edit</button>
-                                ' . $status_btn . '
+                                ' . $job_order . $status_btn . '
                                 <button data-id="' . $row->id . '" class="delete-btn dropdown-item"><i class="dw dw-delete-3"></i> Delete</button>
                             </div>
                         </div>';
 
                 return $btn;
             })
-            ->rawColumns(['action', 'status'])
+            ->rawColumns(['action', 'status', 'budget_text'])
             ->make(true);
     }
     public function fetch_edit($id)
@@ -90,5 +104,23 @@ class TenderController extends Controller
     {
         Tender::find($id)->delete();
         return array("status" => 1, "message" => "FAQ deleted successfully");
+    }
+
+    public function chage_status(Request $request)
+    {
+        $id = $request->edit_id;
+        $status = $request->status;
+        $tender = Tender::find($id);
+        if ($status == "Active") {
+            $tender->status = 1;
+        } else if ($status == "InActive") {
+            $tender->status = 0;
+        } else if ($status == "Add") {
+            $tender->job_order = 1;
+        } else if ($status == "Remove") {
+            $tender->job_order = 0;
+        }
+        $tender->save();
+        return array("status" => 1, "message" => "Status Updated successfully");
     }
 }
