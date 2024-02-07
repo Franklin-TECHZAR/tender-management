@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\DataExport;
 use App\Exports\ExcelExport;
 use App\Models\Tender;
 use App\Models\TenderPaymentLog;

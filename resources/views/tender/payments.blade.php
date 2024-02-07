@@ -133,13 +133,14 @@
                     data: data,
                     processData: false,
                     contentType: false,
-                    success: function() {
+                    success: function(response) {
                         $("#tender-modal").modal("hide");
                         $("#submit-btn").prop("disabled", false);
                         fetch_table();
+                        toastr.success(response.message);
                     },
                     error: function(code) {
-                        alert(code.statusText);
+                        toastr.error(code.statusText);
                     },
                 });
                 return false;
@@ -166,7 +167,7 @@
                     $("#confirm-yes-btn").prop("disabled", false);
                 },
                 error: function(code) {
-                    alert(code.statusText);
+                    toastr.error(code.statusText);
                 },
             });
         });
@@ -220,7 +221,7 @@
                     $("#table-body").html(html_content);
                 },
                 error: function(code) {
-                    alert(code.statusText);
+                    toastr.error(code.statusText);
                 },
             });
 

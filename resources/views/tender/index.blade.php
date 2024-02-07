@@ -39,7 +39,7 @@
                                     role="tab" aria-selected="true"> <i class="bi bi-check2"></i> New</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link @if ($show == 'Job Orders') active @endif" href="?show=Job Orders"
+                                <a class="nav-link @if ($show == 'Job-Orders') active @endif" href="?show=Job-Orders"
                                     role="tab" aria-selected="false"> <i class="bi bi-check2-all"></i> Job Orders</a>
                             </li>
                         </ul>
@@ -188,13 +188,14 @@
                     data: data,
                     processData: false,
                     contentType: false,
-                    success: function() {
+                    success: function(response) {
                         $("#tender-modal").modal("hide");
                         table.clear().draw();
                         $("#submit-btn").prop("disabled", false);
+                        toastr.success(response.message);
                     },
                     error: function(code) {
-                        alert(code.statusText);
+                        toastr.error(code.statusText);
                     },
                 });
                 return false;
@@ -219,7 +220,7 @@
                     $("#tender-modal").modal("show");
                 },
                 error: function(code) {
-                    alert(code.statusText);
+                    toastr.error(code.statusText);
                 },
             });
         });
@@ -245,12 +246,13 @@
                 url: "{{ url('tender/delete') }}/" + edit_id,
                 method: "GET",
                 dataType: "json",
-                success: function(response) {
+                success: function(res) {
                     table.clear().draw();
                     $("#confirm-yes-btn").prop("disabled", false);
+                    toastr.success(response.message);
                 },
                 error: function(code) {
-                    alert(code.statusText);
+                    toastr.error(code.statusText);
                 },
             });
         });
@@ -282,9 +284,10 @@
                 success: function(response) {
                     table.clear().draw();
                     $("#status-confirm-btn").prop("disabled", false);
+                    toastr.success(response.message);
                 },
                 error: function(code) {
-                    alert(code.statusText);
+                    toastr.error(code.statusText);
                 },
             });
         });
@@ -297,6 +300,5 @@
             $("#status-confirm-text").text("Are you confirm to " + status + " this Tender");
             $("#status-confirm-modal").modal("show");
         });
-
     </script>
 @endsection

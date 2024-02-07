@@ -24,8 +24,7 @@
         href="{{ url('theme/src/plugins/datatables/css/dataTables.bootstrap4.min.css') }}" />
     <link rel="stylesheet" type="text/css"
         href="{{ url('theme/src/plugins/datatables/css/responsive.bootstrap4.min.css') }}" />
-    <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
     <style>
         .error {
             color: red;
@@ -41,19 +40,24 @@
         td {
             white-space: nowrap;
         }
+
         .form-group {
             margin-bottom: 5px;
         }
-        .custom-file-input, .custom-file-label, .custom-select, .form-control
-        {
+
+        .custom-file-input,
+        .custom-file-label,
+        .custom-select,
+        .form-control {
             height: 40px;
         }
+
         textarea.form-control {
             height: 100px;
         }
-        .filter-btn
-        {
-            margin-top: 1.8rem!important;
+
+        .filter-btn {
+            margin-top: 1.8rem !important;
             height: 41px;
         }
     </style>
@@ -196,8 +200,7 @@
     <script src="{{ url('theme/src/plugins/datatables/js/responsive.bootstrap4.min.js') }}"></script>
 
     {{-- toastr --}}
-    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     @yield('addscript')
 </body>
 
