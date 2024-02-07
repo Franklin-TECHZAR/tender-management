@@ -82,7 +82,7 @@
                     </div>
                     <div class="form-group">
                         <label>Address</label>
-                        <textarea class="form-control" name="address" id="address" required></textarea>
+                        <textarea class="form-control" name="address" id="address"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

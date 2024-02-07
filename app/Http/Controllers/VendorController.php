@@ -2,44 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Material;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 
-class MaterialController extends Controller
+class VendorController extends Controller
 {
     public function index(Request $request)
     {
-        return view('material.index');
+        return view('vendor.index');
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required',
-            'unit_type' => 'required',
+            'agency_name' => 'required',
+            'contact_name' => 'required',
+            'mobile' => 'required',
+            'city' => 'required',
+            // 'address' => 'required',
+            'gst_number' => 'required',
         ]);
 
         if ($request->edit_id) {
-            $material = Material::find($request->edit_id);
-            $message = "Material Updated Successfully";
+            $vendor = Vendor::find($request->edit_id);
+            $message = "Vendor Updated Successfully";
         } else {
-            $material = new Material();
-            $message = "Material Created Successfully";
+            $vendor = new Vendor();
+            $message = "Vendor Created Successfully";
         }
 
-        $material->name = $request->name;
-        $material->unit_type = $request->unit_type;
+        $vendor->agency_name = $request->agency_name;
+        $vendor->contact_name = $request->contact_name;
+        $vendor->mobile = $request->mobile;
+        $vendor->city = $request->city;
+        $vendor->address = $request->address;
+        $vendor->gst_number = $request->gst_number;
 
-        $material->save();
+        $vendor->save();
 
         return array("status" => 1, "message" => $message);
     }
 
     public function fetch()
     {
-        $data = Material::get();
+        $data = Vendor::get();
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
@@ -62,14 +69,13 @@ class MaterialController extends Controller
 
     public function fetch_edit($id)
     {
-        $material = Material::find($id);
-        return $material;
+        $vendor = Vendor::find($id);
+        return $vendor;
     }
 
     public function delete($id)
     {
-        Material::find($id)->delete();
-        return array("status" => 1, "message" => "Material deleted successfully");
+        Vendor::find($id)->delete();
+        return array("status" => 1, "message" => "FAQ deleted successfully");
     }
-
 }

@@ -8,6 +8,7 @@ $tender = '';
 $masters = '';
 $materials = '';
 $labours = '';
+$vendors = '';
 
 
 $users = '';
@@ -32,6 +33,10 @@ if (isset($url_segments[0]) && $url_segments[0] == 'labours') {
 
 if (isset($url_segments[0]) && $url_segments[0] == 'materials') {
     $materials = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'vendors') {
+    $vendors = 'active';
 }
 
 ?>
@@ -98,6 +103,9 @@ if (isset($url_segments[0]) && $url_segments[0] == 'materials') {
                     </ul>
                     <ul class="submenu" style="display:@if ($materials) block; @else none; @endif">
                         <li><a class="@if ($materials) active @endif" href="{{ url('materials') }}">Material</a></li>
+                    </ul>
+                    <ul class="submenu" style="display:@if ($vendors) block; @else none; @endif">
+                        <li><a class="@if ($vendors) active @endif" href="{{ url('vendors') }}">Vendors / Dealer</a></li>
                     </ul>
                 </li>
             </ul>

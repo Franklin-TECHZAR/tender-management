@@ -88,6 +88,7 @@
     </div>
 </div>
 
+
 @endsection
 
 @section('addscript')
@@ -175,7 +176,7 @@
     $(document).on("click", ".delete-btn", function() {
             var edit_id = $(this).data('id');
             $("#edit_id").val(edit_id);
-            $("#delete-confirm-text").text("Are you confirm to Delete this Tender");
+            $("#delete-confirm-text").text("Are you confirm to Delete this Material");
             $("#delete-confirm-modal").modal("show");
         });
 
