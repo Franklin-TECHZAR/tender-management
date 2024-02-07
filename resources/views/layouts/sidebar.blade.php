@@ -8,6 +8,9 @@ $tender = '';
 $masters = '';
 $materials = '';
 $labours = '';
+$vendors = '';
+$expenses = '';
+$purchase = '';
 
 
 $users = '';
@@ -32,6 +35,18 @@ if (isset($url_segments[0]) && $url_segments[0] == 'labours') {
 
 if (isset($url_segments[0]) && $url_segments[0] == 'materials') {
     $materials = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'vendors') {
+    $vendors = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
+    $expenses = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'purchase') {
+    $purchase = 'active';
 }
 
 ?>
@@ -98,6 +113,15 @@ if (isset($url_segments[0]) && $url_segments[0] == 'materials') {
                     </ul>
                     <ul class="submenu" style="display:@if ($materials) block; @else none; @endif">
                         <li><a class="@if ($materials) active @endif" href="{{ url('materials') }}">Material</a></li>
+                    </ul>
+                    <ul class="submenu" style="display:@if ($vendors) block; @else none; @endif">
+                        <li><a class="@if ($vendors) active @endif" href="{{ url('vendors') }}">Vendors / Dealer</a></li>
+                    </ul>
+                    <ul class="submenu" style="display:@if ($expenses) block; @else none; @endif">
+                        <li><a class="@if ($expenses) active @endif" href="{{ url('expenses') }}">Expenses</a></li>
+                    </ul>
+                    <ul class="submenu" style="display:@if ($purchase) block; @else none; @endif">
+                        <li><a class="@if ($purchase) active @endif" href="{{ url('purchase') }}">Purchase</a></li>
                     </ul>
                 </li>
             </ul>

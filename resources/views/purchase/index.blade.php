@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('title', 'Materials')
+@section('title', 'Purchase')
 
 @section('content')
 
@@ -10,7 +10,7 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="title">
-                            <h4>Materials</h4>
+                            <h4>Purchase Type</h4>
                         </div>
                         <nav aria-label="breadcrumb" role="navigation">
                             <ol class="breadcrumb">
@@ -18,13 +18,13 @@
                                     <a href="{{ url('admin/dashboard') }}">Home</a>
                                 </li>
                                 <li class="breadcrumb-item active" aria-current="page">
-                                    Materials
+                                    Purchase
                                 </li>
                             </ol>
                         </nav>
                     </div>
                     <div class="col-6 text-right">
-                        <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#material-modal">
+                        <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#purchase-modal">
                             <i class="bi-plus-circle"></i> Create New
                         </button>
                     </div>
@@ -37,7 +37,6 @@
                         <tr>
                             <th>S.NO</th>
                             <th>Name</th>
-                            <th>Unit Type</th>
                             <th width="100px">Action</th>
                         </tr>
                     </thead>
@@ -50,29 +49,25 @@
     </div>
 </div>
 
-<div class="modal fade" id="material-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+<div class="modal fade" id="purchase-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modal-title-label">
-                    Create Material
+                    Create Purchase
                 </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                     ×
                 </button>
             </div>
-            <form id="material-form">
+            <form id="purchase-form">
                 @csrf
                 <input type="hidden" name="edit_id" id="edit_id">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Name</label>
                         <input type="text" class="form-control" name="name" id="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Unit Type</label>
-                        <input type="text" class="form-control" name="unit_type" id="unit_type" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -88,7 +83,6 @@
     </div>
 </div>
 
-
 @endsection
 
 @section('addscript')
@@ -96,7 +90,7 @@
     var table = $('.data-table').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ url('materials/fetch') }}",
+        ajax: "{{ url('purchase/fetch') }}",
         columns: [{
                 data: 'DT_RowIndex',
                 name: 'id'
@@ -104,10 +98,6 @@
             {
                 data: 'name',
                 name: 'name'
-            },
-            {
-                data: 'unit_type',
-                name: 'unit_type'
             },
             {
                 data: 'action',
@@ -118,18 +108,11 @@
         ]
     });
 
-    $("#material-form").validate({
-        rules: {
-            mobile: {
-                digits: true,
-                minlength: 10,
-                maxlength: 10
-            }
-        },
+    $("#purchase-form").validate({
         submitHandler: function(form) {
             $("#submit-btn").prop("disabled", true);
             var data = new FormData(form);
-            var url = "{{ url('materials/store') }}";
+            var url = "{{ url('purchase/store') }}";
             $.ajax({
                 type: "POST",
                 url: url,
@@ -137,7 +120,7 @@
                 processData: false,
                 contentType: false,
                 success: function() {
-                    $("#material-modal").modal("hide");
+                    $("#purchase-modal").modal("hide");
                     table.clear().draw();
                     $("#submit-btn").prop("disabled", false);
                 },
@@ -149,17 +132,16 @@
         }
     });
 
-    $(document).on("click", ".edit-btn", function() {
+        $(document).on("click", ".edit-btn", function() {
         var edit_id = $(this).data('id');
         $("#edit_id").val(edit_id);
         $.ajax({
-            url: "{{ url('materials/fetch-edit') }}/" + edit_id,
+            url: "{{ url('purchase/fetch-edit') }}/" + edit_id,
             dataType: "json",
             success: function(response) {
                 $("#name").val(response.name);
-                $("#unit_type").val(response.unit_type);
-                $("#modal-title-label").html('Edit Material');
-                $("#material-modal").modal("show");
+                $("#modal-title-label").html('Edit Purchase');
+                $("#purchase-modal").modal("show");
             },
             error: function(code) {
                 alert(code.statusText);
@@ -168,34 +150,37 @@
     });
 
     $(document).on("click", ".add-btn", function() {
-        $("#edit_id").val("");
-        $("#material-form")[0].reset();
-        $("#modal-title-label").html('Create Material');
-    });
+            $("#edit_id").val("");
+            $("#purchase-form")[0].reset();
+            $("#modal-title-label").html('Create Purchase');
+        });
+
 
     $(document).on("click", ".delete-btn", function() {
-            var edit_id = $(this).data('id');
-            $("#edit_id").val(edit_id);
-            $("#delete-confirm-text").text("Are you confirm to Delete this Material");
-            $("#delete-confirm-modal").modal("show");
-        });
+        var edit_id = $(this).data('id');
+        $("#edit_id").val(edit_id);
+        $("#delete-confirm-text").text("Are you sure you want to delete this Purchase?");
+        $("#delete-confirm-modal").modal("show");
+    });
 
-        $(document).on("click", "#confirm-yes-btn", function() {
-            var edit_id = $("#edit_id").val();
-            $("#confirm-yes-btn").prop("disabled", true);
+    $(document).on("click", "#confirm-yes-btn", function() {
+        var edit_id = $("#edit_id").val();
+        $("#confirm-yes-btn").prop("disabled", true);
 
-            $.ajax({
-                url: "{{ url('materials/delete') }}/" + edit_id,
-                method: "GET",
-                dataType: "json",
-                success: function(response) {
-                    table.clear().draw();
-                    $("#confirm-yes-btn").prop("disabled", false);
-                },
-                error: function(code) {
-                    alert(code.statusText);
-                },
-            });
+        $.ajax({
+            url: "{{ url('purchase/delete') }}/" + edit_id,
+            method: "GET",
+            dataType: "json",
+            success: function(response) {
+                table.clear().draw();
+                $("#confirm-yes-btn").prop("disabled", false);
+            },
+            error: function(code) {
+                alert(code.statusText);
+            },
         });
+    });
+
+
 </script>
 @endsection

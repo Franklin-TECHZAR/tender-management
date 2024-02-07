@@ -6,6 +6,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TenderController;
 use App\Http\Controllers\LabourController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\VendorController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\PurchaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +53,24 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('materials/fetch', [MaterialController::class, 'fetch']);
     Route::get('materials/fetch-edit/{id}', [MaterialController::class, 'fetch_edit']);
     Route::get('materials/delete/{id}', [MaterialController::class, 'delete']);
+
+    Route::get('vendors', [VendorController::class, 'index']);
+    Route::post('vendors/store', [VendorController::class, 'store']);
+    Route::get('vendors/fetch', [VendorController::class, 'fetch']);
+    Route::get('vendors/fetch-edit/{id}', [VendorController::class, 'fetch_edit']);
+    Route::get('vendors/delete/{id}', [VendorController::class, 'delete']);
+
+    Route::get('expenses', [ExpenseController::class, 'index']);
+    Route::post('expenses/store', [ExpenseController::class, 'store']);
+    Route::get('expenses/fetch', [ExpenseController::class, 'fetch']);
+    Route::get('expenses/fetch-edit/{id}', [ExpenseController::class, 'fetch_edit']);
+    Route::get('expenses/delete/{id}', [ExpenseController::class, 'delete']);
+
+    Route::get('purchase', [PurchaseController::class, 'index']);
+    Route::post('purchase/store', [PurchaseController::class, 'store']);
+    Route::get('purchase/fetch', [PurchaseController::class, 'fetch']);
+    Route::get('purchase/fetch-edit/{id}', [PurchaseController::class, 'fetch_edit']);
+    Route::get('purchase/delete/{id}', [PurchaseController::class, 'delete']);
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

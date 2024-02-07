@@ -10,8 +10,7 @@ use Yajra\DataTables\Facades\DataTables;
 class LabourController extends Controller
 {
     public function index(Request $request) {
-        $show = $request->show;
-        return view('labour.index', compact('show'));
+        return view('labour.index');
     }
 
     public function store(Request $request)
@@ -20,7 +19,7 @@ class LabourController extends Controller
             'name' => 'required',
             'type' => 'required',
             'mobile' => 'required',
-            'address' => 'required',
+            // 'address' => 'required',
         ]);
 
         if ($request->edit_id) {

@@ -2,44 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Material;
-use Illuminate\Http\Request;
+use App\Models\Expense;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
-class MaterialController extends Controller
+class ExpenseController extends Controller
 {
-    public function index(Request $request)
-    {
-        return view('material.index');
+    public function index() {
+        return view('expense.index');
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
             'name' => 'required',
-            'unit_type' => 'required',
         ]);
 
         if ($request->edit_id) {
-            $material = Material::find($request->edit_id);
-            $message = "Material Updated Successfully";
+            $expense = Expense::find($request->edit_id);
+            $message = "Expense Updated Successfully";
         } else {
-            $material = new Material();
-            $message = "Material Created Successfully";
+            $expense = new Expense();
+            $message = "Expense Created Successfully";
         }
 
-        $material->name = $request->name;
-        $material->unit_type = $request->unit_type;
+        $expense->name = $request->name;
 
-        $material->save();
+        $expense->save();
 
         return array("status" => 1, "message" => $message);
     }
 
     public function fetch()
     {
-        $data = Material::get();
+        $data = Expense::get();
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
@@ -62,14 +59,14 @@ class MaterialController extends Controller
 
     public function fetch_edit($id)
     {
-        $material = Material::find($id);
-        return $material;
+        $expense = Expense::find($id);
+        return $expense;
     }
 
     public function delete($id)
     {
-        Material::find($id)->delete();
-        return array("status" => 1, "message" => "Material deleted successfully");
+        Expense::find($id)->delete();
+        return array("status" => 1, "message" => "FAQ deleted successfully");
     }
-
 }
+
