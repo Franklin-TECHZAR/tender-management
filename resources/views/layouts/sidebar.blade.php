@@ -5,14 +5,14 @@ $url_segments = request()->segments();
 $dashboard = '';
 $tender = '';
 
+$expenses = '';
+
 $masters = '';
 $materials = '';
 $labours = '';
 $vendors = '';
 $expenses_type = '';
-$purchase = '';
-$expenses = '';
-
+$purchase_type = '';
 
 $users = '';
 $users_roles = '';
@@ -22,6 +22,9 @@ if (isset($url_segments[0]) && $url_segments[0] == 'dashboard') {
 }
 if (isset($url_segments[0]) && $url_segments[0] == 'tender') {
     $tender = 'active';
+}
+if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
+    $expenses = 'active';
 }
 
 if (isset($url_segments[0]) && $url_segments[0] == 'users') {
@@ -35,23 +38,23 @@ if (isset($url_segments[0]) && $url_segments[0] == 'labours') {
 }
 
 if (isset($url_segments[0]) && $url_segments[0] == 'materials') {
+    $masters = 'active';
     $materials = 'active';
 }
 
 if (isset($url_segments[0]) && $url_segments[0] == 'vendors') {
+    $masters = 'active';
     $vendors = 'active';
 }
 
 if (isset($url_segments[0]) && $url_segments[0] == 'expenses_type') {
+    $masters = 'active';
     $expenses_type = 'active';
 }
 
-if (isset($url_segments[0]) && $url_segments[0] == 'purchase') {
-    $purchase = 'active';
-}
-
-if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
-    $expenses = 'active';
+if (isset($url_segments[0]) && $url_segments[0] == 'purchase_type') {
+    $masters = 'active';
+    $purchase_type = 'active';
 }
 
 ?>
@@ -92,19 +95,15 @@ if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
                         </span><span class="mtext">Users list</span>
                     </a>
                 </li>
-                <li class="dropdown @if ($expenses) show @endif">
-                    <a href="javascript:;" class="dropdown-toggle">
+
+                <li>
+                    <a href="{{ url('expenses') }}"
+                        class="@if ($expenses) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy fa fa-money" aria-hidden="true"></i>
-                        </span>
-                        <span class="mtext">Expenses</span>
+                        </span><span class="mtext">Expenses</span>
                     </a>
-                    <ul class="submenu" style="display:@if ($expenses) block; @else none; @endif">
-                        <li><a class="@if ($expenses) active @endif" href="{{ url('expenses/create') }}">Expenses Create</a></li>
-                        <li><a class="@if ($expenses) active @endif" href="{{ url('expenses/list') }}">Expenses List</a></li>
-                    </ul>
                 </li>
-
 
                 <li class="dropdown @if ($users_roles) show @endif">
                     <a href="javascript:;" class="dropdown-toggle">
@@ -127,19 +126,24 @@ if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
                         </span><span class="mtext">Masters</span>
                     </a>
                     <ul class="submenu" style="display:@if ($masters) block; @else none; @endif">
-                        <li><a class="@if ($labours) active @endif" href="{{ url('labours') }}">Labours</a></li>
+                        <li><a class="@if ($labours) active @endif"
+                                href="{{ url('labours') }}">Labours</a></li>
                     </ul>
-                    <ul class="submenu" style="display:@if ($materials) block; @else none; @endif">
-                        <li><a class="@if ($materials) active @endif" href="{{ url('materials') }}">Material</a></li>
+                    <ul class="submenu" style="display:@if ($masters) block; @else none; @endif">
+                        <li><a class="@if ($materials) active @endif"
+                                href="{{ url('materials') }}">Material</a></li>
                     </ul>
-                    <ul class="submenu" style="display:@if ($vendors) block; @else none; @endif">
-                        <li><a class="@if ($vendors) active @endif" href="{{ url('vendors') }}">Vendors / Dealer</a></li>
+                    <ul class="submenu" style="display:@if ($masters) block; @else none; @endif">
+                        <li><a class="@if ($vendors) active @endif"
+                                href="{{ url('vendors') }}">Vendors / Dealer</a></li>
                     </ul>
-                    <ul class="submenu" style="display:@if ($expenses_type) block; @else none; @endif">
-                        <li><a class="@if ($expenses_type) active @endif" href="{{ url('expenses_type') }}">Expenses Type</a></li>
+                    <ul class="submenu" style="display:@if ($masters) block; @else none; @endif">
+                        <li><a class="@if ($expenses_type) active @endif"
+                                href="{{ url('expenses_type') }}">Expenses Type</a></li>
                     </ul>
-                    <ul class="submenu" style="display:@if ($purchase) block; @else none; @endif">
-                        <li><a class="@if ($purchase) active @endif" href="{{ url('purchase_type') }}">Purchase Type</a></li>
+                    <ul class="submenu" style="display:@if ($masters) block; @else none; @endif">
+                        <li><a class="@if ($purchase_type) active @endif"
+                                href="{{ url('purchase_type') }}">Purchase Type</a></li>
                     </ul>
                 </li>
             </ul>
