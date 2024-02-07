@@ -10,6 +10,7 @@ $materials = '';
 $labours = '';
 $vendors = '';
 $expenses = '';
+$purchase = '';
 
 
 $users = '';
@@ -42,6 +43,10 @@ if (isset($url_segments[0]) && $url_segments[0] == 'vendors') {
 
 if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
     $expenses = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'purchase') {
+    $purchase = 'active';
 }
 
 ?>
@@ -114,6 +119,9 @@ if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
                     </ul>
                     <ul class="submenu" style="display:@if ($expenses) block; @else none; @endif">
                         <li><a class="@if ($expenses) active @endif" href="{{ url('expenses') }}">Expenses</a></li>
+                    </ul>
+                    <ul class="submenu" style="display:@if ($purchase) block; @else none; @endif">
+                        <li><a class="@if ($purchase) active @endif" href="{{ url('purchase') }}">Purchase</a></li>
                     </ul>
                 </li>
             </ul>

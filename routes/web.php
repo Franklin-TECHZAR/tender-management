@@ -8,6 +8,7 @@ use App\Http\Controllers\LabourController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\PurchaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('expenses/fetch', [ExpenseController::class, 'fetch']);
     Route::get('expenses/fetch-edit/{id}', [ExpenseController::class, 'fetch_edit']);
     Route::get('expenses/delete/{id}', [ExpenseController::class, 'delete']);
+
+    Route::get('purchase', [PurchaseController::class, 'index']);
+    Route::post('purchase/store', [PurchaseController::class, 'store']);
+    Route::get('purchase/fetch', [PurchaseController::class, 'fetch']);
+    Route::get('purchase/fetch-edit/{id}', [PurchaseController::class, 'fetch_edit']);
+    Route::get('purchase/delete/{id}', [PurchaseController::class, 'delete']);
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
