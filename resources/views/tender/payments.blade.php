@@ -27,6 +27,9 @@
                             </nav>
                         </div>
                         <div class="col-6 text-right">
+                            <a href="{{ url('tender/payment-export')."/".$tender->id }}" class="btn btn-success">
+                                <i class="bi bi-file-earmark-excel"></i> Export
+                            </a>
                             <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#tender-modal">
                                 <i class="bi-plus-circle"></i> New Payment
                             </button>
@@ -191,7 +194,7 @@
                             </tr>`;
 
                     } else {
-                        for (var i = 0; i < data.length; i++) {
+                        for (var i = 0; i < (data.length - 1); i++) {
                             html_content += `<tr>
                                 <td>${i+1}</td>
                                 <td>${data[i].date}</td>
@@ -204,6 +207,14 @@
                                 </td>
                             </tr>`;
                         }
+
+                        html_content += `<tr>
+                                <td colspan='3'>${data[i].description}</td>
+                                <td>${data[i].credit}</td>
+                                <td>${data[i].debit}</td>
+                                <td>${data[i].balance}</td>
+                                <td></td>
+                            </tr>`;
 
                     }
                     $("#table-body").html(html_content);

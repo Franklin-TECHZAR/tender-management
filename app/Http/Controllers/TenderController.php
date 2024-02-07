@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DataExport;
+use App\Exports\ExcelExport;
 use App\Models\Tender;
 use App\Models\TenderPaymentLog;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class TenderController extends Controller
@@ -159,26 +162,37 @@ class TenderController extends Controller
         $tender_id = $request->tender_id;
         $logs = TenderPaymentLog::where('tender_id', $tender_id)->orderBy('date', "ASC")->get();
         $data = [];
-        $balance = 0;
-        foreach ($logs as $log) {
-            if ($log->type == "Credit") {
-                $credit = "<span class='pull-right'>₹" . number_format($log->amount, 2) . "</span>";
-                $debit = "";
-                $balance = $balance + $log->amount;
-            } else {
-                $debit = "<span class='pull-right'>₹" . number_format($log->amount, 2) . "</span>";
+        if (count($logs)) {
+            $balance = 0;
+            $total_credit = 0;
+            $total_debit = 0;
+            foreach ($logs as $log) {
                 $credit = "";
-                $balance = $balance - $log->amount;
+                $debit = "";
+                if ($log->type == "Credit") {
+                    $credit = "<span class='pull-right'>₹" . number_format($log->amount, 2) . "</span>";
+                    $balance = $balance + $log->amount;
+                    $total_credit = $total_credit + $log->amount;
+                } else {
+                    $debit = "<span class='pull-right'>₹" . number_format($log->amount, 2) . "</span>";
+                    $balance = $balance - $log->amount;
+                    $total_debit = $total_debit + $log->amount;
+                }
+
+                $symbol = '';
+                $temp_balance = $balance;
+                if ($temp_balance < 0) {
+                    $temp_balance = - ($temp_balance);
+                    $symbol = "-";
+                }
+                $balance_text = "<b class='pull-right'>" . $symbol . "₹" . number_format($temp_balance, 2) . "</b>";
+                $data[] = array('id' => $log->id, "date" => date("d-m-Y", strtotime($log->date)), "description" => $log->description, "credit" => $credit, "debit" => $debit, "balance" => $balance_text);
             }
-            $symbol = '';
-            $temp_balance = $balance;
-            if($temp_balance < 0)
-            {
-                $temp_balance = -($temp_balance);
-                $symbol = "-";
-            }
-            $balance_text = "<span class='pull-right'>" . $symbol . "₹" . number_format($temp_balance, 2) . "</span>";
-            $data[] = array('id' => $log->id, "date" => $log->date, "description" => $log->description, "credit" => $credit, "debit" => $debit, "balance" => $balance_text);
+
+            $total_debit = "<b class='pull-right'>₹" . number_format($total_debit, 2) . "</b>";
+            $total_credit = "<b class='pull-right'>₹" . number_format($total_credit, 2) . "</b>";
+
+            $data[] = array("description" => "<b class='pull-right'>Total</b>", "credit" => $total_credit, "debit" => $total_debit, "balance" => $balance_text);
         }
         return $data;
     }
@@ -186,5 +200,53 @@ class TenderController extends Controller
     {
         TenderPaymentLog::find($id)->delete();
         return array("status" => 1, "message" => "Log deleted successfully");
+    }
+    public function payment_export($tender_id)
+    {
+        $logs = TenderPaymentLog::where('tender_id', $tender_id)->orderBy('date', "ASC")->get();
+        $export_data = [];
+
+        $balance = 0;
+        $total_credit = 0;
+        $total_debit = 0;
+
+        foreach ($logs as $index => $log) {
+
+            $credit = "";
+            $debit = "";
+
+            if ($log->type == "Credit") {
+                $credit = "₹" . number_format($log->amount, 2);
+                $balance = $balance + $log->amount;
+                $total_credit = $total_credit + $log->amount;
+            } else {
+                $debit = "₹" . number_format($log->amount, 2);
+                $balance = $balance - $log->amount;
+                $total_debit = $total_debit + $log->amount;
+            }
+
+            $symbol = '';
+            $temp_balance = $balance;
+            if ($temp_balance < 0) {
+                $temp_balance = - ($temp_balance);
+                $symbol = "-";
+            }
+
+            $balance_text = $symbol . "₹" . number_format($temp_balance, 2);
+            $export_data[] = array('sno' => $index + 1, "date" => date("d-m-Y", strtotime($log->date)), "description" => $log->description, "credit" => $credit, "debit" => $debit, "balance" => $balance_text);
+        }
+
+        $total_debit = "₹" . number_format($total_debit, 2);
+        $total_credit = "₹" . number_format($total_credit, 2);
+
+        $export_data[] = array("sno" => "", "date" => "", "description" => "Total", "credit" => $total_credit, "debit" => $total_debit, "balance" => $balance_text);
+
+        $tender = Tender::find($tender_id);
+
+        $data["view_file"] = "excel_export.tender_payment_log";
+        $data["export_data"] = $export_data;
+        $data["tender_name"] = $tender->name;
+
+        return Excel::download(new ExcelExport($data), 'tender_payment_log.xlsx');
     }
 }

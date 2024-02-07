@@ -36,7 +36,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('tender/payment-store', [TenderController::class, 'payment_store']);
     Route::get('tender/fetch-payment-log', [TenderController::class, 'fetch_payment_log']);
     Route::get('tender/remove-payment-log/{id}', [TenderController::class, 'remove_payment_log']);
-
+    Route::get('tender/payment-export/{id}', [TenderController::class, 'payment_export']);
 
 
     Route::get('labours', [LabourController::class, 'index']);
