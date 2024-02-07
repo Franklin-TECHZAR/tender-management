@@ -7,6 +7,7 @@ use App\Http\Controllers\TenderController;
 use App\Http\Controllers\LabourController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\ExpenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('vendors/fetch', [VendorController::class, 'fetch']);
     Route::get('vendors/fetch-edit/{id}', [VendorController::class, 'fetch_edit']);
     Route::get('vendors/delete/{id}', [VendorController::class, 'delete']);
+
+    Route::get('expenses', [ExpenseController::class, 'index']);
+    Route::post('expenses/store', [ExpenseController::class, 'store']);
+    Route::get('expenses/fetch', [ExpenseController::class, 'fetch']);
+    Route::get('expenses/fetch-edit/{id}', [ExpenseController::class, 'fetch_edit']);
+    Route::get('expenses/delete/{id}', [ExpenseController::class, 'delete']);
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
