@@ -95,9 +95,8 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_type') {
                         </span><span class="mtext">Users list</span>
                     </a>
                 </li>
-
                 <li>
-                    <a href="{{ url('expenses') }}"
+                    <a href="{{ url('expenses/create') }}"
                         class="@if ($expenses) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy fa fa-money" aria-hidden="true"></i>

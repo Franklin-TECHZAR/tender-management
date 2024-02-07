@@ -3,14 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expense;
+use App\Models\Tender;
+use App\Models\ExpenseType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 class ExpenseController extends Controller
 {
+
     public function index(){
-        return view('Expense.create.index');
+        $tenders = Tender::where('job_order', 1)
+                         ->where('status', 1)
+                         ->pluck('name');
+        $ExpenseType = ExpenseType::get()->pluck('name');
+        return view('Expense.create.index', compact('tenders', 'ExpenseType'));
     }
 
     public function store(Request $request)

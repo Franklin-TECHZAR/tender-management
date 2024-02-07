@@ -67,8 +67,13 @@
                 <input type="hidden" name="edit_id" id="edit_id">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Job Order</label>
-                        <input type="text" class="form-control" name="job_order" id="job_order" required>
+                        <label for="job_order">Job Order</label>
+                        <select class="form-control" name="job_order" id="job_order" required>
+                            <option value="" disabled selected hidden>Select Job Order</option>
+                            @foreach($tenders as $tender)
+                                <option value="{{ $tender }}">{{ $tender }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Payment To</label>
@@ -80,7 +85,12 @@
                     </div>
                     <div class="form-group">
                         <label>Type</label>
-                        <input type="text" class="form-control" name="type" id="type" required>
+                        <select class="form-control" name="type" id="type" required>
+                            <option value="" disabled selected hidden>Select Type</option>
+                            @foreach($ExpenseType as $type)
+                                <option value="{{ $type }}">{{ $type }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Amount</label>
@@ -91,8 +101,14 @@
                         <textarea class="form-control" name="description" id="description"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Payment Mode</label>
-                        <input type="text" class="form-control" name="payment_mode" id="payment_mode" required>
+                        <label for="payment_mode">Payment Mode</label>
+                        <select class="form-control" name="payment_mode" id="payment_mode" required>
+                            <option value="" disabled selected hidden>Select Payment Mode</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Check">Check</option>
+                            <option value="Neft">Neft</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Payment Details</label>

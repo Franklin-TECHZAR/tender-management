@@ -10,7 +10,6 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ExpenseTypeController;
 use App\Http\Controllers\PurchaseTypeController;
 use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\ExpenseListController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,12 +80,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('expenses/create/delete/{id}', [ExpenseController::class, 'delete']);
 
     Route::get('expenses/payments/{id}', [ExpenseController::class, 'showPayments'])->name('expenses.payments');
-
-    Route::get('expenses/list', [ExpenseListController::class, 'index']);
-    Route::post('expenses/list/store', [ExpenseListController::class, 'store']);
-    Route::get('expenses/list/fetch', [ExpenseListController::class, 'fetch']);
-    Route::get('expenses/list/fetch-edit/{id}', [ExpenseListController::class, 'fetch_edit']);
-    Route::get('expenses/list/delete/{id}', [ExpenseListController::class, 'delete']);
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
