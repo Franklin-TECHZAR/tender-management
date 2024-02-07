@@ -2,51 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Vendor;
+use App\Models\PurchaseType;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
-class VendorController extends Controller
+class PurchaseTypeController extends Controller
 {
-    public function index(Request $request)
-    {
-        return view('vendor.index');
+    public function index() {
+        return view('purchase_type.index');
     }
-
     public function store(Request $request)
     {
         $this->validate($request, [
-            'agency_name' => 'required',
-            'contact_name' => 'required',
-            'mobile' => 'required',
-            'city' => 'required',
-            // 'address' => 'required',
-            'gst_number' => 'required',
+            'name' => 'required',
         ]);
 
         if ($request->edit_id) {
-            $vendor = Vendor::find($request->edit_id);
-            $message = "Vendor Updated Successfully";
+            $PurchaseType = PurchaseType::find($request->edit_id);
+            $message = "PurchaseType Updated Successfully";
         } else {
-            $vendor = new Vendor();
-            $message = "Vendor Created Successfully";
+            $PurchaseType = new PurchaseType();
+            $message = "PurchaseType Created Successfully";
         }
 
-        $vendor->agency_name = $request->agency_name;
-        $vendor->contact_name = $request->contact_name;
-        $vendor->mobile = $request->mobile;
-        $vendor->city = $request->city;
-        $vendor->address = $request->address;
-        $vendor->gst_number = $request->gst_number;
+        $PurchaseType->name = $request->name;
 
-        $vendor->save();
+        $PurchaseType->save();
 
         return array("status" => 1, "message" => $message);
     }
 
     public function fetch()
     {
-        $data = Vendor::get();
+        $data = PurchaseType::get();
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
@@ -69,13 +58,13 @@ class VendorController extends Controller
 
     public function fetch_edit($id)
     {
-        $vendor = Vendor::find($id);
-        return $vendor;
+        $PurchaseType = PurchaseType::find($id);
+        return $PurchaseType;
     }
 
     public function delete($id)
     {
-        Vendor::find($id)->delete();
-        return array("status" => 1, "message" => "Vendor deleted successfully");
+        PurchaseType::find($id)->delete();
+        return array("status" => 1, "message" => "PurchaseType deleted successfully");
     }
 }

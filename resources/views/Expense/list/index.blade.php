@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('title', 'Purchase')
+@section('title', 'Expenses')
 
 @section('content')
 
@@ -10,7 +10,7 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="title">
-                            <h4>Purchase Type</h4>
+                            <h4>Expenses List</h4>
                         </div>
                         <nav aria-label="breadcrumb" role="navigation">
                             <ol class="breadcrumb">
@@ -18,13 +18,13 @@
                                     <a href="{{ url('admin/dashboard') }}">Home</a>
                                 </li>
                                 <li class="breadcrumb-item active" aria-current="page">
-                                    Purchase
+                                    Expenses List
                                 </li>
                             </ol>
                         </nav>
                     </div>
                     <div class="col-6 text-right">
-                        <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#purchase-modal">
+                        <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#expense-modal">
                             <i class="bi-plus-circle"></i> Create New
                         </button>
                     </div>
@@ -49,19 +49,19 @@
     </div>
 </div>
 
-<div class="modal fade" id="purchase-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+<div class="modal fade" id="expense-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modal-title-label">
-                    Create Purchase
+                    List Expense
                 </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                     ×
                 </button>
             </div>
-            <form id="purchase-form">
+            <form id="expense-form">
                 @csrf
                 <input type="hidden" name="edit_id" id="edit_id">
                 <div class="modal-body">
@@ -90,7 +90,7 @@
     var table = $('.data-table').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ url('purchase/fetch') }}",
+        ajax: "{{ url('expenses/list/fetch') }}",
         columns: [{
                 data: 'DT_RowIndex',
                 name: 'id'
@@ -108,11 +108,11 @@
         ]
     });
 
-    $("#purchase-form").validate({
+    $("#expense-form").validate({
         submitHandler: function(form) {
             $("#submit-btn").prop("disabled", true);
             var data = new FormData(form);
-            var url = "{{ url('purchase/store') }}";
+            var url = "{{ url('expenses/list/store') }}";
             $.ajax({
                 type: "POST",
                 url: url,
@@ -120,7 +120,7 @@
                 processData: false,
                 contentType: false,
                 success: function() {
-                    $("#purchase-modal").modal("hide");
+                    $("#expense-modal").modal("hide");
                     table.clear().draw();
                     $("#submit-btn").prop("disabled", false);
                 },
@@ -136,12 +136,12 @@
         var edit_id = $(this).data('id');
         $("#edit_id").val(edit_id);
         $.ajax({
-            url: "{{ url('purchase/fetch-edit') }}/" + edit_id,
+            url: "{{ url('expenses/list/fetch-edit') }}/" + edit_id,
             dataType: "json",
             success: function(response) {
                 $("#name").val(response.name);
-                $("#modal-title-label").html('Edit Purchase');
-                $("#purchase-modal").modal("show");
+                $("#modal-title-label").html('Edit Expense Type');
+                $("#expense-modal").modal("show");
             },
             error: function(code) {
                 alert(code.statusText);
@@ -151,15 +151,15 @@
 
     $(document).on("click", ".add-btn", function() {
             $("#edit_id").val("");
-            $("#purchase-form")[0].reset();
-            $("#modal-title-label").html('Create Purchase');
+            $("#expense-form")[0].reset();
+            $("#modal-title-label").html('List Expense Type');
         });
 
 
     $(document).on("click", ".delete-btn", function() {
         var edit_id = $(this).data('id');
         $("#edit_id").val(edit_id);
-        $("#delete-confirm-text").text("Are you sure you want to delete this Purchase?");
+        $("#delete-confirm-text").text("Are you sure you want to delete this Expense?");
         $("#delete-confirm-modal").modal("show");
     });
 
@@ -168,7 +168,7 @@
         $("#confirm-yes-btn").prop("disabled", true);
 
         $.ajax({
-            url: "{{ url('purchase/delete') }}/" + edit_id,
+            url: "{{ url('expenses/list/delete') }}/" + edit_id,
             method: "GET",
             dataType: "json",
             success: function(response) {

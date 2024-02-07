@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('job_order')->nullable();
+            $table->string('payment_to')->nullable();
+            $table->date('date');
+            $table->string('type')->nullable();
+            $table->decimal('amount', 10, 2);
+            $table->text('description')->nullable();
+            $table->string('payment_mode')->nullable();
+            $table->text('payment_details')->nullable();
             $table->timestamps();
             $table->dateTime('deleted_at')->nullable();
         });

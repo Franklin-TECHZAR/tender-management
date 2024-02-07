@@ -7,8 +7,10 @@ use App\Http\Controllers\TenderController;
 use App\Http\Controllers\LabourController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\ExpenseTypeController;
+use App\Http\Controllers\PurchaseTypeController;
 use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\ExpenseListController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,17 +62,31 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('vendors/fetch-edit/{id}', [VendorController::class, 'fetch_edit']);
     Route::get('vendors/delete/{id}', [VendorController::class, 'delete']);
 
-    Route::get('expenses', [ExpenseController::class, 'index']);
-    Route::post('expenses/store', [ExpenseController::class, 'store']);
-    Route::get('expenses/fetch', [ExpenseController::class, 'fetch']);
-    Route::get('expenses/fetch-edit/{id}', [ExpenseController::class, 'fetch_edit']);
-    Route::get('expenses/delete/{id}', [ExpenseController::class, 'delete']);
+    Route::get('expenses_type', [ExpenseTypeController::class, 'index']);
+    Route::post('expenses_type/store', [ExpenseTypeController::class, 'store']);
+    Route::get('expenses_type/fetch', [ExpenseTypeController::class, 'fetch']);
+    Route::get('expenses_type/fetch-edit/{id}', [ExpenseTypeController::class, 'fetch_edit']);
+    Route::get('expenses_type/delete/{id}', [ExpenseTypeController::class, 'delete']);
 
-    Route::get('purchase', [PurchaseController::class, 'index']);
-    Route::post('purchase/store', [PurchaseController::class, 'store']);
-    Route::get('purchase/fetch', [PurchaseController::class, 'fetch']);
-    Route::get('purchase/fetch-edit/{id}', [PurchaseController::class, 'fetch_edit']);
-    Route::get('purchase/delete/{id}', [PurchaseController::class, 'delete']);
+    Route::get('purchase_type', [PurchaseTypeController::class, 'index']);
+    Route::post('purchase_type/store', [PurchaseTypeController::class, 'store']);
+    Route::get('purchase_type/fetch', [PurchaseTypeController::class, 'fetch']);
+    Route::get('purchase_type/fetch-edit/{id}', [PurchaseTypeController::class, 'fetch_edit']);
+    Route::get('purchase_type/delete/{id}', [PurchaseTypeController::class, 'delete']);
+
+    Route::get('expenses/create', [ExpenseController::class, 'index']);
+    Route::post('expenses/create/store', [ExpenseController::class, 'store']);
+    Route::get('expenses/create/fetch', [ExpenseController::class, 'fetch']);
+    Route::get('expenses/create/fetch-edit/{id}', [ExpenseController::class, 'fetch_edit']);
+    Route::get('expenses/create/delete/{id}', [ExpenseController::class, 'delete']);
+
+    Route::get('expenses/payments/{id}', [ExpenseController::class, 'showPayments'])->name('expenses.payments');
+
+    Route::get('expenses/list', [ExpenseListController::class, 'index']);
+    Route::post('expenses/list/store', [ExpenseListController::class, 'store']);
+    Route::get('expenses/list/fetch', [ExpenseListController::class, 'fetch']);
+    Route::get('expenses/list/fetch-edit/{id}', [ExpenseListController::class, 'fetch_edit']);
+    Route::get('expenses/list/delete/{id}', [ExpenseListController::class, 'delete']);
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
