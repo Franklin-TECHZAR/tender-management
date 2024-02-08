@@ -66,7 +66,7 @@ class ExpenseController extends Controller
                             </a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
                                 <button data-id="' . $row->id . '" class="edit-btn dropdown-item"><i class="dw dw-edit2"></i> Edit</button>
-                                <a href="' . url('expenses/payments') . '/' . $row->id . '" class="dropdown-item"><i class="bi bi-cash-stack"></i> Payments</a>
+                                <button data-id="' . $row->id . '" class="view-btn dropdown-item"><i class="dw dw-view"></i> View</button>
                                 <button data-id="' . $row->id . '" class="delete-btn dropdown-item"><i class="dw dw-delete-3"></i> Delete</button>
                             </div>
                         </div>';

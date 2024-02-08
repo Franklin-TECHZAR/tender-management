@@ -115,8 +115,8 @@
                         <textarea class="form-control" name="payment_details" id="payment_details" required></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                <div class="modal-footer" id="modal-footer-buttons">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close-btn">
                         Close
                     </button>
                     <button type="submit" id="submit-btn" class="btn btn-primary">
@@ -200,23 +200,24 @@
         }
     });
 
-    $(document).on("click", ".edit-btn", function() {
+        $(document).on("click", ".edit-btn", function() {
         var edit_id = $(this).data('id');
         $("#edit_id").val(edit_id);
         $.ajax({
             url: "{{ url('expenses/create/fetch-edit') }}/" + edit_id,
             dataType: "json",
             success: function(response) {
-                $("#job_order").val(response.job_order);
-                $("#payment_to").val(response.payment_to);
-                $("#date").val(response.date);
-                $("#type").val(response.type);
-                $("#amount").val(response.amount);
-                $("#description").val(response.description);
-                $("#payment_mode").val(response.payment_mode);
-                $("#payment_details").val(response.payment_details);
+                $("#job_order").val(response.job_order).prop('disabled', false);
+                $("#payment_to").val(response.payment_to).prop('disabled', false);
+                $("#date").val(response.date).prop('disabled', false);
+                $("#type").val(response.type).prop('disabled', false);
+                $("#amount").val(response.amount).prop('disabled', false);
+                $("#description").val(response.description).prop('disabled', false);
+                $("#payment_mode").val(response.payment_mode).prop('disabled', false);
+                $("#payment_details").val(response.payment_details).prop('disabled', false);
                 $("#modal-title-label").html('Edit Expense');
                 $("#expense-modal").modal("show");
+                $("#modal-footer-buttons").show();
             },
             error: function(code) {
                 alert(code.statusText);
@@ -224,11 +225,50 @@
         });
     });
 
+
+
+    $(document).on("click", ".view-btn", function() {
+        var edit_id = $(this).data('id');
+        $("#edit_id").val(edit_id);
+        $.ajax({
+            url: "{{ url('expenses/create/fetch-edit') }}/" + edit_id,
+            dataType: "json",
+            success: function(response) {
+                $("#job_order").val(response.job_order).prop('disabled', true);
+                $("#payment_to").val(response.payment_to).prop('disabled', true);
+                $("#date").val(response.date).prop('disabled', true);
+                $("#type").val(response.type).prop('disabled', true);
+                $("#amount").val(response.amount).prop('disabled', true);
+                $("#description").val(response.description).prop('disabled', true);
+                $("#payment_mode").val(response.payment_mode).prop('disabled', true);
+                $("#payment_details").val(response.payment_details).prop('disabled', true);
+                $("#modal-title-label").html('View Expense');
+                $("#expense-modal").modal("show");
+                $("#modal-footer-buttons").hide();
+            },
+            error: function(code) {
+                alert(code.statusText);
+            },
+        });
+    });
+
+
     $(document).on("click", ".add-btn", function() {
         $("#edit_id").val("");
         $("#expense-form")[0].reset();
+        $("#job_order").prop('disabled', false);
+        $("#payment_to").prop('disabled', false);
+        $("#date").prop('disabled', false);
+        $("#type").prop('disabled', false);
+        $("#amount").prop('disabled', false);
+        $("#description").prop('disabled', false);
+        $("#payment_mode").prop('disabled', false);
+        $("#payment_details").prop('disabled', false);
         $("#modal-title-label").html('Create Expense');
+        $("#modal-footer-buttons").show();
     });
+
+
 
     $(document).on("click", ".delete-btn", function() {
         var edit_id = $(this).data('id');
