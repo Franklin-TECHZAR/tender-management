@@ -6,6 +6,7 @@ $dashboard = '';
 $tender = '';
 
 $expenses = '';
+$purchase =  '';
 
 $masters = '';
 $materials = '';
@@ -25,6 +26,9 @@ if (isset($url_segments[0]) && $url_segments[0] == 'tender') {
 }
 if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
     $expenses = 'active';
+}
+if (isset($url_segments[0]) && $url_segments[0] == 'purchase') {
+    $purchase = 'active';
 }
 
 if (isset($url_segments[0]) && $url_segments[0] == 'users') {
@@ -96,13 +100,24 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_type') {
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url('expenses/create') }}"
+                    <a href="{{ url('purchase') }}"
+                        class="@if ($purchase) active @endif dropdown-toggle no-arrow">
+                        <span class="micon">
+                            <i class="icon-copy bi bi-cart" aria-hidden="true"></i>
+                        </span><span class="mtext">Purchase</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url('expenses') }}"
                         class="@if ($expenses) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy fa fa-money" aria-hidden="true"></i>
                         </span><span class="mtext">Expenses</span>
                     </a>
                 </li>
+
+
 
                 <li class="dropdown @if ($users_roles) show @endif">
                     <a href="javascript:;" class="dropdown-toggle">

@@ -10,6 +10,7 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ExpenseTypeController;
 use App\Http\Controllers\PurchaseTypeController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\PurchaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,10 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('tender/fetch-payment-log', [TenderController::class, 'fetch_payment_log']);
     Route::get('tender/remove-payment-log/{id}', [TenderController::class, 'remove_payment_log']);
     Route::get('tender/payment-export/{id}', [TenderController::class, 'payment_export']);
+
+    Route::get('purchase', [PurchaseController::class, 'index']);
+    Route::get('purchase/create', [PurchaseController::class, 'create']);
+
 
 
     Route::get('labours', [LabourController::class, 'index']);
