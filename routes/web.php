@@ -45,6 +45,7 @@ Route::group(['middleware' => ['admin']], function () {
 
     Route::get('purchase', [PurchaseController::class, 'index']);
     Route::get('purchase/create', [PurchaseController::class, 'create']);
+    Route::post('purchase/submit', [PurchaseController::class, 'submit']);
 
 
 
