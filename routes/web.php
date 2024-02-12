@@ -79,13 +79,15 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('purchase_type/fetch-edit/{id}', [PurchaseTypeController::class, 'fetch_edit']);
     Route::get('purchase_type/delete/{id}', [PurchaseTypeController::class, 'delete']);
 
-    Route::get('expenses/create', [ExpenseController::class, 'index']);
-    Route::post('expenses/create/store', [ExpenseController::class, 'store']);
-    Route::get('expenses/create/fetch', [ExpenseController::class, 'fetch']);
-    Route::get('expenses/create/fetch-edit/{id}', [ExpenseController::class, 'fetch_edit']);
-    Route::get('expenses/create/delete/{id}', [ExpenseController::class, 'delete']);
+    Route::get('expenses', [ExpenseController::class, 'index']);
+    Route::post('expenses/store', [ExpenseController::class, 'store']);
+    Route::get('expenses/fetch', [ExpenseController::class, 'fetch']);
+    Route::get('expenses/fetch-edit/{id}', [ExpenseController::class, 'fetch_edit']);
+    Route::get('expenses/delete/{id}', [ExpenseController::class, 'delete']);
 
-    Route::get('expenses/payments/{id}', [ExpenseController::class, 'showPayments'])->name('expenses.payments');
+    Route::get('generate-pdf/{id}', [ExpenseController::class, 'generatePDF'])->name('generate.pdf');
+
+    // Route::get('expenses/export', [ExpenseController::class, 'exportExpensesData'])->name('expenses.export');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
