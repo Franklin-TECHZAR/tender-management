@@ -92,10 +92,10 @@
     <div class="container mt-5">
         <div class="card mb-3">
             <div class="card-header text-center border">
-                <h1>Company Name</h1>
+                <h1>{{ $name }}</h1>
                 <p>{{ $address }}</p>
                 <p><span class="light-bold">Mobile No:</span> {{ $mobile }},  <span class="light-bold">Email:</span> {{ $email }}</p>
-                <h3>Payment Voucher</h3>
+                <h3>Salary Voucher</h3>
             </div>
 
             <div class="card-body border">
@@ -104,13 +104,13 @@
                         <table class="Order">
                             <tr>
                                 <td><strong>Job Order:</strong>
-                                    {{ $expense->job_order }}</span></span></td>
+                                    {{ $salary->job_order }}</span></span></td>
                                 <td>
                                     <div class="receipt-info">
 
                                         <p><strong>Payment Voucher No:</strong>
-                                            <span><span>{{ $expense->id }}</span></span></p>
-                                            <p><strong>Date:</strong> <span><span>{{ date('d-m-Y', strtotime($expense->date)) }}</span></span></p>
+                                            <span><span>{{ $salary->id }}</span></span></p>
+                                            <p><strong>Date:</strong> <span><span>{{ date('d-m-Y', strtotime($salary->date)) }}</span></span></p>
                                     </div>
                                 </td>
                             </tr>
@@ -121,24 +121,24 @@
                             <tr>
                                 <td><strong>Amount</strong></td>
                                 <td class="colon">:</td>
-                                <td><span class="underline"><span><span style="font-family: DejaVu Sans; sans-serif;">&#8377;{{ number_format($expense->amount, 2) }}</span></span></td>
+                                <td><span class="underline"><span><span style="font-family: DejaVu Sans; sans-serif;">&#8377;{{ number_format($salary->amount, 2) }}</span></span></td>
                             </tr>
                             <tr>
                                 <td><strong>Payment Method</strong></td>
                                 <td class="colon">:</td>
                                 <td><span
-                                        class="underline"><span>{{ $expense->payment_mode }}</span></span>
+                                        class="underline"><span>{{ $salary->payment_mode }}</span></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td><strong>Payment Details</strong></td>
                                 <td class="colon">:</td>
-                                <td><span class="underline"><span>{{ $expense->payment_details }}</span></span></td>
+                                <td><span class="underline"><span>{{ $salary->payment_details }}</span></span></td>
                             </tr>
                             <tr>
                                 <td><strong>Amount Paid To</strong></td>
                                 <td class="colon">:</td>
-                                <td><span class="underline"><span>{{ $expense->payment_to }}</span></span></td>
+                                <td><span class="underline"><span>{{ $salary->payment_to }}</span></span></td>
                             </tr>
                         </table>
                     </div>

@@ -24,7 +24,8 @@
         href="{{ url('theme/src/plugins/datatables/css/dataTables.bootstrap4.min.css') }}" />
     <link rel="stylesheet" type="text/css"
         href="{{ url('theme/src/plugins/datatables/css/responsive.bootstrap4.min.css') }}" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         .error {
             color: red;
@@ -201,6 +202,7 @@
 
     {{-- toastr --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     @yield('addscript')
 </body>
 

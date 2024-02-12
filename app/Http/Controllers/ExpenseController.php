@@ -20,7 +20,15 @@ class ExpenseController extends Controller
                          ->where('status', 1)
                          ->pluck('name');
         $ExpenseType = ExpenseType::get()->pluck('name');
-        return view('Expense.create.index', compact('tenders', 'ExpenseType'));
+        $Expense = Expense::get()->pluck('type');
+        return view('Expense.create.index', compact('tenders', 'ExpenseType','Expense'));
+    }
+
+    public function getTypes(Request $request)
+    {
+        $jobOrder = $request->input('job_order');
+        $types = Expense::where('job_order', $jobOrder)->pluck('type');
+        return response()->json(['types' => $types]);
     }
 
     public function store(Request $request)
@@ -104,13 +112,15 @@ class ExpenseController extends Controller
                 $address = $company_settings->address;
                 $mobile = $company_settings->mobile;
                 $email = $company_settings->email;
+                $name = $company_settings->name;
                 $data = [
                     'expense' => $expense,
                     'address' => $address,
                     'mobile' => $mobile,
                     'email' => $email,
+                    'name' => $name,
                 ];
-                $pdf = PDF::loadView('pdf_export.receipt', $data);
+                $pdf = PDF::loadView('pdf_export.expense_receipt', $data);
                 return $pdf->stream('payment_receipt.pdf');
                     // return $pdf->download('payment_receipt.pdf');
             }

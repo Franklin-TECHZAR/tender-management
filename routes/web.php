@@ -11,6 +11,7 @@ use App\Http\Controllers\ExpenseTypeController;
 use App\Http\Controllers\PurchaseTypeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SalaryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,8 +87,16 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('expenses/delete/{id}', [ExpenseController::class, 'delete']);
 
     Route::get('generate-pdf/{id}', [ExpenseController::class, 'generatePDF'])->name('generate.pdf');
+    Route::get('/get-types', [ExpenseController::class, 'getTypes'])->name('get.types');
 
-    // Route::get('expenses/export', [ExpenseController::class, 'exportExpensesData'])->name('expenses.export');
+    Route::get('/salaries', [SalaryController::class, 'create'])->name('salaries.create');
+    Route::post('/salaries/store', [SalaryController::class, 'store'])->name('salaries.store');
+    Route::get('salaries/fetch', [SalaryController::class, 'fetch']);
+    Route::get('salaries/fetch-edit/{id}', [SalaryController::class, 'fetch_edit']);
+    Route::get('salaries/delete/{id}', [SalaryController::class, 'delete']);
+
+    Route::get('generatesalary-pdf/{id}', [SalaryController::class, 'generatePDF'])->name('generatesalary.pdf');
+
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

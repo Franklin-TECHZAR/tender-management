@@ -17,6 +17,7 @@ $purchase_type = '';
 
 $users = '';
 $users_roles = '';
+$salaries = '';
 
 if (isset($url_segments[0]) && $url_segments[0] == 'dashboard') {
     $dashboard = 'active';
@@ -59,6 +60,10 @@ if (isset($url_segments[0]) && $url_segments[0] == 'expenses_type') {
 if (isset($url_segments[0]) && $url_segments[0] == 'purchase_type') {
     $masters = 'active';
     $purchase_type = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'salaries') {
+    $salaries = 'active';
 }
 
 ?>
@@ -117,6 +122,13 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_type') {
                     </a>
                 </li>
 
+                <li>
+                    <a href="{{ url('salaries') }}" class="@if ($salaries) active @endif dropdown-toggle no-arrow">
+                        <span class="micon">
+                            <i class="icon-copy fa fa-dollar" aria-hidden="true"></i>
+                        </span><span class="mtext">Salaries</span>
+                    </a>
+                </li>
 
 
                 <li class="dropdown @if ($users_roles) show @endif">
