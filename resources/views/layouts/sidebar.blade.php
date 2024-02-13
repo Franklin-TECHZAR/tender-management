@@ -14,6 +14,7 @@ $labours = '';
 $vendors = '';
 $expenses_type = '';
 $purchase_type = '';
+$purchase_dept = '';
 
 $users = '';
 $users_roles = '';
@@ -65,6 +66,11 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_type') {
 if (isset($url_segments[0]) && $url_segments[0] == 'salaries') {
     $salaries = 'active';
 }
+
+if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
+    $purchase_dept = 'active';
+}
+
 
 ?>
 <div class="left-side-bar">
@@ -130,6 +136,13 @@ if (isset($url_segments[0]) && $url_segments[0] == 'salaries') {
                     </a>
                 </li>
 
+                <li>
+                    <a href="{{ url('purchase_dept') }}" class="@if ($purchase_dept) active @endif dropdown-toggle no-arrow">
+                        <span class="micon">
+                            <i class="icon-copy bi bi-credit-card" aria-hidden="true"></i>
+                        </span><span class="mtext">Purchase Dept</span>
+                    </a>
+                </li>
 
                 <li class="dropdown @if ($users_roles) show @endif">
                     <a href="javascript:;" class="dropdown-toggle">

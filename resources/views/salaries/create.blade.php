@@ -22,6 +22,9 @@
                             </nav>
                         </div>
                         <div class="col-md-6 d-flex justify-content-end align-items-center">
+                            <button class="btn btn-success export-btn mr-2">
+                                <i class="bi bi-file-earmark-excel"></i> Export
+                            </button>
                             <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#salary-modal">
                                 <i class="bi bi-plus"></i> Create New
                             </button>
@@ -33,14 +36,18 @@
                         <div class="col-12">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="col-md-6 d-flex justify-content-start align-items-center">
-                                    <div class="form-group">
+                                    <div class="form-group mr-3">
                                         <label for="job_orders">Filter by Job Order:</label>
-                                        <select class="form-control" name="job_orders" id="job_orders" required>
-                                            <option value="" selected>Select Job Order</option>
-                                            @foreach ($tenders as $tender)
-                                                <option value="{{ $tender }}">{{ $tender }}</option>
+                                        <select class="form-control" name="job_orders" id="job_orders" required style="width: 200px;">
+                                            <option value="" selected>All</option>
+                                            @foreach ($tenders as $id => $tenderName)
+                                                <option value="{{ $id }}">{{ $tenderName }}</option>
                                             @endforeach
                                         </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="date_range">Date Range:</label>
+                                        <input type="text" class="form-control" name="date_range" id="date_range">
                                     </div>
                                 </div>
                                 <div class="col-md-6 d-flex justify-content-end align-items-center">
@@ -95,14 +102,19 @@
                             <label for="job_order">Job Order</label>
                             <select class="form-control" name="job_order" id="job_order" required>
                                 <option value="" disabled selected hidden>Select Job Order</option>
-                                @foreach ($tenders as $tender)
-                                    <option value="{{ $tender }}">{{ $tender }}</option>
+                                @foreach ($tenders as $id => $tenderName)
+                                    <option value="{{ $id }}">{{ $tenderName }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="labour">Labour</label>
-                            <input type="text" class="form-control" name="labour" id="labour" required>
+                            <select class="form-control" name="labour" id="labour" required>
+                                <option value="" disabled selected hidden>Select Labour</option>
+                                @foreach ($Labour as $Labour)
+                                    <option value="{{ $Labour->name }}">{{ $Labour->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="date">Date (Single / Multiple date Range)</label>
@@ -154,11 +166,6 @@
                 dateFormat: "Y-m-d"
             });
 
-            $(document).on("click", ".salary-btn", function() {
-                var expense_id = $(this).data('id');
-                window.location.href = "{{ url('generatesalary-pdf') }}/" + expense_id;
-            });
-
             var table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -202,7 +209,6 @@
                 }],
 
                 footerCallback: function(row, data, start, end, display) {
-                    debugger
                     var api = this.api();
                     var total = api
                         .column(4, {
@@ -222,6 +228,42 @@
                     $('#total_amount').val(formattedTotal);
                 }
             });
+
+            $('#date_range').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
+                    'YYYY-MM-DD'));
+                $(this).trigger('change');
+                table.columns(3).search(picker.startDate.format('YYYY-MM-DD') + '|' + picker.endDate.format(
+                    'YYYY-MM-DD'), true).draw();
+            });
+
+            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+                table.columns(3).search('').draw();
+            });
+
+
+            $(document).on("click", ".export-btn", function() {
+                var job_order = $('#job_orders').val();
+                var date_range = $('#date_range').val();
+                var export_url = "{{ url('export') }}";
+                if (date_range) {
+                    export_url += "?date_range=" + date_range;
+                }
+                if (job_order) {
+                    export_url += (date_range ? "&" : "?") + "job_order=" + job_order;
+                }
+                window.location.href = export_url;
+            });
+
+
 
             $('#job_orders').on('change', function() {
                 var filterValue = $(this).val();
@@ -265,7 +307,8 @@
                         $("#amount").val(response.amount).prop('disabled', false);
                         $("#description").val(response.description).prop('disabled', false);
                         $("#payment_mode").val(response.payment_mode).prop('disabled', false);
-                        $("#payment_details").val(response.payment_details).prop('disabled',false);
+                        $("#payment_details").val(response.payment_details).prop('disabled',
+                            false);
                         $("#modal-title-label").html('Edit Salary');
                         $("#salary-modal").modal("show");
                         $("#modal-footer-buttons").show();

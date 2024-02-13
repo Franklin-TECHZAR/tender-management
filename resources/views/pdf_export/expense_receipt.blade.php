@@ -78,8 +78,8 @@
         .colon{
             width: 15%;
         }
-        h3{
-            margin-bottom: 5px
+        h2{
+            margin-bottom: 10px;
         }
         .light-bold {
         font-weight: 200; /* or any other style you prefer */
@@ -95,7 +95,7 @@
                 <h1>{{ $name }}</h1>
                 <p>{{ $address }}</p>
                 <p><span class="light-bold">Mobile No:</span> {{ $mobile }},  <span class="light-bold">Email:</span> {{ $email }}</p>
-                <h3>Payment Voucher</h3>
+                <h2>Payment Voucher</h2>
             </div>
 
             <div class="card-body border">

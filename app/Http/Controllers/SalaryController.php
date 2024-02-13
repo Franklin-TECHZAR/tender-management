@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\CompanySetting;
 use Illuminate\Http\Request;
 use App\Models\Tender;
+use App\Models\Labour;
 use App\Models\Salary;
 use Yajra\DataTables\Facades\DataTables;
+use App\Exports\ExpenseExport;
+use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 
 class SalaryController extends Controller
@@ -16,8 +19,9 @@ class SalaryController extends Controller
     {
         $tenders = Tender::where('job_order', 1)
                          ->where('status', 1)
-                         ->pluck('name');
-        return view('salaries.create', compact('tenders'));
+                         ->pluck('name','id');
+        $Labour = Labour::get('name');
+        return view('salaries.create', compact('tenders','Labour'));
     }
 
 
@@ -83,11 +87,9 @@ class SalaryController extends Controller
     }
 
 
-
-
     public function fetch()
     {
-        $data = Salary::get();
+        $data = Salary::orderBy('date', "DESC")->get();
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('amount', function ($row) {
@@ -99,8 +101,7 @@ class SalaryController extends Controller
                                 <i class="dw dw-more"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
-                            <button data-id="' . $row->id . '" class="salary-btn dropdown-item"><i class="dw dw-download"></i> Download Receipt</a>
-                            <button data-id="' . $row->id . '" class="view-btn dropdown-item"><i class="dw dw-view"></i> View</button>
+                            <a href="/generatesalary-pdf/' . $row->id . '" class="dropdown-item" target="_blank"><i class="dw dw-download"></i> Download Receipt</a>
                             <button data-id="' . $row->id . '" class="edit-btn dropdown-item"><i class="dw dw-edit2"></i> Edit</button>
                             <button data-id="' . $row->id . '" class="delete-btn dropdown-item"><i class="dw dw-delete-3"></i> Delete</button>
                             </div>
@@ -143,6 +144,66 @@ class SalaryController extends Controller
         ];
         $pdf = PDF::loadView('pdf_export.salary_receipt', $data);
         return $pdf->stream('salary_receipt.pdf');
+
             // return $pdf->download('payment_receipt.pdf');
     }
+
+    public function export(Request $request)
+    {
+        $query = Salary::query();
+
+        if ($request->has('date_range')) {
+            $dates = explode(' - ', $request->date_range);
+
+            $start_date = date('Y-m-d', strtotime($dates[0]));
+            $end_date = date('Y-m-d', strtotime($dates[1]));
+
+            $query->whereBetween('date', [$start_date, $end_date]);
+        }
+
+        if ($request->has('job_order')) {
+            $query->where('job_order', $request->job_order);
+        }
+
+        $salary = $query->get();
+        $total_amount = $salary->sum('amount');
+
+        $export_data = $salary->map(function ($salary, $index) {
+            $jobOrderName = Tender::find($salary->job_order)->name;
+            return [
+                'S.No' => $index + 1,
+                'Job Order' => $jobOrderName,
+                'Labour' => $salary->labour,
+                'Date' => date("d-m-Y", strtotime($salary->date)),
+                'Type' => $salary->type,
+                'Description' => $salary->description,
+                'Payment Mode' => $salary->payment_mode,
+                'Payment Details' => $salary->payment_details,
+                'Amount' => '₹' . number_format($salary->amount, 2),
+            ];
+        });
+
+        $total_amount = "₹" . number_format($total_amount, 2);
+
+        $export_data[] = [
+            'S.No' => '',
+            'Job Order' => '',
+            'Labour' => '',
+            'Date' => '',
+            'Type' => '',
+            'Description' => '',
+            'Payment Mode' => '',
+            'Payment Details' => 'Total',
+            'Amount' => $total_amount,
+        ];
+
+        $data = [
+            'view_file' => 'excel_export.salary_export',
+            'export_data' => $export_data,
+        ];
+
+        return Excel::download(new ExpenseExport($data), 'salaries.xlsx');
+    }
+
+
 }

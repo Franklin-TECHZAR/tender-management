@@ -22,6 +22,9 @@
                             </nav>
                         </div>
                         <div class="col-md-6 d-flex justify-content-end align-items-center">
+                            <button class="btn btn-success expense_export mr-2">
+                                <i class="bi bi-file-earmark-excel"></i> Export
+                            </button>
                             <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#expense-modal">
                                 <i class="bi bi-plus"></i> Create New
                             </button>
@@ -32,25 +35,31 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="d-flex justify-content-between align-items-center">
-                                <div class="col-md-6 d-flex justify-content-start align-items-center">
+                                <div class="col-md-8 d-flex justify-content-start align-items-center">
                                     <div class="form-group mr-4 mb-2">
                                         <label for="job_orders">Filter by Job Order:</label>
-                                        <select class="form-control" name="job_orders" id="job_orders" required>
-                                            <option value="" selected>Select Job Order</option>
-                                            @foreach ($tenders as $tender)
-                                                <option value="{{ $tender }}">{{ $tender }}</option>
+                                        <select class="form-control" name="job_orders" id="job_orders" required style="width: 200px;">
+                                            <option value="" selected>All</option>
+                                            @foreach ($tenders as $id => $tenderName)
+                                                <option value="{{ $id }}">{{ $tenderName }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group mr-2 mb-2">
                                         <label for="type">Filter by Type:</label>
                                         <select class="form-control" name="type" id="type" required>
-                                            <option value="" selected>Select Type</option>
-                                            <!-- Options will be dynamically populated based on the selected job order -->
+                                            <option value="" selected>All</option>
+                                            @foreach ($ExpenseType as $type)
+                                                <option value="{{ $type }}">{{ $type }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="date_range">Date Range:</label>
+                                        <input type="text" class="form-control" name="date_range" id="date_range">
+                                    </div>
                                 </div>
-                                <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                <div class="col-md-4 d-flex justify-content-end align-items-center">
                                     <div class="form-group">
                                         <label for="total_amount">Total Amount:</label>
                                         <input type="text" class="form-control" id="total_amount" readonly>
@@ -104,8 +113,8 @@
                             <label for="job_order">Job Order</label>
                             <select class="form-control" name="job_order" id="job_order" required>
                                 <option value="" disabled selected hidden>Select Job Order</option>
-                                @foreach ($tenders as $tender)
-                                    <option value="{{ $tender }}">{{ $tender }}</option>
+                                @foreach ($tenders as $id => $tenderName)
+                                    <option value="{{ $id }}">{{ $tenderName }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -213,7 +222,6 @@
                     visible: false
                 }],
                 footerCallback: function(row, data, start, end, display) {
-                    debugger
                     var api = this.api();
                     var total = api
                         .column(5, {
@@ -233,6 +241,52 @@
                     $('#total_amount').val(formattedTotal);
                 }
 
+            });
+
+            $('#date_range').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
+                    'YYYY-MM-DD'));
+                $(this).trigger('change');
+                table.columns(3).search(picker.startDate.format('YYYY-MM-DD') + '|' + picker.endDate.format(
+                    'YYYY-MM-DD'), true).draw();
+            });
+
+            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+                table.columns(3).search('').draw();
+            });
+
+
+            $(document).on("click", ".expense_export", function() {
+                var job_order = $('#job_orders').val();
+                var type = $('#type').val();
+                var date_range = $('#date_range').val();
+
+                var export_url = "{{ url('expense_export') }}";
+                var queryParams = [];
+
+                if (job_order) {
+                    queryParams.push("job_order=" + job_order);
+                }
+                if (type) {
+                    queryParams.push("type=" + type);
+                }
+                if (date_range) {
+                    queryParams.push("date_range=" + encodeURIComponent(date_range));
+                }
+
+                if (queryParams.length > 0) {
+                    export_url += "?" + queryParams.join("&");
+                }
+
+                window.location.href = export_url;
             });
 
 
@@ -260,10 +314,6 @@
                 }
             });
 
-            $(document).on("click", ".export-btn", function() {
-                var expense_id = $(this).data('id');
-                window.location.href = "{{ url('generate-pdf') }}/" + expense_id;
-            });
 
 
 
@@ -370,51 +420,14 @@
             });
 
 
-            $(document).ready(function() {
-                var table = $('.data-table').DataTable();
-                $('#job_orders').change(function() {
-                    var selectedJobOrder = $(this).val();
-                    if (selectedJobOrder) {
-                        $.ajax({
-                            url: '/get-types',
-                            type: 'GET',
-                            data: {
-                                job_order: selectedJobOrder
-                            },
-                            success: function(response) {
-                                $('#type').empty();
-                                $('#type').append($('<option>', {
-                                    value: '',
-                                    text: 'Select Type',
-                                    disabled: true,
-                                    selected: true
-                                }));
-                                $.each(response.types, function(key, value) {
-                                    $('#type').append($('<option>', {
-                                        value: value,
-                                        text: value
-                                    }));
-                                });
-                                table.columns(4).search('').draw();
-                            }
-                        });
-                    } else {
-                        $('#type').empty();
-                        $('#type').append($('<option>', {
-                            value: '',
-                            text: 'Select Type',
-                            disabled: true,
-                            selected: true
-                        }));
+            $('#type').on('change', function() {
+                var filterValue = $(this).val();
+                table.columns(4).search(filterValue).draw();
+            });
 
-                        table.columns(4).search('').draw();
-                    }
-                });
-
-                $('#type').on('change', function() {
-                    var filterValue = $(this).val();
-                    table.columns(4).search(filterValue).draw();
-                });
+            $('#job_orders').on('change', function() {
+                var filterValue = $(this).val();
+                table.columns(1).search(filterValue).draw();
             });
         });
     </script>
