@@ -17,7 +17,18 @@
     <link rel="stylesheet" type="text/css" href="{{ url('theme/vendors/styles/core.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('theme/vendors/styles/icon-font.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('theme/vendors/styles/style.css') }}" />
-
+	<style>
+		.my-logo
+		{
+			height: 100% !important;
+		}
+		.logo-text
+		{
+			font-size:22px;
+			font-family: 'dropways';					
+			font-weight: bolder;
+		}
+	</style>
 </head>
 
 <body class="login-page">
@@ -25,7 +36,8 @@
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <div class="brand-logo">
                 <a href="{{ url('/') }}">
-                    <img src="{{ url('images/logo-white.png') }}" alt="" />
+                    <img src="{{ url('images/logo-white.png') }}" class="my-logo" alt="" />
+					<h2 class="logo-text">Alpha Power Electromechanical Projects</h2>
                 </a>
             </div>
             {{-- <div class="login-menu">

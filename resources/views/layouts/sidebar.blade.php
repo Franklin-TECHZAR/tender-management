@@ -73,11 +73,25 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
 
 
 ?>
+<style>
+.my-logo
+{
+	height: 50px !important;
+}
+.my-logo-text
+{
+    color: #fff;
+	font-size:20px;
+    text-align: center;
+    font-family: 'FontAwesome';
+	text-shadow: 1px 1px #FF0000;
+}
+</style>
 <div class="left-side-bar">
     <div class="brand-logo">
         <a href="{{ url('admin') }}">
-            <img src="{{ url('images/logo-white.png') }}" alt="" class="dark-logo" />
-            <img src="{{ url('images/logo-white.png') }}" alt="" class="light-logo" />
+			<img src="{{ url('images/logo-white.png') }}" class="my-logo" alt="" />
+			<h4 class="my-logo-text">Alpha Power</h4>
         </a>
         <div class="close-sidebar" data-toggle="left-sidebar-close">
             <i class="ion-close-round"></i>
