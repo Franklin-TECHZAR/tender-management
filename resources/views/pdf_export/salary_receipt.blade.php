@@ -121,7 +121,7 @@
                             <tr>
                                 <td><strong>Amount</strong></td>
                                 <td class="colon">:</td>
-                                <td><span class="underline"><span><span style="font-family: DejaVu Sans; sans-serif;">&#8377;{{ number_format($salary->amount, 2) }}</span></span></td>
+                                <td><span class="underline"><span><span style="font-family: DejaVu Sans; sans-serif; opacity: 0.9; font-size: 14px; margin-left: -5px;">&#8377;{{ number_format($salary->amount, 2) }}</span></span></td>
                             </tr>
                             <tr>
                                 <td><strong>Payment Method</strong></td>

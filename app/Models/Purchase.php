@@ -10,4 +10,13 @@ class Purchase extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
+    }
 }

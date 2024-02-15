@@ -46,8 +46,14 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('tender/payment-export/{id}', [TenderController::class, 'payment_export']);
 
     Route::get('purchase', [PurchaseController::class, 'index']);
-    Route::get('purchase/create', [PurchaseController::class, 'create']);
+    Route::get('purchase/create', [PurchaseController::class, 'create'])->name('purchase.create');
+    Route::get('purchase/create/{id}', [PurchaseController::class, 'edit'])->name('purchase.edit');
     Route::post('purchase/submit', [PurchaseController::class, 'submit']);
+    Route::post('purchase/store', [PurchaseController::class, 'store'])->name('purchase.store');
+    Route::get('purchase/fetch', [PurchaseController::class, 'fetch']);
+    Route::get('purchase/fetch-edit/{id}', [PurchaseController::class, 'fetch_edit']);
+    Route::get('purchase/delete/{id}', [PurchaseController::class, 'delete']);
+    Route::get('generatePurchase-pdf/{id}', [PurchaseController::class, 'generatePDF'])->name('generatePurchase.pdf');
 
 
 

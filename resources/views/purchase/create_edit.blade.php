@@ -14,7 +14,7 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="title">
-                                <h4>Create Purchase (Invoice)</h4>
+                                <h4>{{ $purchase->id ? 'Edit Purchase (Invoice)' : 'Create Purchase (Invoice)' }}</h4>
                             </div>
                             <nav aria-label="breadcrumb" role="navigation">
                                 <ol class="breadcrumb">
@@ -25,30 +25,58 @@
                                         <a href="{{ url('purchase') }}">Purchase</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">
-                                        Create Purchase
+                                        {{ $purchase->id ? 'Edit Purchase' : 'Create Purchase' }}
                                     </li>
                                 </ol>
                             </nav>
                         </div>
                         <div class="col-6 text-right">
                             <button id="save_btn" class="btn btn-primary">
-                                <i class="fa fa-floppy-o"></i> Save
+                                <i class="fa fa-floppy-o"></i>
+                                {{ $purchase->id ? 'Update' : 'Save' }}
                             </button>
                         </div>
                     </div>
                 </div>
                 <div class="pd-20 bg-white border-radius-4 box-shadow">
-                    <form id="purchase-form" method="POST" action="{{ url('purchase/submit') }}">
+                    {{-- <form id="purchase-form" method="POST" action="{{ url('purchase/submit') }}"> --}}
+                    <form id="purchase-form" method="POST"
+                        action="{{ $purchase->id ? route('purchase.edit', $purchase->id) : route('purchase.store') }}">
                         @csrf
+                        <input type="hidden" name="edit_id" value="{{ $purchase->id }}">
                         <div class="row">
                             <div class="col-sm-6 form-group">
                                 <label>Job Order</label>
                                 <select class="form-control" id="job_order" name="job_order">
                                     <option value="">Select Job Order</option>
                                     @foreach ($job_orders as $jo)
-                                        <option value="{{ $jo->id }}">{{ $jo->name }}</option>
+                                        <option value="{{ $jo->id }}"
+                                            {{ $purchase->job_order_id == $jo->id ? 'selected' : '' }}>{{ $jo->name }}
+                                        </option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="col-sm-6 form-group">
+                                <label>Invoice No</label>
+                                <input type="text" class="form-control" name="invoice_no" id="invoice_no"
+                                    value="{{ $purchase->invoice_no }}">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-6 form-group">
+                                <label>Type</label>
+                                <select class="form-control" name="type" id="type">
+                                    <option value="" disabled selected hidden>Select Type</option>
+                                    @foreach ($ExpenseType as $type)
+                                        <option value="{{ $type }}"
+                                            {{ $purchase->type == $type ? 'selected' : '' }}>{{ $type }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-sm-6 form-group">
+                                <label>Date</label>
+                                <input type="date" class="form-control" name="date" id="date"
+                                    value="{{ $purchase->date }}">
                             </div>
                         </div>
                         <div class="row">
@@ -76,7 +104,9 @@
                                             <select class="form-control" id="vendor" name="vendor">
                                                 <option value="">Select Vendor</option>
                                                 @foreach ($vendors as $ven)
-                                                    <option value="{{ $ven->id }}">{{ $ven->agency_name }}</option>
+                                                    <option value="{{ $ven->id }}"
+                                                        {{ $purchase->vendor_id == $ven->id ? 'selected' : '' }}>
+                                                        {{ $ven->agency_name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -183,35 +213,59 @@
 
         $(document).ready(function() {
             add_row();
-            $("#add_row_btn").click(function() {
+            $("#add_row_btn").click(function(event) {
+                event.preventDefault();
                 add_row();
             });
         });
 
+
+        var materials = [
+            @foreach ($materials as $mat)
+                {
+                    id: '{{ $mat->id }}',
+                    name: '{{ $mat->name }}'
+                },
+            @endforeach
+        ];
+
+
         function add_row() {
             row_no++;
             var html_text = `<tr id="tr${row_no}">
-                                <th><input type="text" class="form-control sno" readonly></th>
-                                <th>
-                                    <select name="material[]" class="form-control material" id="material${row_no}" data-row_no="${row_no}">
-                                        <option value="">Select Materials</option>
-                                        @foreach ($materials as $mat)
-                                            <option value="{{ $mat->id }}">{{ $mat->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </th>
-                                <th><input type="text" name="qty[]" class="form-control qty"></th>
-                                <th><input type="text" name="unit[]" class="form-control unit textbox-right" id="unit${row_no}"></th>
-                                <th><input type="text" name="amount[]" class="form-control amount textbox-right" id="amount${row_no}" data-row_no="${row_no}"></th>
-                                <th><input type="text" name="gst[]" class="form-control gst textbox-right" id="gst${row_no}" data-row_no="${row_no}"></th>
-                                <th><input type="text" name="total[]" class="form-control total textbox-right" id="total${row_no}" data-row_no="${row_no}" readonly></th>
-                                <th>
-                                    <button class="btn btn-sm btn-danger" onClick=remove_row(${row_no})><i class="bi bi-trash3"></i></button>
-                                </th>
-                            </tr>`;
+                <th><input type="text" class="form-control sno" readonly></th>
+                <th>
+                    <select name="material[]" class="form-control material" id="material${row_no}" data-row_no="${row_no}">
+                    <option value="">Select Materials</option>`;
+            materials.forEach(function(material) {
+                html_text += `<option value="${material.id}">${material.name}</option>`;
+            });
+            html_text += `   </select>
+                </th>
+                <th><input type="text" name="qty[]" class="form-control qty" id="qty${row_no}"></th>
+                <th><input type="text" name="unit[]" class="form-control unit textbox-right" id="unit${row_no}"></th>
+                <th><input type="text" name="amount[]" class="form-control amount textbox-right" id="amount${row_no}" data-row_no="${row_no}"></th>
+                <th><input type="text" name="gst[]" class="form-control gst textbox-right" id="gst${row_no}" data-row_no="${row_no}"></th>
+                <th><input type="text" name="total[]" class="form-control total textbox-right" id="total${row_no}" data-row_no="${row_no}" readonly></th>
+                <th>
+                    <button class="btn btn-sm btn-danger" onClick=remove_row(${row_no})><i class="bi bi-trash3"></i></button>
+                </th>
+            </tr>`;
             $("#products_table_body").append(html_text);
             sno_arrange();
+            var isEditMode = '{{ $purchase->id ? true : false }}';
+            if (isEditMode) {
+                var purchase = {!! json_encode($purchase) !!};
+                $("#material1").val(purchase.material_id);
+                $("#qty1").val(purchase.quantity);
+                $("#unit1").val(purchase.unit);
+                $("#amount1").val(purchase.amount);
+                $("#gst1").val(purchase.gst);
+                $("#total1").val(purchase.total);
+            }
+            sno_arrange();
         }
+
 
         function remove_row(row_id) {
             $("#tr" + row_id).remove();
@@ -255,6 +309,29 @@
     </script>
 
     <script>
+        $("#purchase-form").validate({
+            submitHandler: function(form) {
+                $("#save_btn").prop("disabled", true);
+                var data = new FormData(form);
+                var url = "{{ url('purchase/store') }}";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    success: function() {
+                        $("#save_btn").prop("disabled", false);
+                        window.location.href = "{{ url('purchase') }}";
+                    },
+                    error: function(code) {
+                        alert(code.statusText);
+                    },
+                });
+                return false;
+            }
+        });
+
         $(document).on("click", "#save_btn", function() {
             var vendor = $("#vendor").val();
             var job_order = $("#job_order").val();
@@ -314,5 +391,8 @@
                 $("#purchase-form").submit();
             }
         });
+    </script>
+    <script>
+        var purchase = @json($purchase);
     </script>
 @endsection
