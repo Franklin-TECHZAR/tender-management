@@ -10,6 +10,8 @@ use App\Models\Purchase;
 use App\Models\ExpenseType;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
+use App\Exports\PurchaseExport;
+use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 
 class PurchaseController extends Controller
@@ -17,8 +19,8 @@ class PurchaseController extends Controller
     public function index()
     {
         $tenders = Tender::where('job_order', 1)
-        ->where('status', 1)
-        ->pluck('name','id');
+            ->where('status', 1)
+            ->pluck('name', 'id');
         return view('purchase.index', compact('tenders'));
     }
 
@@ -149,7 +151,7 @@ class PurchaseController extends Controller
                                     </div>';
                 return $btn;
             })
-            ->rawColumns(['action', 'amount','total'])
+            ->rawColumns(['action', 'amount', 'total'])
             ->make(true);
     }
 
@@ -186,6 +188,72 @@ class PurchaseController extends Controller
         ];
         $pdf = PDF::loadView('pdf_export.purchase_receipt', $data);
         return $pdf->stream('purchase_receipt.pdf');
+    }
+
+    public function export(Request $request)
+    {
+        $query = Purchase::query();
+
+        if ($request->has('date_range')) {
+            $dates = explode(' - ', $request->date_range);
+
+            $start_date = date('Y-m-d', strtotime($dates[0]));
+            $end_date = date('Y-m-d', strtotime($dates[1]));
+
+            $query->whereBetween('date', [$start_date, $end_date]);
+        }
+
+        if ($request->has('job_order')) {
+            $query->where('job_order_id', $request->job_order);
+        }
+
+        $purchase = $query->get();
+
+        if ($purchase->isEmpty()) {
+            return redirect()->back()->with('error', 'No data found based on the selected criteria.');
+        }
+
+        $total_amount = $purchase->sum('total');
+
+        $export_data = $purchase->map(function ($purchase, $index) {
+            $jobOrderName = Tender::find($purchase->job_order_id)->name;
+            return [
+                'S.No' => $index + 1,
+                'Job Order' => $jobOrderName,
+                'Type' => $purchase->type,
+                'Date' => date("d-m-Y", strtotime($purchase->date)),
+                'Invoice No' => $purchase->invoice_no,
+                'Vendor' => $purchase->vendor->agency_name,
+                'Product/Material' => $purchase->material->name,
+                'Quantity' => $purchase->quantity,
+                'Amount' => '₹' . number_format($purchase->amount, 2),
+                'GST' => $purchase->gst . '%',
+                'Total' => '₹' . number_format($purchase->total, 2),
+            ];
+        });
+
+        $total_amount = "₹" . number_format($total_amount, 2);
+
+        $export_data[] = [
+            'S.No' => '',
+            'Job Order' => '',
+            'Type' => '',
+            'Date' => '',
+            'Invoice No' => '',
+            'Vendor' => '',
+            'Product/Material' => '',
+            'Quantity' => '',
+            'Amount' => '',
+            'GST' => '',
+            'Total' => $total_amount,
+        ];
+
+        $data = [
+            'view_file' => 'excel_export.purchase_export',
+            'export_data' => $export_data,
+        ];
+
+        return Excel::download(new PurchaseExport($data), 'purchase.xlsx');
     }
 
 }

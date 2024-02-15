@@ -142,6 +142,11 @@ class ExpenseController extends Controller
         }
 
         $expenses = $query->get();
+
+        if ($expenses->isEmpty()) {
+            return redirect()->back()->with('error', 'No data found based on the selected criteria.');
+        }
+
         $total_amount = $expenses->sum('amount');
 
         $export_data = $expenses->map(function ($expense, $index) {

@@ -24,6 +24,9 @@
                             </nav>
                         </div>
                         <div class="col-6 text-right">
+                            <button class="btn btn-success purchase_export mr-2">
+                                <i class="bi bi-file-earmark-excel"></i> Export
+                            </button>
                             <a href="{{ url('purchase/create') }}" class="btn btn-primary">
                                 <i class="bi-plus-circle"></i> Create New
                             </a>
@@ -37,7 +40,8 @@
                                 <div class="col-md-6 d-flex justify-content-start align-items-center">
                                     <div class="form-group mr-3">
                                         <label for="job_orders">Filter by Job Order:</label>
-                                        <select class="form-control" name="job_orders" id="job_orders" required style="width: 200px;">
+                                        <select class="form-control" name="job_orders" id="job_orders" required
+                                            style="width: 200px;">
                                             <option value="" selected>All</option>
                                             @foreach ($tenders as $id => $tenderName)
                                                 <option value="{{ $id }}">{{ $tenderName }}</option>
@@ -255,31 +259,45 @@
 
 
         $('#job_orders').on('change', function() {
-                var filterValue = $(this).val();
-                table.columns(1).search(filterValue).draw();
-            });
+            var filterValue = $(this).val();
+            table.columns(1).search(filterValue).draw();
+        });
 
 
-            $('#date_range').daterangepicker({
-                autoUpdateInput: false,
-                locale: {
-                    cancelLabel: 'Clear'
-                }
-            });
 
-            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
-                $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
-                    'YYYY-MM-DD'));
-                $(this).trigger('change');
-                table.columns(3).search(picker.startDate.format('YYYY-MM-DD') + '|' + picker.endDate.format(
-                    'YYYY-MM-DD'), true).draw();
-            });
+        $('#date_range').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
 
-            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
-                $(this).val('');
-                table.columns(3).search('').draw();
-            });
+        $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
+                'YYYY-MM-DD'));
+            $(this).trigger('change');
+            table.columns(3).search(picker.startDate.format('YYYY-MM-DD') + '|' + picker.endDate.format(
+                'YYYY-MM-DD'), true).draw();
+        });
 
+        $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+            table.columns(3).search('').draw();
+        });
+
+
+        $(document).on("click", ".purchase_export", function() {
+            var job_order = $('#job_orders').val();
+            var date_range = $('#date_range').val();
+            var export_url = "{{ url('purchase_export') }}";
+            if (date_range) {
+                export_url += "?date_range=" + date_range;
+            }
+            if (job_order) {
+                export_url += (date_range ? "&" : "?") + "job_order=" + job_order;
+            }
+            window.location.href = export_url;
+        });
 
         $(document).on("click", ".delete-btn", function() {
             var edit_id = $(this).data('id');

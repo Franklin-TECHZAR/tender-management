@@ -54,6 +54,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('purchase/fetch-edit/{id}', [PurchaseController::class, 'fetch_edit']);
     Route::get('purchase/delete/{id}', [PurchaseController::class, 'delete']);
     Route::get('generatePurchase-pdf/{id}', [PurchaseController::class, 'generatePDF'])->name('generatePurchase.pdf');
+    Route::get('purchase_export', [PurchaseController::class, 'export']);
 
 
 

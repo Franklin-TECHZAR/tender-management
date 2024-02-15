@@ -166,6 +166,10 @@ class SalaryController extends Controller
         }
 
         $salary = $query->get();
+          if ($salary->isEmpty()) {
+            return redirect()->back()->with('error', 'No data found based on the selected criteria.');
+        }
+
         $total_amount = $salary->sum('amount');
 
         $export_data = $salary->map(function ($salary, $index) {
