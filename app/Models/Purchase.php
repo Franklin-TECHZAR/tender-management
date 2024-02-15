@@ -10,6 +10,7 @@ class Purchase extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    protected $table = "purchase";
 
     public function vendor()
     {
