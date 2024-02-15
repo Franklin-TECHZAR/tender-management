@@ -117,7 +117,7 @@
                         <div class="form-group">
                             <label for="date">Date (Single / Multiple date Range)</label>
                             <input type="text" id="datepicker" name="date" placeholder="Select Dates" multiple
-                                style="width: 450px; height: 40px;">
+                                style="width: 450px; height: 40px; opacity: 0.3; border-radius: 5px;">
                         </div>
                         <div class="form-group">
                             <label for="amount">Amount</label>
