@@ -33,38 +33,34 @@
                 </div>
                 <div class="page-header">
                     <div class="row">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="col-md-8 d-flex justify-content-start align-items-center">
-                                    <div class="form-group mr-4 mb-2">
-                                        <label for="job_orders">Filter by Job Order:</label>
-                                        <select class="form-control" name="job_orders" id="job_orders" required style="width: 200px;">
-                                            <option value="" selected>All</option>
-                                            @foreach ($tenders as $id => $tenderName)
-                                                <option value="{{ $id }}">{{ $tenderName }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group mr-2 mb-2">
-                                        <label for="type">Filter by Type:</label>
-                                        <select class="form-control" name="type" id="type" required>
-                                            <option value="" selected>All</option>
-                                            @foreach ($ExpenseType as $type)
-                                                <option value="{{ $type }}">{{ $type }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="date_range">Date Range:</label>
-                                        <input type="text" class="form-control" name="date_range" id="date_range">
-                                    </div>
-                                </div>
-                                <div class="col-md-4 d-flex justify-content-end align-items-center">
-                                    <div class="form-group">
-                                        <label for="total_amount">Total Amount:</label>
-                                        <input type="text" class="form-control" id="total_amount" readonly>
-                                    </div>
-                                </div>
+                        <div class="col-sm-3">
+                            <label for="job_orders">Filter by Job Order:</label>
+                            <select class="form-control" name="job_orders" id="job_orders" required>
+                                <option value="" selected>All</option>
+                                @foreach ($tenders as $id => $tenderName)
+                                    <option value="{{ $id }}">{{ $tenderName }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="type">Filter by Type:</label>
+                            <select class="form-control" name="type" id="type" required>
+                                <option value="" selected>All</option>
+                                @foreach ($ExpenseType as $type)
+                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label for="date_range">Date Range:</label>
+                                <input type="text" class="form-control" name="date_range" id="date_range">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label for="total_amount">Total Amount:</label>
+                                <input type="text" class="form-control" id="total_amount" readonly>
                             </div>
                         </div>
                     </div>

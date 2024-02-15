@@ -116,14 +116,14 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
                     </a>
                 </li>
 
-                <li>
+                {{-- <li>
                     <a href="{{ url('users') }}"
                         class="@if ($users) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy fa fa-address-card-o" aria-hidden="true"></i>
                         </span><span class="mtext">Users list</span>
                     </a>
-                </li>
+                </li> --}}
                 <li>
                     <a href="{{ url('purchase') }}"
                         class="@if ($purchase) active @endif dropdown-toggle no-arrow">
@@ -158,7 +158,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
                     </a>
                 </li>
 
-                <li class="dropdown @if ($users_roles) show @endif">
+                {{-- <li class="dropdown @if ($users_roles) show @endif">
                     <a href="javascript:;" class="dropdown-toggle">
                         <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 5px" width="10" height="10"
                             fill="currentColor" class="bi bi-person-fill-gear micon" viewBox="0 0 22 22">
@@ -171,7 +171,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
                         <li><a class="@if ($users) active @endif"
                                 href="{{ url('users') }}">Users</a></li>
                     </ul>
-                </li>
+                </li> --}}
                 <li class="dropdown @if ($masters) show @endif">
                     <a href="javascript:;" class="dropdown-toggle">
                         <span class="micon">
