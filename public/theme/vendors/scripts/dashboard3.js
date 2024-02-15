@@ -1,11 +1,11 @@
 var options = {
 	series: [
 	{
-		name: "Patients",
+		name: "Purchase",
 		data: [10, 15, 12, 20, 18, 26, 24, 25, 20, 25, 22, 30]
 	},
 	{
-		name: "Consultations",
+		name: "Expenses",
 		data: [15, 10, 17, 15, 23, 21, 30, 20, 26, 20, 28, 25]
 	}
 	],

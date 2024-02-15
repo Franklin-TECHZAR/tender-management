@@ -6,7 +6,7 @@ $dashboard = '';
 $tender = '';
 
 $expenses = '';
-$purchase =  '';
+$purchase = '';
 
 $masters = '';
 $materials = '';
@@ -71,27 +71,40 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
     $purchase_dept = 'active';
 }
 
-
 ?>
 <style>
-.my-logo
-{
-	height: 50px !important;
-}
-.my-logo-text
-{
-    color: #fff;
-	font-size:20px;
-    text-align: center;
-    font-family: 'FontAwesome';
-	text-shadow: 1px 1px #FF0000;
-}
+    .my-brand-logo {
+        background: #fff;
+        text-align: center;
+        margin: 10px;
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .my-logo {
+        width: 150px !important;
+    }
+
+    .my-logo-text {
+        font-size: 18px;
+        margin-left: 10px;
+        text-align: center;
+        margin-top: 5px;
+        text-shadow:
+            1px 1px 2px black,
+            0 0 1em blue,
+            0 0 0.2em blue;
+        color: white;
+        font-family: Georgia,
+            serif;
+    }
 </style>
 <div class="left-side-bar">
-    <div class="brand-logo">
+    <div class="my-brand-logo">
         <a href="{{ url('admin') }}">
-			<img src="{{ url('images/logo-white.png') }}" class="my-logo" alt="" />
-			<h4 class="my-logo-text">Alpha Power</h4>
+            <img src="{{ url('images/logo-white.png') }}" class="my-logo" alt="" />
+            <br>
+            <h4 class="my-logo-text">Alpha Power Projects</h4>
         </a>
         <div class="close-sidebar" data-toggle="left-sidebar-close">
             <i class="ion-close-round"></i>
@@ -143,7 +156,8 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
                 </li>
 
                 <li>
-                    <a href="{{ url('salaries') }}" class="@if ($salaries) active @endif dropdown-toggle no-arrow">
+                    <a href="{{ url('salaries') }}"
+                        class="@if ($salaries) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy fa fa-dollar" aria-hidden="true"></i>
                         </span><span class="mtext">Salaries</span>
@@ -151,7 +165,8 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
                 </li>
 
                 <li>
-                    <a href="{{ url('purchase_dept') }}" class="@if ($purchase_dept) active @endif dropdown-toggle no-arrow">
+                    <a href="{{ url('purchase_dept') }}"
+                        class="@if ($purchase_dept) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy bi bi-credit-card" aria-hidden="true"></i>
                         </span><span class="mtext">Purchase Dept</span>

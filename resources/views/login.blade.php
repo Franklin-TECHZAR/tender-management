@@ -25,8 +25,9 @@
 		.logo-text
 		{
 			font-size:22px;
-			font-family: 'dropways';					
+			font-family: 'dropways';
 			font-weight: bolder;
+            margin-left: 10px;
 		}
 	</style>
 </head>

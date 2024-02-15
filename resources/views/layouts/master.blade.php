@@ -64,6 +64,79 @@
             height: 41px;
         }
     </style>
+    <style>
+        .error {
+            color: red;
+        }
+
+        .border-radius-100,
+        .user-info-dropdown .dropdown-toggle .user-icon img {
+            height: 100%;
+            object-fit: cover;
+        }
+
+        th,
+        td {
+            white-space: nowrap;
+        }
+
+        .left-side-bar {
+            background: #008000;;
+            /* #142127 */
+        }
+
+        .btn-primary,
+        .btn-primary:hover {
+            background-color: #008000;
+            border-color: #008000;
+        }
+
+        .breadcrumb-item.active {
+            color: #008000;
+        }
+
+        .btn-link {
+            color: #008000;
+        }
+
+        .page-item.active .page-link {
+            background-color: #008000;
+            border-color: #008000;
+        }
+
+        .custom-checkbox .custom-control-input:checked~.custom-control-label::before {
+            background-color: #008000;
+        }
+
+        .custom-control-input:checked~.custom-control-label::before {
+            border-color: #008000;
+            background-color: #008000;
+        }
+
+        .custom-control-label::before {
+            border: 2px solid #008000;
+        }
+
+        .nav-tabs.customtab .nav-item.show .nav-link,
+        .nav-tabs.customtab .nav-link.active {
+            color: #008000;
+            border-bottom: 2px solid #008000;
+        }
+
+        .nav-tabs.customtab .nav-link:focus,
+        .nav-tabs.customtab .nav-link:hover {
+            color: #008000;
+            border-bottom: 2px solid #008000;
+        }
+
+        .dropdown-item:focus,
+        .dropdown-item:hover {
+            color: #008000;
+        }
+        .text-primary {
+            color: #008000!important;
+        }
+    </style>
 </head>
 
 <body>
