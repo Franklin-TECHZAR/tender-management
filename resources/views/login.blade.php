@@ -18,6 +18,9 @@
     <link rel="stylesheet" type="text/css" href="{{ url('theme/vendors/styles/icon-font.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('theme/vendors/styles/style.css') }}" />
 	<style>
+        body {
+            background: #fff6e9;
+        }
 		.my-logo
 		{
 			height: 100% !important;
@@ -29,6 +32,27 @@
 			font-weight: bolder;
             margin-left: 10px;
 		}
+        .btn-primary,
+        .btn-primary:hover {
+            background-color: #008000;
+            border-color: #008000;
+        }
+        .custom-checkbox .custom-control-input:checked~.custom-control-label::before {
+            background-color: #008000;
+        }
+
+        .custom-control-input:checked~.custom-control-label::before {
+            border-color: #008000;
+            background-color: #008000;
+        }
+
+        .custom-control-label::before {
+            border: 2px solid #008000;
+        }
+        .text-primary {
+            color: #008000!important;
+        }
+
 	</style>
 </head>
 

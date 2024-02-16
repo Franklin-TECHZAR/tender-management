@@ -29,6 +29,9 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
     <style>
+        body {
+            background: #fff6e9;
+        }
         .error {
             color: red;
         }
