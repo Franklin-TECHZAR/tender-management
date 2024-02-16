@@ -18,6 +18,9 @@
     <link rel="stylesheet" type="text/css" href="{{ url('theme/vendors/styles/icon-font.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url('theme/vendors/styles/style.css') }}" />
 	<style>
+        body {
+            background: #fff6e9;
+        }
 		.my-logo
 		{
 			height: 100% !important;
@@ -25,9 +28,31 @@
 		.logo-text
 		{
 			font-size:22px;
-			font-family: 'dropways';					
+			font-family: 'dropways';
 			font-weight: bolder;
+            margin-left: 10px;
 		}
+        .btn-primary,
+        .btn-primary:hover {
+            background-color: #2da32d;
+            border-color: #2da32d;
+        }
+        .custom-checkbox .custom-control-input:checked~.custom-control-label::before {
+            background-color: #2da32d;
+        }
+
+        .custom-control-input:checked~.custom-control-label::before {
+            border-color: #2da32d;
+            background-color: #2da32d;
+        }
+
+        .custom-control-label::before {
+            border: 2px solid #2da32d;
+        }
+        .text-primary {
+            color: #2da32d!important;
+        }
+
 	</style>
 </head>
 

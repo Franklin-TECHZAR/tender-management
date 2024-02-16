@@ -29,6 +29,9 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
     <style>
+        body {
+            background: #fff6e9;
+        }
         .error {
             color: red;
         }
@@ -62,6 +65,79 @@
         .filter-btn {
             margin-top: 1.8rem !important;
             height: 41px;
+        }
+    </style>
+    <style>
+        .error {
+            color: red;
+        }
+
+        .border-radius-100,
+        .user-info-dropdown .dropdown-toggle .user-icon img {
+            height: 100%;
+            object-fit: cover;
+        }
+
+        th,
+        td {
+            white-space: nowrap;
+        }
+
+        .left-side-bar {
+            background: #2da32d;;
+            /* #142127 */
+        }
+
+        .btn-primary,
+        .btn-primary:hover {
+            background-color: #2da32d;
+            border-color: #2da32d;
+        }
+
+        .breadcrumb-item.active {
+            color: #2da32d;
+        }
+
+        .btn-link {
+            color: #2da32d;
+        }
+
+        .page-item.active .page-link {
+            background-color: #2da32d;
+            border-color: #2da32d;
+        }
+
+        .custom-checkbox .custom-control-input:checked~.custom-control-label::before {
+            background-color: #2da32d;
+        }
+
+        .custom-control-input:checked~.custom-control-label::before {
+            border-color: #2da32d;
+            background-color: #2da32d;
+        }
+
+        .custom-control-label::before {
+            border: 2px solid #2da32d;
+        }
+
+        .nav-tabs.customtab .nav-item.show .nav-link,
+        .nav-tabs.customtab .nav-link.active {
+            color: #2da32d;
+            border-bottom: 2px solid #2da32d;
+        }
+
+        .nav-tabs.customtab .nav-link:focus,
+        .nav-tabs.customtab .nav-link:hover {
+            color: #2da32d;
+            border-bottom: 2px solid #2da32d;
+        }
+
+        .dropdown-item:focus,
+        .dropdown-item:hover {
+            color: #2da32d;
+        }
+        .text-primary {
+            color: #2da32d!important;
         }
     </style>
 </head>
