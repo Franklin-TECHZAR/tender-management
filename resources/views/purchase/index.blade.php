@@ -73,7 +73,7 @@
                 </div>
                 <div class="pd-20 bg-white border-radius-4 box-shadow">
 
-                    <table class="table table-bordered data-table">
+                    <table class="table table-bordered data-table table-responsive" width="974px">
                         <thead>
                             <tr>
                                 <th>S.NO</th>
@@ -177,6 +177,85 @@
             flatpickr("#datepicker", {
                 dateFormat: "Y-m-d"
             });
+
+
+            $('#date_range').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                var startDate = picker.startDate;
+                var endDate = picker.endDate;
+                var currentDate = startDate.clone();
+                var dateRangeString = '';
+
+                while (currentDate.isSameOrBefore(endDate)) {
+                    dateRangeString += currentDate.format('YYYY-MM-DD') + '|';
+                    currentDate.add(1, 'day');
+                }
+
+                dateRangeString = dateRangeString.slice(0, -1);
+                $(this).val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
+                $(this).trigger('change');
+                table.column(3).search(dateRangeString, true).draw();
+            });
+
+
+            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+                table.column(3).search('').draw();
+                calculateTotalAmount();
+            });
+
+            function calculateTotalAmount() {
+                $.ajax({
+                    url: "{{ url('purchase/fetch') }}",
+                    success: function(response) {
+                        var total = 0;
+                        var filteredJobOrder = $('#job_orders').val();
+                        console.log('filteredJobOrder', filteredJobOrder);
+                        var filteredDateRange = $('#date_range').val();
+
+                        console.log('filteredDateRange', filteredDateRange);
+                        console.log('response', response);
+                        $.each(response.data, function(index, row) {
+                            if (!row.deleted_at) {
+                                var rowDate = new Date(row.date);
+                                var startDate = new Date(filteredDateRange.split(' - ')[0]);
+                                var endDate = new Date(filteredDateRange.split(' - ')[1]);
+
+                                console.log('Row job ID', row.job_order_id, 'F_ID',
+                                    filteredJobOrder, 'S_D', startDate, 'E_D', endDate);
+                                if ((filteredJobOrder === '' || row.job_order_id ==
+                                        filteredJobOrder) &&
+                                    (filteredDateRange === '' || (rowDate >= startDate &&
+                                        rowDate <= endDate))) {
+                                    console.log("work fine");
+                                    console.log('amount', row.total.replace(/[^\d.]/g, ''));
+                                    var amount = parseFloat(row.total.replace(/[^\d.]/g, ''));
+                                    console.log(amount);
+                                    total += isNaN(amount) ? 0 : amount;
+                                }
+                            }
+                        });
+
+                        var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        }) + ' /-';
+                        $('#total_amount').val(formattedTotal);
+                        console.log('formattedTotal', formattedTotal);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+
             table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -243,92 +322,56 @@
                     targets: 1,
                     visible: false
                 }],
-                footerCallback: function(row, data, start, end, display) {
-                    var api = this.api();
-                    var total = api
-                        .column(8, {
-                            page: 'current'
-                        })
-                        .data()
-                        .reduce(function(acc, val) {
-                            var num = parseFloat(val.replace(/[^\d.]/g, ''));
-                            return isNaN(num) ? acc : acc + num;
-                        }, 0);
-
-                    var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 2
-                    }) + ' /-';
-                    console.log('Formatted Total:', formattedTotal);
-                    $('#total_amount').val(formattedTotal);
+                footerCallback: function(row, date, end, display) {
+                    calculateTotalAmount();
                 }
             });
-        });
+
+            $('#job_orders').on('change', function() {
+                var filterValue = $(this).val();
+                table.columns(1).search(filterValue).draw();
+                calculateTotalAmount();
+            });
 
 
-        $('#job_orders').on('change', function() {
-            var filterValue = $(this).val();
-            table.columns(1).search(filterValue).draw();
-        });
 
 
+            $(document).on("click", ".purchase_export", function() {
+                var job_order = $('#job_orders').val();
+                var date_range = $('#date_range').val();
+                var export_url = "{{ url('purchase_export') }}";
+                if (date_range) {
+                    export_url += "?date_range=" + date_range;
+                }
+                if (job_order) {
+                    export_url += (date_range ? "&" : "?") + "job_order=" + job_order;
+                }
+                window.location.href = export_url;
+            });
 
-        $('#date_range').daterangepicker({
-            autoUpdateInput: false,
-            locale: {
-                cancelLabel: 'Clear'
-            }
-        });
+            $(document).on("click", ".delete-btn", function() {
+                var edit_id = $(this).data('id');
+                $("#edit_id").val(edit_id);
+                $("#delete-confirm-text").text("Are you sure you want to delete this Labour?");
+                $("#delete-confirm-modal").modal("show");
+            });
 
-        $('#date_range').on('apply.daterangepicker', function(ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
-                'YYYY-MM-DD'));
-            $(this).trigger('change');
-            table.columns(3).search(picker.startDate.format('YYYY-MM-DD') + '|' + picker.endDate.format(
-                'YYYY-MM-DD'), true).draw();
-        });
+            $(document).on("click", "#confirm-yes-btn", function() {
+                var edit_id = $("#edit_id").val();
+                $("#confirm-yes-btn").prop("disabled", true);
 
-        $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
-            $(this).val('');
-            table.columns(3).search('').draw();
-        });
-
-
-        $(document).on("click", ".purchase_export", function() {
-            var job_order = $('#job_orders').val();
-            var date_range = $('#date_range').val();
-            var export_url = "{{ url('purchase_export') }}";
-            if (date_range) {
-                export_url += "?date_range=" + date_range;
-            }
-            if (job_order) {
-                export_url += (date_range ? "&" : "?") + "job_order=" + job_order;
-            }
-            window.location.href = export_url;
-        });
-
-        $(document).on("click", ".delete-btn", function() {
-            var edit_id = $(this).data('id');
-            $("#edit_id").val(edit_id);
-            $("#delete-confirm-text").text("Are you sure you want to delete this Labour?");
-            $("#delete-confirm-modal").modal("show");
-        });
-
-        $(document).on("click", "#confirm-yes-btn", function() {
-            var edit_id = $("#edit_id").val();
-            $("#confirm-yes-btn").prop("disabled", true);
-
-            $.ajax({
-                url: "{{ url('purchase/delete') }}/" + edit_id,
-                method: "GET",
-                dataType: "json",
-                success: function(response) {
-                    table.clear().draw();
-                    $("#confirm-yes-btn").prop("disabled", false);
-                },
-                error: function(code) {
-                    alert(code.statusText);
-                },
+                $.ajax({
+                    url: "{{ url('purchase/delete') }}/" + edit_id,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(response) {
+                        table.clear().draw();
+                        $("#confirm-yes-btn").prop("disabled", false);
+                    },
+                    error: function(code) {
+                        alert(code.statusText);
+                    },
+                });
             });
         });
     </script>

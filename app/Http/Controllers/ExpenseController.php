@@ -166,6 +166,8 @@ class ExpenseController extends Controller
 
         $total_amount = "₹" . number_format($total_amount, 2);
 
+        $date_range = $request->date_range;
+
         $export_data[] = [
             'S.No' => '',
             'Job Order' => '',
@@ -181,6 +183,7 @@ class ExpenseController extends Controller
         $data = [
             'view_file' => 'excel_export.expense_export',
             'export_data' => $export_data,
+            'date_range' =>  $date_range,
         ];
 
         return Excel::download(new ExpenseExport($data), 'expenses.xlsx');

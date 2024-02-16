@@ -18,10 +18,10 @@ class SalaryController extends Controller
     public function create()
     {
         $tenders = Tender::where('job_order', 1)
-                         ->where('status', 1)
-                         ->pluck('name','id');
+            ->where('status', 1)
+            ->pluck('name', 'id');
         $Labour = Labour::get('name');
-        return view('salaries.create', compact('tenders','Labour'));
+        return view('salaries.create', compact('tenders', 'Labour'));
     }
 
 
@@ -109,7 +109,7 @@ class SalaryController extends Controller
 
                 return $btn;
             })
-            ->rawColumns(['action','amount'])
+            ->rawColumns(['action', 'amount'])
             ->make(true);
     }
 
@@ -145,7 +145,7 @@ class SalaryController extends Controller
         $pdf = PDF::loadView('pdf_export.salary_receipt', $data);
         return $pdf->stream('salary_receipt.pdf');
 
-            // return $pdf->download('payment_receipt.pdf');
+        // return $pdf->download('payment_receipt.pdf');
     }
 
     public function export(Request $request)
@@ -166,11 +166,13 @@ class SalaryController extends Controller
         }
 
         $salary = $query->get();
-          if ($salary->isEmpty()) {
+        if ($salary->isEmpty()) {
             return redirect()->back()->with('error', 'No data found based on the selected criteria.');
         }
 
         $total_amount = $salary->sum('amount');
+
+        $date_range = $request->date_range;
 
         $export_data = $salary->map(function ($salary, $index) {
             $jobOrderName = Tender::find($salary->job_order)->name;
@@ -204,10 +206,9 @@ class SalaryController extends Controller
         $data = [
             'view_file' => 'excel_export.salary_export',
             'export_data' => $export_data,
+            'date_range' =>  $date_range,
         ];
 
         return Excel::download(new ExpenseExport($data), 'salaries.xlsx');
     }
-
-
 }

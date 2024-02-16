@@ -19,6 +19,15 @@
             <th colspan="2" style="font-weight: 500; text-align: right;">Date Time : {{ date('d-m-Y - h:i A') }}</th>
         </tr>
         <tr>
+            <th></th>
+            <th colspan="2" style="font-weight: 500;"> Start Date : {{ explode(' - ', $data['date_range'])[0] }}</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th colspan="2" style="font-weight: 500;"> End Date  : {{ explode(' - ', $data['date_range'])[1] }}</th>
+        </tr>
+
+        <tr>
             <th style="width:50px;background: #0b027e;color:white;font-weight: 600;text-align: left">S.NO</th>
             <th style="width:200px;background: #0b027e;color:white;font-weight: 600;text-align: left">Payment To</th>
             <th style="width:100px;background: #0b027e;color:white;font-weight: 600;text-align: left">Date</th>

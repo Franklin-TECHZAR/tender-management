@@ -172,6 +172,79 @@
 @section('addscript')
     <script type="text/javascript">
         $(document).ready(function() {
+
+            $('#date_range').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                var startDate = picker.startDate;
+                var endDate = picker.endDate;
+                var currentDate = startDate.clone();
+                var dateRangeString = '';
+
+                while (currentDate.isSameOrBefore(endDate)) {
+                    dateRangeString += currentDate.format('YYYY-MM-DD') + '|';
+                    currentDate.add(1, 'day');
+                }
+
+                dateRangeString = dateRangeString.slice(0, -1);
+                $(this).val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
+                $(this).trigger('change');
+                table.column(3).search(dateRangeString, true).draw();
+            });
+
+
+            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+                table.column(3).search('').draw();
+                calculateExpenseTotal();
+            });
+
+            function calculateExpenseTotal() {
+                $.ajax({
+                    url: "{{ url('expenses/fetch') }}",
+                    success: function(response) {
+                        var total = 0;
+                        var filteredJobOrder = $('#job_orders').val();
+                        var filteredDateRange = $('#date_range').val();
+                        var filteredType = $('#type').val();
+
+                        console.log('filteredDateRange', filteredDateRange);
+                        console.log('response', response);
+                        $.each(response.data, function(index, row) {
+                            if (!row.deleted_at) {
+                                var rowDate = new Date(row.date);
+                                var startDate = new Date(filteredDateRange.split(' - ')[0]);
+                                var endDate = new Date(filteredDateRange.split(' - ')[1]);
+
+                                if ((filteredJobOrder === '' || row.job_order ===
+                                        filteredJobOrder) &&
+                                    (filteredDateRange === '' || (rowDate >= startDate &&
+                                        rowDate <= endDate)) &&
+                                    (filteredType === '' || row.type === filteredType)) {
+                                    var amount = parseFloat(row.amount.replace(/[^\d.]/g, ''));
+                                    total += isNaN(amount) ? 0 : amount;
+                                }
+                            }
+                        });
+
+                        var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        }) + ' /-';
+                        $('#total_amount').val(formattedTotal);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+
             var table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -217,46 +290,9 @@
                     targets: 1,
                     visible: false
                 }],
-                footerCallback: function(row, data, start, end, display) {
-                    var api = this.api();
-                    var total = api
-                        .column(5, {
-                            page: 'current'
-                        })
-                        .data()
-                        .reduce(function(acc, val) {
-                            var num = parseFloat(val.replace(/[^\d.]/g, ''));
-                            return isNaN(num) ? acc : acc + num;
-                        }, 0);
-
-                    var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 2
-                    }) + ' /-';
-                    console.log('Formatted Total:', formattedTotal);
-                    $('#total_amount').val(formattedTotal);
+                footerCallback: function(row, date, end, display) {
+                    calculateExpenseTotal();
                 }
-
-            });
-
-            $('#date_range').daterangepicker({
-                autoUpdateInput: false,
-                locale: {
-                    cancelLabel: 'Clear'
-                }
-            });
-
-            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
-                $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
-                    'YYYY-MM-DD'));
-                $(this).trigger('change');
-                table.columns(3).search(picker.startDate.format('YYYY-MM-DD') + '|' + picker.endDate.format(
-                    'YYYY-MM-DD'), true).draw();
-            });
-
-            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
-                $(this).val('');
-                table.columns(3).search('').draw();
             });
 
 
@@ -419,11 +455,13 @@
             $('#type').on('change', function() {
                 var filterValue = $(this).val();
                 table.columns(4).search(filterValue).draw();
+                calculateExpenseTotal();
             });
 
             $('#job_orders').on('change', function() {
                 var filterValue = $(this).val();
                 table.columns(1).search(filterValue).draw();
+                calculateExpenseTotal();
             });
         });
     </script>
