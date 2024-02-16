@@ -34,23 +34,23 @@
 		}
         .btn-primary,
         .btn-primary:hover {
-            background-color: #008000;
-            border-color: #008000;
+            background-color: #2da32d;
+            border-color: #2da32d;
         }
         .custom-checkbox .custom-control-input:checked~.custom-control-label::before {
-            background-color: #008000;
+            background-color: #2da32d;
         }
 
         .custom-control-input:checked~.custom-control-label::before {
-            border-color: #008000;
-            background-color: #008000;
+            border-color: #2da32d;
+            background-color: #2da32d;
         }
 
         .custom-control-label::before {
-            border: 2px solid #008000;
+            border: 2px solid #2da32d;
         }
         .text-primary {
-            color: #008000!important;
+            color: #2da32d!important;
         }
 
 	</style>
