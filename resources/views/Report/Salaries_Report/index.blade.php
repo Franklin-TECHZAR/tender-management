@@ -135,7 +135,7 @@
 
                 var totalRow = '<tr>' +
                     '<td colspan="5" style="text-align: right;"><b>Total:</b></td>' +
-                    '<td style="text-align: right;"><b>₹ ' + totalAmount.toFixed(2) + '</b></td>' +
+                    '<td style="text-align: right;"><b>₹ ' + totalAmount.toFixed(2) + ' /-</b></td>' +
                     '</tr>';
                 $('#salary_table_body').append(totalRow);
                 calculateTotalAmount();
