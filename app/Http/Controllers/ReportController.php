@@ -226,31 +226,10 @@ class ReportController extends Controller
         return view('Report.Expenses_Report.index', compact('tenders', 'ExpenseType', 'Expense'));
     }
 
-
     public function expense_fetch()
     {
-        $data = Expense::orderBy('date', "DESC")->get();
-        return DataTables::of($data)
-            ->addIndexColumn()
-            ->addColumn('amount', function ($row) {
-                return "<span class='pull-right'>₹" . number_format($row->amount, 2) . "</span>";
-            })
-            ->addColumn('action', function ($row) {
-                $btn = '<div class="dropdown">
-                            <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                                <i class="dw dw-more"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
-                            <a href="/generate-pdf/' . $row->id . '" class="dropdown-item" target="_blank"><i class="dw dw-download"></i> Download Receipt</a>
-                            <button data-id="' . $row->id . '" class="edit-btn dropdown-item"><i class="dw dw-edit2"></i> Edit</button>
-                            <button data-id="' . $row->id . '" class="delete-btn dropdown-item"><i class="dw dw-delete-3"></i> Delete</button>
-                            </div>
-                        </div>';
-
-                return $btn;
-            })
-            ->rawColumns(['action', 'amount'])
-            ->make(true);
+        $expense = Expense::orderBy('date', 'ASC')->get();
+        return response()->json(['expense' => $expense]);
     }
 
 
@@ -267,14 +246,22 @@ class ReportController extends Controller
             $query->whereBetween('date', [$start_date, $end_date]);
         }
 
-        $expenses = $query->get();
+        if ($request->has('job_order')) {
+            $query->where('job_order', $request->job_order);
+        }
+
+        if ($request->has('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $expenses = $query->orderBy('date', 'ASC')->get();
 
         if ($expenses->isEmpty()) {
             return redirect()->back()->with('error', 'No data found based on the selected criteria.');
         }
 
         $total_amount = $expenses->sum('amount');
-
+        $date_range = $request->date_range;
         $export_data = $expenses->map(function ($expense, $index) {
             $jobOrderName = Tender::find($expense->job_order)->name;
             return [
@@ -307,6 +294,7 @@ class ReportController extends Controller
         $data = [
             'view_file' => 'excel_export.expense_export',
             'export_data' => $export_data,
+            'date_range' =>  $date_range,
         ];
 
         return Excel::download(new ExpenseExport($data), 'expenses.xlsx');

@@ -19,11 +19,23 @@
         </tr>
         <tr>
             <th></th>
-            <th colspan="2" style="font-weight: 500;"> Start Date : {{ explode(' - ', $data['date_range'])[0] }}</th>
+            <th colspan="2" style="font-weight: 500;"> Start Date :
+                @if(isset($data['date_range']) && count(explode(' - ', $data['date_range'])) > 0)
+                    {{ explode(' - ', $data['date_range'])[0] }}
+                @else
+                    ALL
+                @endif
+            </th>
         </tr>
         <tr>
             <th></th>
-            <th colspan="2" style="font-weight: 500;"> End Date  : {{ explode(' - ', $data['date_range'])[1] }}</th>
+            <th colspan="2" style="font-weight: 500;"> End Date:
+                @if (isset($data['date_range']) && count(explode(' - ', $data['date_range'])) > 1)
+                    {{ explode(' - ', $data['date_range'])[1] }}
+                @else
+                    ALL
+                @endif
+            </th>
         </tr>
         <tr>
             <th style="width:50px;background: #0b027e;color:white;font-weight: 600;text-align: left">S.NO</th>

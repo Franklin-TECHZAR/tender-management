@@ -122,8 +122,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('salaries_report/report', [ReportController::class, 'salary_export']);
 
     Route::get('expenses_report', [ReportController::class, 'expense_index']);
-    Route::get('report/expense_fetch', [ReportController::class, 'expense_fetch']);
-    Route::get('report/expense_export', [ReportController::class, 'expense_export']);
+    Route::get('report/expense_fetch', [ReportController::class, 'expense_fetch'])->name('expenses.fetch');
+    Route::get('expense_export/report', [ReportController::class, 'expense_export']);
 
 });
 
