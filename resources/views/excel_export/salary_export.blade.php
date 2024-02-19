@@ -7,7 +7,7 @@
         </tr>
         <tr>
             <th colspan="9" style="font-weight: 500;text-align: center;color:#0b027e;">
-                Salaries Report <!-- Change 'Expenses Report' to 'Salaries Report' -->
+                Salary Report <!-- Change 'Expenses Report' to 'Salaries Report' -->
             </th>
         </tr>
         <tr>
@@ -20,11 +20,23 @@
         </tr>
         <tr>
             <th></th>
-            <th colspan="2" style="font-weight: 500;"> Start Date : {{ explode(' - ', $data['date_range'])[0] }}</th>
+            <th colspan="2" style="font-weight: 500;"> Start Date :
+                @if(isset($data['date_range']) && count(explode(' - ', $data['date_range'])) > 0)
+                    {{ explode(' - ', $data['date_range'])[0] }}
+                @else
+                    ALL
+                @endif
+            </th>
         </tr>
         <tr>
             <th></th>
-            <th colspan="2" style="font-weight: 500;"> End Date  : {{ explode(' - ', $data['date_range'])[1] }}</th>
+            <th colspan="2" style="font-weight: 500;"> End Date:
+                @if (isset($data['date_range']) && count(explode(' - ', $data['date_range'])) > 1)
+                    {{ explode(' - ', $data['date_range'])[1] }}
+                @else
+                    ALL
+                @endif
+            </th>
         </tr>
 
         <tr>
@@ -34,7 +46,8 @@
             <!-- Remove 'Type' column -->
             <th style="width:300px;background: #0b027e;color:white;font-weight: 600;text-align: left">Description</th>
             <th style="width:100px;background: #0b027e;color:white;font-weight: 600;text-align: left">Payment Mode</th>
-            <th style="width:200px;background: #0b027e;color:white;font-weight: 600;text-align: left">Payment Details</th>
+            <th style="width:200px;background: #0b027e;color:white;font-weight: 600;text-align: left">Payment Details
+            </th>
             <th style="width:100px;background: #0b027e;color:white;font-weight: 600;text-align: right">Amount</th>
         </tr>
     </thead>

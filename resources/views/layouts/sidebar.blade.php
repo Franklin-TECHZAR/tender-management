@@ -5,20 +5,25 @@ $url_segments = request()->segments();
 $dashboard = '';
 $tender = '';
 
-$expenses = '';
 $purchase = '';
+$expenses = '';
 
 $masters = '';
 $materials = '';
 $labours = '';
-$vendors = '';
 $expenses_type = '';
 $purchase_type = '';
 $purchase_dept = '';
+$salaries = '';
+$vendors = '';
 
 $users = '';
 $users_roles = '';
-$salaries = '';
+
+$report = '';
+$expenses_report = '';
+$salaries_report = '';
+$purchases_report = '';
 
 if (isset($url_segments[0]) && $url_segments[0] == 'dashboard') {
     $dashboard = 'active';
@@ -63,12 +68,28 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_type') {
     $purchase_type = 'active';
 }
 
-if (isset($url_segments[0]) && $url_segments[0] == 'salaries') {
-    $salaries = 'active';
+if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
+    $report = 'active';
+    $purchase_dept = 'active';
 }
 
-if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
-    $purchase_dept = 'active';
+if (isset($url_segments[0]) && $url_segments[0] == 'salaries_report') {
+    $report = 'active';
+    $salaries_report = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'purchases_report') {
+    $report = 'active';
+    $purchases_report = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'expenses_report') {
+    $report = 'active';
+    $expenses_report = 'active';
+}
+
+if (isset($url_segments[0]) && $url_segments[0] == 'report') {
+    $report = 'active';
 }
 
 ?>
@@ -160,7 +181,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
                         class="@if ($salaries) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy fa fa-dollar" aria-hidden="true"></i>
-                        </span><span class="mtext">Salaries</span>
+                        </span><span class="mtext">Salary</span>
                     </a>
                 </li>
 
@@ -172,8 +193,35 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
                         </span><span class="mtext">Purchase Dept</span>
                     </a>
                 </li>
+                <li>
+                </li>
+
+                <li class="dropdown @if ($report) show @endif">
+                    <a href="javascript:;" class="dropdown-toggle">
+                        <span class="micon">
+                            <i class="icon-copy fa fa-file-text" aria-hidden="true"></i>
+                        </span>
+                        <span class="mtext">Report</span>
+                    </a>
+
+                    <ul class="submenu" style="display:@if ($report) block; @else none; @endif">
+                        <li><a class="@if ($salaries_report) active @endif"
+                                href="{{ url('salaries_report') }}">Salary</a></li>
+                    </ul>
+                    <ul class="submenu" style="display:@if ($report) block; @else none; @endif">
+                        <li><a class="@if ($expenses_report) active @endif"
+                                href="{{ url('expenses_report') }}">Expenses</a></li>
+                    </ul>
+                    <ul class="submenu" style="display:@if ($report) block; @else none; @endif">
+                        <li><a class="@if ($purchases_report) active @endif"
+                                href="{{ url('purchases_report') }}">Purchase Dept</a></li>
+                    </ul>
+                </li>
 
                 {{-- <li class="dropdown @if ($users_roles) show @endif">
+
+
+                <li class="dropdown @if ($users_roles) show @endif">
                     <a href="javascript:;" class="dropdown-toggle">
                         <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 5px" width="10" height="10"
                             fill="currentColor" class="bi bi-person-fill-gear micon" viewBox="0 0 22 22">

@@ -13,6 +13,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,6 +112,19 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('purchase_dept/fetch', [PaymentController::class, 'fetch']);
     Route::get('purchase_dept/fetch-edit/{id}', [PaymentController::class, 'fetch_edit']);
     Route::get('purchase_dept/delete/{id}', [PaymentController::class, 'delete']);
+
+    Route::get('purchases_report', [ReportController::class, 'purchase_index']);
+    Route::get('report/purchase_fetch', [ReportController::class, 'purchase_fetch']);
+    Route::get('report/purchase_export', [PurchaseController::class, 'purchase_export']);
+
+    Route::get('salaries_report', [ReportController::class, 'salary_create']);
+    Route::get('report/salary_fetch', [ReportController::class, 'salary_fetch'])->name('salaries.fetch');
+    Route::get('salaries_report/report', [ReportController::class, 'salary_export']);
+
+    Route::get('expenses_report', [ReportController::class, 'expense_index']);
+    Route::get('report/expense_fetch', [ReportController::class, 'expense_fetch']);
+    Route::get('report/expense_export', [ReportController::class, 'expense_export']);
+
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

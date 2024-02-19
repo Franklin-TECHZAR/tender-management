@@ -67,9 +67,9 @@
                                 <label>Type</label>
                                 <select class="form-control" name="type" id="type">
                                     <option value="" disabled selected hidden>Select Type</option>
-                                    @foreach ($ExpenseType as $type)
-                                        <option value="{{ $type }}"
-                                            {{ $purchase->type == $type ? 'selected' : '' }}>{{ $type }}</option>
+                                    @foreach ($PurchaseTypes as $type)
+                                        <option value="{{ $type->id }}"
+                                            {{ $purchase->type == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
                                     @endforeach
                                 </select>
                             </div>

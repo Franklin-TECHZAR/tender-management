@@ -51,9 +51,10 @@
                                 <label for="job_orders">Filter by Purchase Type:</label>
                                 <select class="form-control" name="purchase_type" id="purchase_type" required>
                                     <option value="" selected>All</option>
-                                    @foreach ($tenders as $id => $tenderName)
-                                        <option value="{{ $id }}">{{ $tenderName }}</option>
-                                    @endforeach
+                                    @foreach ($PurchaseTypes as $type)
+                                    <option value="{{ $type->id }}"
+                                        {{ $purchase->type == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
+                                @endforeach
                                 </select>
                             </div>
                         </div>
@@ -73,7 +74,7 @@
                 </div>
                 <div class="pd-20 bg-white border-radius-4 box-shadow">
 
-                    <table class="table table-bordered data-table table-responsive" width="974px">
+                    <table class="table table-bordered data-table">
                         <thead>
                             <tr>
                                 <th>S.NO</th>
@@ -216,6 +217,7 @@
                     success: function(response) {
                         var total = 0;
                         var filteredJobOrder = $('#job_orders').val();
+                        var filteredPurchaseType = $('#purchase_type').val();
                         console.log('filteredJobOrder', filteredJobOrder);
                         var filteredDateRange = $('#date_range').val();
 
@@ -232,7 +234,8 @@
                                 if ((filteredJobOrder === '' || row.job_order_id ==
                                         filteredJobOrder) &&
                                     (filteredDateRange === '' || (rowDate >= startDate &&
-                                        rowDate <= endDate))) {
+                                        rowDate <= endDate)) && (filteredPurchaseType === '' || row.type ==
+                                        filteredPurchaseType)) {
                                     console.log("work fine");
                                     console.log('amount', row.total.replace(/[^\d.]/g, ''));
                                     var amount = parseFloat(row.total.replace(/[^\d.]/g, ''));
@@ -333,7 +336,11 @@
                 calculateTotalAmount();
             });
 
-
+            $('#purchase_type').on('change', function() {
+                var filterValue = $(this).val();
+                table.columns(2).search(filterValue).draw();
+                calculateTotalAmount();
+            });
 
 
             $(document).on("click", ".purchase_export", function() {

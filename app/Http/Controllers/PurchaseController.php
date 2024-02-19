@@ -8,6 +8,7 @@ use App\Models\Tender;
 use App\Models\Vendor;
 use App\Models\Purchase;
 use App\Models\ExpenseType;
+use App\Models\PurchaseType;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use App\Exports\PurchaseExport;
@@ -18,10 +19,12 @@ class PurchaseController extends Controller
 {
     public function index()
     {
+        $purchase = new Purchase();
         $tenders = Tender::where('job_order', 1)
             ->where('status', 1)
             ->pluck('name', 'id');
-        return view('purchase.index', compact('tenders'));
+            $PurchaseTypes = PurchaseType::get();
+        return view('purchase.index', compact('tenders','PurchaseTypes','purchase'));
     }
 
     public function create()
@@ -31,8 +34,9 @@ class PurchaseController extends Controller
         $vendors = Vendor::get();
         $materials = Material::get();
         $job_orders = Tender::where("job_order", 1)->where("status", 1)->get();
-        $ExpenseType = ExpenseType::get()->pluck('name');
-        return view('purchase.create_edit', compact('company_settings', 'vendors', 'materials', 'job_orders', 'ExpenseType', 'purchase'));
+        // $ExpenseType = ExpenseType::get()->pluck('name');
+        $PurchaseTypes = PurchaseType::get();
+        return view('purchase.create_edit', compact('company_settings', 'vendors', 'materials', 'job_orders', 'PurchaseTypes', 'purchase'));
     }
 
     public function edit($id)
@@ -42,8 +46,9 @@ class PurchaseController extends Controller
         $materials = Material::get();
         $job_orders = Tender::where("job_order", 1)->where("status", 1)->get();
         $purchase = Purchase::findOrFail($id);
-        $ExpenseType = ExpenseType::get()->pluck('name');
-        return view('purchase.create_edit', compact('company_settings', 'vendors', 'materials', 'job_orders', 'ExpenseType', 'purchase'));
+        // $ExpenseType = ExpenseType::get()->pluck('name');
+        $PurchaseTypes = PurchaseType::get();
+        return view('purchase.create_edit', compact('company_settings', 'vendors', 'materials', 'job_orders', 'PurchaseTypes', 'purchase'));
     }
 
     public function submit(Request $request)
@@ -255,5 +260,4 @@ class PurchaseController extends Controller
 
         return Excel::download(new PurchaseExport($data), 'purchase.xlsx');
     }
-
 }
