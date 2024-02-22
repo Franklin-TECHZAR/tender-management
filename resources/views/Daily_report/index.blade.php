@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('title', 'Expenses')
+@section('title', 'Labour Report')
 @section('content')
     <div class="main-container">
         <div class="pd-ltr-20 xs-pd-20-10">
@@ -8,7 +8,7 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="title">
-                                <h4>Expenses Management</h4>
+                                <h4>Labour Report Management</h4>
                             </div>
                             <nav aria-label="breadcrumb" role="navigation">
                                 <ol class="breadcrumb">
@@ -16,16 +16,16 @@
                                         <a href="{{ url('admin/dashboard') }}">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">
-                                        Create Expenses
+                                        Create Labour Report
                                     </li>
                                 </ol>
                             </nav>
                         </div>
                         <div class="col-md-6 d-flex justify-content-end align-items-center">
-                            {{-- <button class="btn btn-success expense_export mr-2">
+                            <button class="btn btn-success export-btn mr-2">
                                 <i class="bi bi-file-earmark-excel"></i> Export
-                            </button> --}}
-                            <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#expense-modal">
+                            </button>
+                            <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#labour-report-modal">
                                 <i class="bi bi-plus"></i> Create New
                             </button>
                         </div>
@@ -33,52 +33,34 @@
                 </div>
                 <div class="page-header">
                     <div class="row">
-                        <div class="col-sm-3">
-                            <label for="job_orders">Filter by Job Order:</label>
-                            <select class="form-control" name="job_orders" id="job_orders" required>
-                                <option value="" selected>All</option>
-                                @foreach ($tenders as $id => $tenderName)
-                                    <option value="{{ $id }}">{{ $tenderName }}</option>
-                                @endforeach
-                            </select>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="job_orders">Filter by Job Order:</label>
+                                <select class="form-control" name="job_orders" id="job_orders" required>
+                                    <option value="" selected>All</option>
+                                    @foreach ($tenders as $id => $tenderName)
+                                        <option value="{{ $id }}">{{ $tenderName }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-sm-3">
-                            <label for="type">Filter by Type:</label>
-                            <select class="form-control" name="type" id="type" required>
-                                <option value="" selected>All</option>
-                                @foreach ($ExpenseType as $type)
-                                    <option value="{{ $type }}">{{ $type }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="date_range">Date Range:</label>
                                 <input type="text" class="form-control" name="date_range" id="date_range">
                             </div>
                         </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label for="total_amount">Total Amount:</label>
-                                <input type="text" class="form-control" id="total_amount" readonly>
-                            </div>
-                        </div>
                     </div>
                 </div>
-
                 <div class="pd-20 bg-white border-radius-4 box-shadow">
                     <table class="table table-bordered data-table">
                         <thead>
                             <tr>
                                 <th>S.NO</th>
                                 <th>Job Order</th>
-                                <th>Payment To</th>
+                                <th>Labour</th>
                                 <th>Date</th>
-                                <th>Type</th>
-                                <th>Amount</th>
-                                {{-- <th>Description</th> --}}
-                                <th>Payment Mode</th>
-                                {{-- <th>Payment Details</th> --}}
+                                <th>Description</th>
                                 <th width="100px">Action</th>
                             </tr>
                         </thead>
@@ -89,19 +71,19 @@
         </div>
     </div>
 
-    <div class="modal fade" id="expense-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+    <div class="modal fade" id="labour-report-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="modal-title-label">
-                        Create Expense
+                        Create Labour Report
                     </h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         ×
                     </button>
                 </div>
-                <form id="expense-form">
+                <form id="labour-report-form">
                     @csrf
                     <input type="hidden" name="edit_id" id="edit_id">
                     <div class="modal-body">
@@ -115,43 +97,22 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Payment To</label>
-                            <input type="text" class="form-control" name="payment_to" id="payment_to" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input type="date" class="form-control" name="date" id="date" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Type</label>
-                            <select class="form-control" name="type" id="type" required>
-                                <option value="" disabled selected hidden>Select Type</option>
-                                @foreach ($ExpenseType as $type)
-                                    <option value="{{ $type }}">{{ $type }}</option>
+                            <label for="labour">Labour</label>
+                            <select class="form-control" name="labour" id="labour" required>
+                                <option value="" disabled selected hidden>Select Labour</option>
+                                @foreach ($Labour as $Labour)
+                                    <option value="{{ $Labour->name }}">{{ $Labour->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Amount</label>
-                            <input type="number" class="form-control" name="amount" id="amount" required>
+                            <label for="date">Date (Single / Multiple date Range)</label>
+                            <input type="text" id="datepicker" name="date" placeholder="Select Dates" multiple
+                                style="width: 450px; height: 40px; opacity: 0.3; border-radius: 5px;">
                         </div>
                         <div class="form-group">
-                            <label>Description</label>
+                            <label for="description">Description</label>
                             <textarea class="form-control" name="description" id="description"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="payment_mode">Payment Mode</label>
-                            <select class="form-control" name="payment_mode" id="payment_mode" required>
-                                <option value="" disabled selected hidden>Select Payment Mode</option>
-                                <option value="Cash">Cash</option>
-                                <option value="Cheque">Cheque</option>
-                                <option value="Neft">Neft</option>
-                                <option value="Bank Transfer">Bank Transfer</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Payment Details</label>
-                            <textarea class="form-control" name="payment_details" id="payment_details" required></textarea>
                         </div>
                     </div>
                     <div class="modal-footer" id="modal-footer-buttons">
@@ -168,10 +129,13 @@
     </div>
 
 @endsection
-
 @section('addscript')
     <script type="text/javascript">
         $(document).ready(function() {
+            flatpickr("#datepicker", {
+                mode: "multiple",
+                dateFormat: "Y-m-d"
+            });
 
             $('#date_range').daterangepicker({
                 autoUpdateInput: false,
@@ -201,17 +165,16 @@
             $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
                 $(this).val('');
                 table.column(3).search('').draw();
-                calculateExpenseTotal();
+                calculateTotalAmount();
             });
 
-            function calculateExpenseTotal() {
+            function calculateTotalAmount() {
                 $.ajax({
-                    url: "{{ url('expenses/fetch') }}",
+                    url: "{{ url('salaries/fetch') }}",
                     success: function(response) {
                         var total = 0;
                         var filteredJobOrder = $('#job_orders').val();
                         var filteredDateRange = $('#date_range').val();
-                        var filteredType = $('#type').val();
 
                         console.log('filteredDateRange', filteredDateRange);
                         console.log('response', response);
@@ -224,8 +187,7 @@
                                 if ((filteredJobOrder === '' || row.job_order ===
                                         filteredJobOrder) &&
                                     (filteredDateRange === '' || (rowDate >= startDate &&
-                                        rowDate <= endDate)) &&
-                                    (filteredType === '' || row.type === filteredType)) {
+                                        rowDate <= endDate))) {
                                     var amount = parseFloat(row.amount.replace(/[^\d.]/g, ''));
                                     total += isNaN(amount) ? 0 : amount;
                                 }
@@ -244,11 +206,15 @@
                 });
             }
 
+            $('#job_orders').on('change', function() {
+                table.column(1).search(this.value).draw();
+                calculateTotalAmount();
+            });
 
             var table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ url('expenses/fetch') }}",
+                ajax: "{{ url('labour_report/fetch') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex'
@@ -258,27 +224,17 @@
                         name: 'job_order'
                     },
                     {
-                        data: 'payment_to',
-                        name: 'payment_to'
+                        data: 'labour',
+                        name: 'labour'
                     },
                     {
                         data: 'date',
                         name: 'date'
                     },
                     {
-                        data: 'type',
-                        name: 'type'
+                        data: 'desc',
+                        name: 'desc'
                     },
-                    {
-                        data: 'amount',
-                        name: 'amount'
-                    },
-                    // { data: 'description', name: 'description' },
-                    {
-                        data: 'payment_mode',
-                        name: 'payment_mode'
-                    },
-                    // { data: 'payment_details', name: 'payment_details' },
                     {
                         data: 'action',
                         name: 'action',
@@ -291,42 +247,15 @@
                     visible: false
                 }],
                 footerCallback: function(row, date, end, display) {
-                    calculateExpenseTotal();
+                    calculateTotalAmount();
                 }
             });
 
-
-            $(document).on("click", ".expense_export", function() {
-                var job_order = $('#job_orders').val();
-                var type = $('#type').val();
-                var date_range = $('#date_range').val();
-
-                var export_url = "{{ url('expense_export') }}";
-                var queryParams = [];
-
-                if (job_order) {
-                    queryParams.push("job_order=" + job_order);
-                }
-                if (type) {
-                    queryParams.push("type=" + type);
-                }
-                if (date_range) {
-                    queryParams.push("date_range=" + encodeURIComponent(date_range));
-                }
-
-                if (queryParams.length > 0) {
-                    export_url += "?" + queryParams.join("&");
-                }
-
-                window.location.href = export_url;
-            });
-
-
-            $("#expense-form").validate({
+            $("#labour-report-form").validate({
                 submitHandler: function(form) {
                     $("#submit-btn").prop("disabled", true);
                     var data = new FormData(form);
-                    var url = "{{ url('expenses/store') }}";
+                    var url = "{{ url('labour_report/store') }}";
                     $.ajax({
                         type: "POST",
                         url: url,
@@ -334,7 +263,7 @@
                         processData: false,
                         contentType: false,
                         success: function() {
-                            $("#expense-modal").modal("hide");
+                            $("#labour-report-modal").modal("hide");
                             table.clear().draw();
                             $("#submit-btn").prop("disabled", false);
                         },
@@ -346,33 +275,19 @@
                 }
             });
 
-
-
-
             $(document).on("click", ".edit-btn", function() {
                 var edit_id = $(this).data('id');
                 $("#edit_id").val(edit_id);
                 $.ajax({
-                    url: "{{ url('expenses/fetch-edit') }}/" + edit_id,
+                    url: "{{ url('labour_report/fetch-edit') }}/" + edit_id,
                     dataType: "json",
                     success: function(response) {
-                        console.log('response', response);
                         $("#job_order").val(response.job_order).prop('disabled', false);
-                        $("#payment_to").val(response.payment_to).prop('disabled', false);
-                        $("#date").val(response.date).prop('disabled', false);
-                        // $("#type").val(response.type).prop('disabled', false);
-                        $("#amount").val(response.amount).prop('disabled', false);
-                        $("#description").val(response.description).prop('disabled', false);
-                        $("#payment_mode").val(response.payment_mode).prop('disabled', false);
-                        $("#payment_details").val(response.payment_details).prop('disabled',
-                            false);
-                        $("#type option").each(function() {
-                            if ($(this).val() === response.type) {
-                                $(this).prop("selected", true);
-                            }
-                        });
-                        $("#modal-title-label").html('Edit Expense');
-                        $("#expense-modal").modal("show");
+                        $("#labour").val(response.labour).prop('disabled', false);
+                        $("#datepicker").val(response.date).prop('disabled', false);
+                        $("#description").val(response.desc).prop('disabled', false);
+                        $("#modal-title-label").html('Edit Labour Report');
+                        $("#labour-report-modal").modal("show");
                         $("#modal-footer-buttons").show();
                     },
                     error: function(code) {
@@ -381,26 +296,19 @@
                 });
             });
 
-
-
             $(document).on("click", ".view-btn", function() {
                 var edit_id = $(this).data('id');
                 $("#edit_id").val(edit_id);
                 $.ajax({
-                    url: "{{ url('expenses/fetch-edit') }}/" + edit_id,
+                    url: "{{ url('labour_report/fetch-edit') }}/" + edit_id,
                     dataType: "json",
                     success: function(response) {
                         $("#job_order").val(response.job_order).prop('disabled', true);
-                        $("#payment_to").val(response.payment_to).prop('disabled', true);
-                        $("#date").val(response.date).prop('disabled', true);
-                        $("#type").val(response.type).prop('disabled', true);
-                        $("#amount").val(response.amount).prop('disabled', true);
+                        $("#labour").val(response.labour).prop('disabled', true);
+                        $("#datepicker").val(response.date).prop('disabled', true);
                         $("#description").val(response.description).prop('disabled', true);
-                        $("#payment_mode").val(response.payment_mode).prop('disabled', true);
-                        $("#payment_details").val(response.payment_details).prop('disabled',
-                            true);
-                        $("#modal-title-label").html('View Expense');
-                        $("#expense-modal").modal("show");
+                        $("#modal-title-label").html('View Labour Report');
+                        $("#labour-report-modal").modal("show");
                         $("#modal-footer-buttons").hide();
                     },
                     error: function(code) {
@@ -409,28 +317,35 @@
                 });
             });
 
-
             $(document).on("click", ".add-btn", function() {
                 $("#edit_id").val("");
-                $("#expense-form")[0].reset();
+                $("#labour-report-form")[0].reset();
                 $("#job_order").prop('disabled', false);
-                $("#payment_to").prop('disabled', false);
-                $("#date").prop('disabled', false);
-                $("#type").prop('disabled', false);
-                $("#amount").prop('disabled', false);
+                $("#labour").prop('disabled', false);
+                $("#datepicker").prop('disabled', false);
                 $("#description").prop('disabled', false);
-                $("#payment_mode").prop('disabled', false);
-                $("#payment_details").prop('disabled', false);
-                $("#modal-title-label").html('Create Expense');
+                $("#modal-title-label").html('Create Labour Report');
                 $("#modal-footer-buttons").show();
             });
 
+            $(document).on("click", ".export-btn", function() {
+                var job_order = $('#job_orders').val();
+                var date_range = $('#date_range').val();
+                var export_url = "{{ url('labour_export') }}";
+                if (date_range) {
+                    export_url += "?date_range=" + date_range;
+                }
+                if (job_order) {
+                    export_url += (date_range ? "&" : "?") + "job_order=" + job_order;
+                }
+                window.location.href = export_url;
+            });
 
 
             $(document).on("click", ".delete-btn", function() {
                 var edit_id = $(this).data('id');
                 $("#edit_id").val(edit_id);
-                $("#delete-confirm-text").text("Are you sure you want to delete this Expense?");
+                $("#delete-confirm-text").text("Are you sure you want to delete this Labour Report?");
                 $("#delete-confirm-modal").modal("show");
             });
 
@@ -438,7 +353,7 @@
                 var edit_id = $("#edit_id").val();
                 $("#confirm-yes-btn").prop("disabled", true);
                 $.ajax({
-                    url: "{{ url('expenses/delete') }}/" + edit_id,
+                    url: "{{ url('labour_report/delete') }}/" + edit_id,
                     method: "GET",
                     dataType: "json",
                     success: function(response) {
@@ -449,19 +364,6 @@
                         alert(code.statusText);
                     },
                 });
-            });
-
-
-            $('#type').on('change', function() {
-                var filterValue = $(this).val();
-                table.columns(4).search(filterValue).draw();
-                calculateExpenseTotal();
-            });
-
-            $('#job_orders').on('change', function() {
-                var filterValue = $(this).val();
-                table.columns(1).search(filterValue).draw();
-                calculateExpenseTotal();
             });
         });
     </script>

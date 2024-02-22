@@ -82,7 +82,7 @@ class ReportController extends Controller
             $query->where('job_order_id', $request->job_order);
         }
 
-        $purchase = $query->get();
+        $purchase = $query->orderBy('date', 'ASC')->get();
 
         if ($purchase->isEmpty()) {
             return redirect()->back()->with('error', 'No data found based on the selected criteria.');

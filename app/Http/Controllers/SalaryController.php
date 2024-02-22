@@ -165,7 +165,7 @@ class SalaryController extends Controller
             $query->where('job_order', $request->job_order);
         }
 
-        $salary = $query->get();
+        $salary = $query->orderBy('date', 'ASC')->get();
         if ($salary->isEmpty()) {
             return redirect()->back()->with('error', 'No data found based on the selected criteria.');
         }

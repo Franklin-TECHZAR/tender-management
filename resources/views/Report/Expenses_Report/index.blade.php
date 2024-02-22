@@ -80,7 +80,7 @@
                                 {{-- <th>Description</th> --}}
                                 <th>Payment Mode</th>
                                 <th>Payment Details</th>
-                                <th>Amount</th>
+                                <th style="text-align: right;">Amount</th>
                             </tr>
                         </thead>
                         <tbody id="expenses_table">
@@ -125,7 +125,11 @@
                         '<td>' + expense.type + '</td>' +
                         '<td>' + expense.payment_mode + '</td>' +
                         '<td>' + expense.payment_details + '</td>' +
-                        '<td style="text-align: right;">₹ ' + expense.amount + '</td>' +
+                        '<td style="text-align: right;">₹' + parseFloat(expense.amount).toLocaleString(
+                            'en-IN', {
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2
+                            }) + '</td>' +
                         '</tr>';
 
                     totalAmount += parseFloat(expense.amount);
@@ -134,7 +138,11 @@
 
                 var totalRow = '<tr>' +
                     '<td colspan="6" style="text-align: right;"><b>Total:</b></td>' +
-                    '<td style="text-align: right;"><b>₹ ' + totalAmount.toFixed(2) + ' /-</b></td>' +
+                    '<td style="text-align: right;"><b>₹' + totalAmount.toLocaleString(
+                        'en-IN', {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        }) + '</b></td>' +
                     '</tr>';
                 $('#expenses_table').append(totalRow);
                 calculateTotalAmount();

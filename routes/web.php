@@ -14,6 +14,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\LabourReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,6 +99,13 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('generate-pdf/{id}', [ExpenseController::class, 'generatePDF'])->name('generate.pdf');
     Route::get('/get-types', [ExpenseController::class, 'getTypes'])->name('get.types');
 
+    Route::get('labour_report', [LabourReportController::class, 'index']);
+    Route::post('labour_report/store', [LabourReportController::class, 'store']);
+    Route::get('labour_report/fetch', [LabourReportController::class, 'fetch']);
+    Route::get('labour_report/fetch-edit/{id}', [LabourReportController::class, 'fetch_edit']);
+    Route::get('labour_report/delete/{id}', [LabourReportController::class, 'delete']);
+    Route::get('labour_export', [LabourReportController::class, 'export']);
+
     Route::get('/salaries', [SalaryController::class, 'create'])->name('salaries.create');
     Route::post('/salaries/store', [SalaryController::class, 'store'])->name('salaries.store');
     Route::get('salaries/fetch', [SalaryController::class, 'fetch']);
@@ -105,7 +113,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('salaries/delete/{id}', [SalaryController::class, 'delete']);
     Route::get('export', [SalaryController::class, 'export']);
     Route::get('generatesalary-pdf/{id}', [SalaryController::class, 'generatePDF'])->name('generatesalary.pdf');
-
 
     Route::get('/purchase_dept', [PaymentController::class, 'create'])->name('purchase_dept.create');
     Route::post('/purchase_dept/store', [PaymentController::class, 'store'])->name('purchase_dept.store');

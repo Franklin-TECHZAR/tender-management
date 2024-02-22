@@ -25,6 +25,8 @@ $expenses_report = '';
 $salaries_report = '';
 $purchases_report = '';
 
+$labour_report = '';
+
 if (isset($url_segments[0]) && $url_segments[0] == 'dashboard') {
     $dashboard = 'active';
 }
@@ -36,6 +38,9 @@ if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
 }
 if (isset($url_segments[0]) && $url_segments[0] == 'purchase') {
     $purchase = 'active';
+}
+if (isset($url_segments[0]) && $url_segments[0] == '$labour_report') {
+    $$labour_report = 'active';
 }
 
 if (isset($url_segments[0]) && $url_segments[0] == 'users') {
@@ -186,13 +191,22 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                 </li>
 
                 <li>
+                    <a href="{{ url('labour_report') }}"
+                        class="@if ($labour_report) active @endif dropdown-toggle no-arrow">
+                        <span class="micon">
+                            <i class="icon-copy fa fa-calendar" aria-hidden="true"></i>
+                        </span><span class="mtext">Daily Labour Report</span>
+                    </a>
+                </li>
+
+                {{-- <li>
                     <a href="{{ url('purchase_dept') }}"
                         class="@if ($purchase_dept) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy bi bi-credit-card" aria-hidden="true"></i>
                         </span><span class="mtext">Purchase Dept</span>
                     </a>
-                </li>
+                </li> --}}
                 <li>
                 </li>
 
@@ -212,10 +226,10 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                         <li><a class="@if ($expenses_report) active @endif"
                                 href="{{ url('expenses_report') }}">Expenses</a></li>
                     </ul>
-                    <ul class="submenu" style="display:@if ($report) block; @else none; @endif">
+                    {{-- <ul class="submenu" style="display:@if ($report) block; @else none; @endif">
                         <li><a class="@if ($purchases_report) active @endif"
-                                href="{{ url('purchases_report') }}">Purchase Dept</a></li>
-                    </ul>
+                                href="{{ url('purchases_report') }}">Purchase</a></li>
+                    </ul> --}}
                 </li>
 
                 {{-- <li class="dropdown @if ($users_roles) show @endif">

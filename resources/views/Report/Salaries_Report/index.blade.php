@@ -74,7 +74,7 @@
                                 <th>Date</th>
                                 <th>Payment Mode</th>
                                 <th>Payment Details</th>
-                                <th>Amount</th>
+                                <th style="text-align: right;">Amount</th>
                                 {{-- <th>Action</th> --}}
                             </tr>
                         </thead>
@@ -125,7 +125,11 @@
                         '<td>' + formattedDate + '</td>' +
                         '<td>' + salary.payment_mode + '</td>' +
                         '<td>' + salary.payment_details + '</td>' +
-                        '<td style="text-align: right;">₹ ' + salary.amount + '</td>' +
+                        '<td style="text-align: right;">₹' + parseFloat(salary.amount).toLocaleString(
+                            'en-IN', {
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2
+                            }) + '</td>' +
                         '</tr>';
 
                     totalAmount += parseFloat(salary.amount);
@@ -135,7 +139,11 @@
 
                 var totalRow = '<tr>' +
                     '<td colspan="5" style="text-align: right;"><b>Total:</b></td>' +
-                    '<td style="text-align: right;"><b>₹ ' + totalAmount.toFixed(2) + ' /-</b></td>' +
+                    '<td style="text-align: right;"><b>₹' + totalAmount.toLocaleString(
+                            'en-IN', {
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2
+                            }) + '</b></td>' +
                     '</tr>';
                 $('#salary_table_body').append(totalRow);
                 calculateTotalAmount();
@@ -181,7 +189,7 @@
                     }
                 });
 
-                var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
+                var formattedTotal = '₹' + total.toLocaleString('en-IN', {
                     maximumFractionDigits: 2,
                     minimumFractionDigits: 2
                 }) + ' /-';

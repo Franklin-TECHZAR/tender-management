@@ -44,6 +44,7 @@
                         action="{{ $purchase->id ? route('purchase.edit', $purchase->id) : route('purchase.store') }}">
                         @csrf
                         <input type="hidden" name="edit_id" value="{{ $purchase->id }}">
+                        <input type="hidden" name="final_total" id="final_total_input">
                         <div class="row">
                             <div class="col-sm-6 form-group">
                                 <label>Job Order</label>
@@ -59,7 +60,8 @@
                             <div class="col-sm-6 form-group">
                                 <label>Invoice No</label>
                                 <input type="text" class="form-control" name="invoice_no" id="invoice_no"
-                                    value="{{ $purchase->invoice_no }}">
+                                    value="{{ isset($purchase) ? $purchase->invoice_no : '' }}">
+
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -69,7 +71,8 @@
                                     <option value="" disabled selected hidden>Select Type</option>
                                     @foreach ($PurchaseTypes as $type)
                                         <option value="{{ $type->id }}"
-                                            {{ $purchase->type == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
+                                            {{ $purchase->type == $type->id ? 'selected' : '' }}>{{ $type->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -133,15 +136,62 @@
                                 </tr>
                             </thead>
                             <tbody id="products_table_body">
+                                @foreach ($purchase->invoiceProduct as $key => $invoiceProduct)
+                                    <tr id="tr{{ $key + 1 }}">
+                                        <td>{{ $key + 1 }}</td>
+                                        <td>
+                                            <select name="material[]" class="form-control material">
+                                                <option value="">Select Material</option>
+                                                @foreach ($materials as $mat)
+                                                    <option value="{{ $mat->id }}"
+                                                        {{ $invoiceProduct->material_id == $mat->id ? 'selected' : '' }}>
+                                                        {{ $mat->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <input type="hidden" name="material_id[]"
+                                                value="{{ $invoiceProduct->material_id }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="qty[]" class="form-control"
+                                                value="{{ $invoiceProduct->quantity }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="unit[]" class="form-control"
+                                                value="{{ $invoiceProduct->unit }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="amount[]" class="form-control"
+                                                value="{{ $invoiceProduct->amount }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="gst[]" class="form-control"
+                                                value="{{ $invoiceProduct->gst }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="total[]" class="form-control"
+                                                value="{{ $invoiceProduct->total }}">
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger"
+                                                onclick="remove_row({{ $key + 1 }})">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
+
                             <tfoot>
                                 <tr>
                                     <th colspan="4"><span class="pull-right">Total : </span></th>
-                                    <th><input type="text" class="form-control textbox-right" id="total_amount" readonly>
+                                    <th><input type="text" class="form-control textbox-right" id="total_amount"
+                                            readonly>
                                     </th>
                                     <th><input type="text" class="form-control textbox-right" id="total_gst" readonly>
                                     </th>
-                                    <th><input type="text" class="form-control textbox-right" id="final_total" readonly>
+                                    <th><input type="text" class="form-control textbox-right" id="final_total"
+                                            readonly>
                                     </th>
                                     <th></th>
                                 </tr>
@@ -212,10 +262,15 @@
         });
 
         $(document).ready(function() {
-            add_row();
+            calculate();
+            @if (!$purchase->id)
+                add_row();
+            @endif
+            calculate();
             $("#add_row_btn").click(function(event) {
                 event.preventDefault();
                 add_row();
+                calculate();
             });
         });
 
@@ -233,39 +288,27 @@
         function add_row() {
             row_no++;
             var html_text = `<tr id="tr${row_no}">
-                <th><input type="text" class="form-control sno" readonly></th>
-                <th>
-                    <select name="material[]" class="form-control material" id="material${row_no}" data-row_no="${row_no}">
-                    <option value="">Select Materials</option>`;
+        <th><input type="text" class="form-control sno" readonly></th>
+        <th>
+            <select name="material[]" class="form-control material" id="material${row_no}" data-row_no="${row_no}">
+            <option value="">Select Materials</option>`;
             materials.forEach(function(material) {
                 html_text += `<option value="${material.id}">${material.name}</option>`;
             });
             html_text += `   </select>
-                </th>
-                <th><input type="text" name="qty[]" class="form-control qty" id="qty${row_no}"></th>
-                <th><input type="text" name="unit[]" class="form-control unit textbox-right" id="unit${row_no}"></th>
-                <th><input type="text" name="amount[]" class="form-control amount textbox-right" id="amount${row_no}" data-row_no="${row_no}"></th>
-                <th><input type="text" name="gst[]" class="form-control gst textbox-right" id="gst${row_no}" data-row_no="${row_no}"></th>
-                <th><input type="text" name="total[]" class="form-control total textbox-right" id="total${row_no}" data-row_no="${row_no}" readonly></th>
-                <th>
-                    <button class="btn btn-sm btn-danger" onClick=remove_row(${row_no})><i class="bi bi-trash3"></i></button>
-                </th>
-            </tr>`;
+        </th>
+        <th><input type="text" name="qty[]" class="form-control qty" id="qty${row_no}"></th>
+        <th><input type="text" name="unit[]" class="form-control unit textbox-right" id="unit${row_no}"></th>
+        <th><input type="text" name="amount[]" class="form-control amount textbox-right" id="amount${row_no}" data-row_no="${row_no}"></th>
+        <th><input type="text" name="gst[]" class="form-control gst textbox-right" id="gst${row_no}" data-row_no="${row_no}"></th>
+        <th><input type="text" name="total[]" class="form-control total textbox-right" id="total${row_no}" data-row_no="${row_no}" readonly></th>
+        <th>
+            <button class="btn btn-sm btn-danger" onClick=remove_row(${row_no})><i class="bi bi-trash3"></i></button>
+        </th>
+    </tr>`;
             $("#products_table_body").append(html_text);
             sno_arrange();
-            var isEditMode = '{{ $purchase->id ? true : false }}';
-            if (isEditMode) {
-                var purchase = {!! json_encode($purchase) !!};
-                $("#material1").val(purchase.material_id);
-                $("#qty1").val(purchase.quantity);
-                $("#unit1").val(purchase.unit);
-                $("#amount1").val(purchase.amount);
-                $("#gst1").val(purchase.gst);
-                $("#total1").val(purchase.total);
-            }
-            sno_arrange();
         }
-
 
         function remove_row(row_id) {
             $("#tr" + row_id).remove();
@@ -281,30 +324,55 @@
             });
         }
 
+        $(document).ready(function() {
+            calculate();
+
+            @if ($purchase->id)
+                $("#products_table_body tr").each(function() {
+                    calculate($(this));
+                });
+            @endif
+        });
+
+        @if ($purchase->id)
+            var total_amount = 0;
+            var total_gst = 0;
+            var final_total = 0;
+
+            $("#products_table_body tr").each(function() {
+                calculate($(this));
+            });
+        @endif
+
         function calculate() {
             var total_amount = 0;
             var total_gst = 0;
             var final_total = 0;
 
-            $(".amount").each(function() {
-                if (this.value) {
-                    total_amount = parseFloat(total_amount) + parseFloat(this.value);
-                }
-            });
-            $(".gst").each(function() {
-                if (this.value) {
-                    total_gst = parseFloat(total_gst) + parseFloat(this.value);
-                }
-            });
-            $(".total").each(function() {
-                if (this.value) {
-                    final_total = parseFloat(final_total) + parseFloat(this.value);
+            $("#products_table_body tr").each(function() {
+                var amountInput = $(this).find("input[name='amount[]']");
+                var gstInput = $(this).find("input[name='gst[]']");
+
+                var amount = amountInput.val();
+                var gst = gstInput.val();
+
+                if (!isNaN(parseFloat(amount)) && !isNaN(parseFloat(gst))) {
+                    var total = parseFloat(amount) + parseFloat(gst);
+                    final_total += total;
+                    total_amount += parseFloat(amount);
+                    total_gst += parseFloat(gst);
+                } else {
+                    console.log('Invalid amount or gst value.');
                 }
             });
 
-            $("#total_amount").val(total_amount);
-            $("#total_gst").val(total_gst);
-            $("#final_total").val(final_total);
+            $("#total_amount").val(total_amount.toFixed(2));
+            console.log('total_amount', total_amount);
+            $("#total_gst").val(total_gst.toFixed(2));
+            console.log('total_gst', total_gst);
+            $("#final_total").val(final_total.toFixed(2));
+            console.log('final_total', final_total);
+            $("#final_total_input").val(final_total.toFixed(2));
         }
     </script>
 

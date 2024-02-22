@@ -22,9 +22,9 @@
                                 </nav>
                             </div>
                             <div class="col-md-6 d-flex justify-content-end align-items-center">
-                                <button class="btn btn-success export-btn mr-2">
+                                {{-- <button class="btn btn-success export-btn mr-2">
                                     <i class="bi bi-file-earmark-excel"></i> Export
-                                </button>
+                                </button> --}}
                                 <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#salary-modal">
                                     <i class="bi bi-plus"></i> Create New
                                 </button>

@@ -19,6 +19,26 @@
             <th colspan="4" style="font-weight: 500; text-align: right;">Date Time : {{ date('d-m-Y - h:i A') }}</th>
         </tr>
         <tr>
+            <th></th>
+            <th colspan="2" style="font-weight: 500;"> Start Date :
+                @if(isset($data['date_range']) && count(explode(' - ', $data['date_range'])) > 0)
+                    {{ explode(' - ', $data['date_range'])[0] }}
+                @else
+                    ALL
+                @endif
+            </th>
+        </tr>
+        <tr>
+            <th></th>
+            <th colspan="2" style="font-weight: 500;"> End Date:
+                @if (isset($data['date_range']) && count(explode(' - ', $data['date_range'])) > 1)
+                    {{ explode(' - ', $data['date_range'])[1] }}
+                @else
+                    ALL
+                @endif
+            </th>
+        </tr>
+        <tr>
             <th style="width:50px;background: #0b027e;color:white;font-weight: 600;text-align: left">S.NO</th>
             <th style="width:200px;background: #0b027e;color:white;font-weight: 600;text-align: left">Type</th>
             <th style="width:100px;background: #0b027e;color:white;font-weight: 600;text-align: left">Date</th>

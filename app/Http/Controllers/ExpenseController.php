@@ -141,7 +141,7 @@ class ExpenseController extends Controller
             $query->whereBetween('date', [$start_date, $end_date]);
         }
 
-        $expenses = $query->get();
+        $expenses = $query->orderBy('date', 'ASC')->get();
 
         if ($expenses->isEmpty()) {
             return redirect()->back()->with('error', 'No data found based on the selected criteria.');

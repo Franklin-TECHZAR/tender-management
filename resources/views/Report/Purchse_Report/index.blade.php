@@ -10,7 +10,7 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="title">
-                                <h4>Purchase</h4>
+                                <h4>Purchase Report</h4>
                             </div>
                             <nav aria-label="breadcrumb" role="navigation">
                                 <ol class="breadcrumb">
@@ -18,7 +18,7 @@
                                         <a href="{{ url('admin/dashboard') }}">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">
-                                        Purchase
+                                        Purchase Report
                                     </li>
                                 </ol>
                             </nav>
@@ -27,9 +27,6 @@
                             <button class="btn btn-success purchase_export mr-2">
                                 <i class="bi bi-file-earmark-excel"></i> Export
                             </button>
-                            <a href="{{ url('purchase/create') }}" class="btn btn-primary">
-                                <i class="bi-plus-circle"></i> Create New
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -51,10 +48,9 @@
                                 <label for="job_orders">Filter by Purchase Type:</label>
                                 <select class="form-control" name="purchase_type" id="purchase_type" required>
                                     <option value="" selected>All</option>
-                                    @foreach ($PurchaseTypes as $type)
-                                    <option value="{{ $type->id }}"
-                                        {{ $purchase->type == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
-                                @endforeach
+                                    @foreach ($tenders as $id => $tenderName)
+                                        <option value="{{ $id }}">{{ $tenderName }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -81,11 +77,11 @@
                                 <th>Job Order</th>
                                 <th>Type</th>
                                 <th>Date</th>
-                                <th>Invoice No</th>
+                                {{-- <th>Invoice No</th> --}}
                                 <th>Vendor</th>
-                                {{-- <th>Product/Material</th> --}}
-                                {{-- <th>Quantity</th> --}}
-                                {{-- <th>Amount</th> --}}
+                                <th>Product/Material</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
                                 {{-- <th>GST</th> --}}
                                 <th>Total</th>
                                 <th width="100px">Action</th>
@@ -180,36 +176,36 @@
             });
 
 
-             $('#date_range').daterangepicker({
-                    autoUpdateInput: false,
-                    locale: {
-                        cancelLabel: 'Clear'
-                    }
-                });
+            $('#date_range').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
 
-                $('#date_range').on('apply.daterangepicker', function(ev, picker) {
-                    var startDate = picker.startDate;
-                    var endDate = picker.endDate;
-                    var currentDate = startDate.clone();
-                    var dateRangeString = '';
+            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                var startDate = picker.startDate;
+                var endDate = picker.endDate;
+                var currentDate = startDate.clone();
+                var dateRangeString = '';
 
-                    while (currentDate.isSameOrBefore(endDate)) {
-                        dateRangeString += currentDate.format('YYYY-MM-DD') + '|';
-                        currentDate.add(1, 'day');
-                    }
+                while (currentDate.isSameOrBefore(endDate)) {
+                    dateRangeString += currentDate.format('YYYY-MM-DD') + '|';
+                    currentDate.add(1, 'day');
+                }
 
-                    dateRangeString = dateRangeString.slice(0, -1);
-                    $(this).val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
-                    $(this).trigger('change');
-                    table.column(3).search(dateRangeString, true).draw();
-                });
+                dateRangeString = dateRangeString.slice(0, -1);
+                $(this).val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
+                $(this).trigger('change');
+                table.column(3).search(dateRangeString, true).draw();
+            });
 
 
-                $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
-                    $(this).val('');
-                    table.column(3).search('').draw();
-                    calculateTotalAmount();
-                });
+            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+                table.column(3).search('').draw();
+                calculateTotalAmount();
+            });
 
             function calculateTotalAmount() {
                 $.ajax({
@@ -217,7 +213,6 @@
                     success: function(response) {
                         var total = 0;
                         var filteredJobOrder = $('#job_orders').val();
-                        var filteredPurchaseType = $('#purchase_type').val();
                         console.log('filteredJobOrder', filteredJobOrder);
                         var filteredDateRange = $('#date_range').val();
 
@@ -234,11 +229,10 @@
                                 if ((filteredJobOrder === '' || row.job_order_id ==
                                         filteredJobOrder) &&
                                     (filteredDateRange === '' || (rowDate >= startDate &&
-                                        rowDate <= endDate)) && (filteredPurchaseType === '' || row.type ==
-                                        filteredPurchaseType)) {
+                                        rowDate <= endDate))) {
                                     console.log("work fine");
-                                    console.log('amount', row.final_total.replace(/[^\d.]/g, ''));
-                                    var amount = parseFloat(row.final_total.replace(/[^\d.]/g, ''));
+                                    console.log('amount', row.total.replace(/[^\d.]/g, ''));
+                                    var amount = parseFloat(row.total.replace(/[^\d.]/g, ''));
                                     console.log(amount);
                                     total += isNaN(amount) ? 0 : amount;
                                 }
@@ -279,10 +273,10 @@
                         data: 'date',
                         name: 'date'
                     },
-                    {
-                        data: 'invoice_no',
-                        name: 'invoice_no'
-                    },
+                    // {
+                    //     data: 'invoice_no',
+                    //     name: 'invoice_no'
+                    // },
                     {
                         data: 'vendor',
                         name: 'vendor',
@@ -291,28 +285,28 @@
                             return data;
                         }
                     },
-                    // {
-                    //     data: 'material',
-                    //     name: 'material',
-                    //     render: function(data, type, full, meta) {
-                    //         return data;
-                    //     }
-                    // },
-                    // {
-                    //     data: 'quantity',
-                    //     name: 'quantity'
-                    // },
-                    // {
-                    //     data: 'amount',
-                    //     name: 'amount'
-                    // },
+                    {
+                        data: 'material',
+                        name: 'material',
+                        render: function(data, type, full, meta) {
+                            return data;
+                        }
+                    },
+                    {
+                        data: 'quantity',
+                        name: 'quantity'
+                    },
+                    {
+                        data: 'amount',
+                        name: 'amount'
+                    },
                     // {
                     //     data: 'gst',
                     //     name: 'gst'
                     // },
                     {
-                        data: 'final_total',
-                        name: 'final_total'
+                        data: 'total',
+                        name: 'total'
                     },
                     {
                         data: 'action',
@@ -336,11 +330,7 @@
                 calculateTotalAmount();
             });
 
-            $('#purchase_type').on('change', function() {
-                var filterValue = $(this).val();
-                table.columns(2).search(filterValue).draw();
-                calculateTotalAmount();
-            });
+
 
 
             $(document).on("click", ".purchase_export", function() {
