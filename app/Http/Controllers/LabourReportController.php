@@ -11,6 +11,9 @@ use App\Models\LabourReport;
 use Yajra\DataTables\Facades\DataTables;
 use App\Exports\ExcelExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+
 
 class LabourReportController extends Controller
 {
@@ -35,52 +38,94 @@ class LabourReportController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $isEdit = !empty($request->edit_id);
+
+        if (!$isEdit) {
+            $existingReport = LabourReport::where('job_order', $request->job_order)
+                ->where('date', $request->date)
+                ->where('id', '!=', $request->edit_id)
+                ->exists();
+
+            if ($existingReport) {
+                return response()->json(['status' => 0, 'message' => 'A Labour Report already exists for the selected Job Order and Date.']);
+            }
+        }
+
+        // $labourNames = $request->input('labour');
+        // $existingLabourReport = LabourReport::where('job_order', $request->job_order)
+        //     ->where('date', $request->date)
+        //     ->whereIn('labour', $labourNames)
+        //     ->exists();
+
+        // if ($existingLabourReport) {
+        //     return response()->json(['status' => 0, 'message' => 'A Labour Report with one of the selected Labour names already exists for the selected Job Order and Date.']);
+        // }
+
+        // Define validation rules based on conditions
+        $dateValidationRules = [];
+        if (!$request->input('date_disabled') && !$request->input('date_readonly') && !$isEdit) {
+            $dateValidationRules = [
+                'date' => [
+                    'required',
+                    Rule::unique('labour_reports')->where(function ($query) use ($request) {
+                        return $query->where('job_order', $request->job_order);
+                    })->ignore($request->edit_id)
+                ]
+            ];
+        }
+
+        // Validate the request
+        $this->validate($request, array_merge([
             'job_order' => 'required',
-            'labour' => 'required',
+            'labour' => 'required|array',
             'description' => 'required',
+        ], $dateValidationRules), [
+            'date.required' => 'The date field is required.',
+            'date.unique' => 'A Labour Report already exists for the selected Job Order and Date.'
         ]);
 
-        $dates = explode(', ', $request->date);
-
-        if ($request->edit_id) {
+        // Update or create the Labour Report
+        if ($isEdit) {
             $existingReport = LabourReport::find($request->edit_id);
             $message = "Labour Report Updated Successfully";
 
             $existingReport->job_order = $request->job_order;
-            $existingReport->labour = $request->labour;
+            $existingReport->labour = implode(',', $request->labour);
             $existingReport->desc = $request->description;
+            $existingReport->date = $request->date;
             $existingReport->save();
-
-            if (count($dates) == 1) {
-                $existingReport->date = $dates[0];
-                $existingReport->save();
-            } else {
-                foreach ($dates as $date) {
-                    if ($date != $existingReport->date) {
-                        $labourReport = new LabourReport();
-                        $labourReport->job_order = $request->job_order;
-                        $labourReport->labour = $request->labour;
-                        $labourReport->desc = $request->description;
-                        $labourReport->date = $date;
-                        $labourReport->save();
-                    }
-                }
-            }
         } else {
-            foreach ($dates as $date) {
-                $labourReport = new LabourReport();
-                $labourReport->job_order = $request->job_order;
-                $labourReport->labour = $request->labour;
-                $labourReport->desc = $request->description;
-                $labourReport->date = $date;
-                $labourReport->save();
-            }
+            $labourReport = new LabourReport();
+            $labourReport->job_order = $request->job_order;
+            $labourReport->labour = implode(',', $request->labour);
+            $labourReport->desc = $request->description;
+            $labourReport->date = $request->date;
+            $labourReport->save();
 
-            $message = "Labour Reports Created Successfully";
+            $message = "Labour Report Created Successfully";
         }
 
-        return ["status" => 1, "message" => $message];
+        // Return response
+        return response()->json(['status' => 1, 'message' => $message]);
+    }
+
+
+
+    public function checkDate(Request $request)
+    {
+        $jobOrder = $request->input('job_order');
+        $date = $request->input('date');
+        $editId = $request->input('edit_id');
+        $existingReport = LabourReport::where('job_order', $jobOrder)
+            ->where('date', $date)
+            ->where('id', '!=', $editId)
+            ->exists();
+
+        if ($existingReport) {
+            return response()->json(['status' => 0, 'message' => 'A Labour Report already exists for the selected Job Order and Date.']);
+        }
+
+        return response()->json(['status' => 1, 'message' => 'No existing Labour Report for the selected Job Order and Date.']);
     }
 
 
@@ -88,6 +133,10 @@ class LabourReportController extends Controller
     public function fetch()
     {
         $data = LabourReport::orderBy('date', 'DESC')->get();
+        $data->transform(function ($item) {
+            $item->date = Carbon::parse($item->date)->format('d-m-Y');
+            return $item;
+        });
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
@@ -126,8 +175,8 @@ class LabourReportController extends Controller
         if ($request->has('date_range')) {
             $dates = explode(' - ', $request->date_range);
 
-            $start_date = date('Y-m-d', strtotime($dates[0]));
-            $end_date = date('Y-m-d', strtotime($dates[1]));
+            $start_date = date('d-m-Y', strtotime($dates[0]));
+            $end_date = date('d-m-Y', strtotime($dates[1]));
 
             $query->whereBetween('date', [$start_date, $end_date]);
         }

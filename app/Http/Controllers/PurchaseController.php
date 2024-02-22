@@ -14,6 +14,7 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Exports\PurchaseExport;
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
+use Carbon\Carbon;
 
 class PurchaseController extends Controller
 {
@@ -129,6 +130,10 @@ class PurchaseController extends Controller
     $data = InvoicePurchase::with(['vendor:id,agency_name', 'material:id,name'])
         ->orderBy('id', 'DESC')
         ->get();
+        $data->transform(function ($item) {
+            $item->date = Carbon::parse($item->date)->format('d-m-Y');
+            return $item;
+        });
     return DataTables::of($data)
         ->addIndexColumn()
         ->addColumn('amount', function ($row) {
@@ -240,8 +245,8 @@ class PurchaseController extends Controller
         if ($request->has('date_range')) {
             $dates = explode(' - ', $request->date_range);
 
-            $start_date = date('Y-m-d', strtotime($dates[0]));
-            $end_date = date('Y-m-d', strtotime($dates[1]));
+            $start_date = date('d-m-Y', strtotime($dates[0]));
+            $end_date = date('d-m-Y', strtotime($dates[1]));
 
             $query->whereBetween('date', [$start_date, $end_date]);
         }

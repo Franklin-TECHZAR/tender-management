@@ -98,18 +98,20 @@
                         </div>
                         <div class="form-group">
                             <label for="labour">Labour</label>
-                            <select class="form-control" name="labour" id="labour" required>
-                                <option value="" disabled selected hidden>Select Labour</option>
-                                @foreach ($Labour as $Labour)
-                                    <option value="{{ $Labour->name }}">{{ $Labour->name }}</option>
+                            <select class="form-control" name="labour[]" id="labour" required multiple>
+                                <option value="" disabled hidden>Select Labour</option>
+                                @foreach ($Labour as $labour)
+                                    <option value="{{ $labour->name }}">{{ $labour->name }}</option>
                                 @endforeach
                             </select>
                         </div>
+
                         <div class="form-group">
-                            <label for="date">Date (Single / Multiple date Range)</label>
-                            <input type="text" id="datepicker" name="date" placeholder="Select Dates" multiple
-                                style="width: 450px; height: 40px; opacity: 0.3; border-radius: 5px;">
+                            <label for="date">Date</label>
+                            <input type="date" class="form-control" name="date" id="date" required>
+                            <div class="invalid-feedback">Please provide a valid date.</div>
                         </div>
+
                         <div class="form-group">
                             <label for="description">Description</label>
                             <textarea class="form-control" name="description" id="description"></textarea>
@@ -131,10 +133,16 @@
 @endsection
 @section('addscript')
     <script type="text/javascript">
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         $(document).ready(function() {
-            flatpickr("#datepicker", {
-                mode: "multiple",
-                dateFormat: "Y-m-d"
+
+            $('#labour').select2({
+                width: '100%',
+                tags: true
             });
 
             $('#date_range').daterangepicker({
@@ -151,12 +159,12 @@
                 var dateRangeString = '';
 
                 while (currentDate.isSameOrBefore(endDate)) {
-                    dateRangeString += currentDate.format('YYYY-MM-DD') + '|';
+                    dateRangeString += currentDate.format('DD-MM-YYYY') + '|';
                     currentDate.add(1, 'day');
                 }
 
                 dateRangeString = dateRangeString.slice(0, -1);
-                $(this).val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
+                $(this).val(startDate.format('DD-MM-YYYY') + ' - ' + endDate.format('DD-MM-YYYY'));
                 $(this).trigger('change');
                 table.column(3).search(dateRangeString, true).draw();
             });
@@ -251,9 +259,9 @@
                 }
             });
 
+
             $("#labour-report-form").validate({
                 submitHandler: function(form) {
-                    $("#submit-btn").prop("disabled", true);
                     var data = new FormData(form);
                     var url = "{{ url('labour_report/store') }}";
                     $.ajax({
@@ -262,14 +270,34 @@
                         data: data,
                         processData: false,
                         contentType: false,
-                        success: function() {
-                            $("#labour-report-modal").modal("hide");
-                            table.clear().draw();
+                        beforeSend: function() {
+                            $("#submit-btn").prop("disabled", true);
+                            $('.invalid-feedback').remove();
+                            $('#date').removeClass('is-invalid');
+                        },
+                        success: function(response) {
+                            if (response.status === 0) {
+                                console.log('Error callback triggered');
+                                $('#date').addClass('is-invalid').after(
+                                    '<div class="invalid-feedback">' + response
+                                    .message + '</div>');
+                            } else {
+                                table.clear().draw();
+                                toastr.success(response.message);
+                                console.log('this is not error page');
+                                $("#labour-report-modal").modal("hide");
+                            }
+                        },
+                        error: function(xhr) {
+                            console.log('Error callback triggered');
+                            console.log(xhr);
+                            var error = xhr.responseJSON.message;
+                            $('#date').addClass('is-invalid').after(
+                                '<div class="invalid-feedback">' + error + '</div>');
+                        },
+                        complete: function() {
                             $("#submit-btn").prop("disabled", false);
-                        },
-                        error: function(code) {
-                            alert(code.statusText);
-                        },
+                        }
                     });
                     return false;
                 }
@@ -283,8 +311,11 @@
                     dataType: "json",
                     success: function(response) {
                         $("#job_order").val(response.job_order).prop('disabled', false);
-                        $("#labour").val(response.labour).prop('disabled', false);
-                        $("#datepicker").val(response.date).prop('disabled', false);
+                        var labours = response.labour.split(',').map(function(item) {
+                            return item.trim();
+                        });
+                        $("#labour").val(labours).trigger('change').prop('disabled', false);
+                        $("#date").val(response.date).prop('readonly', true);
                         $("#description").val(response.desc).prop('disabled', false);
                         $("#modal-title-label").html('Edit Labour Report');
                         $("#labour-report-modal").modal("show");
@@ -296,36 +327,20 @@
                 });
             });
 
-            $(document).on("click", ".view-btn", function() {
-                var edit_id = $(this).data('id');
-                $("#edit_id").val(edit_id);
-                $.ajax({
-                    url: "{{ url('labour_report/fetch-edit') }}/" + edit_id,
-                    dataType: "json",
-                    success: function(response) {
-                        $("#job_order").val(response.job_order).prop('disabled', true);
-                        $("#labour").val(response.labour).prop('disabled', true);
-                        $("#datepicker").val(response.date).prop('disabled', true);
-                        $("#description").val(response.description).prop('disabled', true);
-                        $("#modal-title-label").html('View Labour Report');
-                        $("#labour-report-modal").modal("show");
-                        $("#modal-footer-buttons").hide();
-                    },
-                    error: function(code) {
-                        alert(code.statusText);
-                    },
-                });
-            });
-
             $(document).on("click", ".add-btn", function() {
                 $("#edit_id").val("");
                 $("#labour-report-form")[0].reset();
                 $("#job_order").prop('disabled', false);
-                $("#labour").prop('disabled', false);
                 $("#datepicker").prop('disabled', false);
+                $("#labour").prop('disabled', false);
                 $("#description").prop('disabled', false);
                 $("#modal-title-label").html('Create Labour Report');
                 $("#modal-footer-buttons").show();
+
+                $("#date").val("").prop('readonly', false);
+
+                $("#labour").prop('disabled', false);
+                $("#labour").trigger('change');
             });
 
             $(document).on("click", ".export-btn", function() {
@@ -359,6 +374,7 @@
                     success: function(response) {
                         table.clear().draw();
                         $("#confirm-yes-btn").prop("disabled", false);
+                        toastr.success(response.message);
                     },
                     error: function(code) {
                         alert(code.statusText);

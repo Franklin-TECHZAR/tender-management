@@ -187,12 +187,12 @@
                 var dateRangeString = '';
 
                 while (currentDate.isSameOrBefore(endDate)) {
-                    dateRangeString += currentDate.format('YYYY-MM-DD') + '|';
+                    dateRangeString += currentDate.format('DD-MM-YYYY') + '|';
                     currentDate.add(1, 'day');
                 }
 
                 dateRangeString = dateRangeString.slice(0, -1);
-                $(this).val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
+                $(this).val(startDate.format('DD-MM-YYYY') + ' - ' + endDate.format('DD-MM-YYYY'));
                 $(this).trigger('change');
                 table.column(3).search(dateRangeString, true).draw();
             });

@@ -12,6 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Exports\ExpenseExport;
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
+use Carbon\Carbon;
 
 
 class ExpenseController extends Controller
@@ -71,6 +72,10 @@ class ExpenseController extends Controller
     public function fetch()
     {
         $data = Expense::orderBy('date', "DESC")->get();
+        $data->transform(function ($item) {
+            $item->date = Carbon::parse($item->date)->format('d-m-Y');
+            return $item;
+        });
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('amount', function ($row) {

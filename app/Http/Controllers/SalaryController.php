@@ -12,6 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Exports\ExpenseExport;
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
+use Carbon\Carbon;
 
 class SalaryController extends Controller
 {
@@ -90,6 +91,10 @@ class SalaryController extends Controller
     public function fetch()
     {
         $data = Salary::orderBy('date', "DESC")->get();
+        $data->transform(function ($item) {
+            $item->date = Carbon::parse($item->date)->format('d-m-Y');
+            return $item;
+        });
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('amount', function ($row) {
@@ -165,7 +170,7 @@ class SalaryController extends Controller
             $query->where('job_order', $request->job_order);
         }
 
-        $salary = $query->orderBy('date', 'ASC')->get();
+        $salary = $query->get();
         if ($salary->isEmpty()) {
             return redirect()->back()->with('error', 'No data found based on the selected criteria.');
         }

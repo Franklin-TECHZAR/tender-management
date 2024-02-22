@@ -105,6 +105,8 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('labour_report/fetch-edit/{id}', [LabourReportController::class, 'fetch_edit']);
     Route::get('labour_report/delete/{id}', [LabourReportController::class, 'delete']);
     Route::get('labour_export', [LabourReportController::class, 'export']);
+    Route::post('labour_report/check_date', [LabourReportController::class, 'checkDate'])->name('labour_report.check_date');
+
 
     Route::get('/salaries', [SalaryController::class, 'create'])->name('salaries.create');
     Route::post('/salaries/store', [SalaryController::class, 'store'])->name('salaries.store');
