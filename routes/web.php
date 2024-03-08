@@ -15,6 +15,9 @@ use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\LabourReportController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,8 +137,28 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('report/expense_fetch', [ReportController::class, 'expense_fetch'])->name('expenses.fetch');
     Route::get('expense_export/report', [ReportController::class, 'expense_export']);
 
+
+    /* Users */
+
+    Route::get('users', [UserController::class, 'index']);
+    Route::post('users/store', [UserController::class, 'store']);
+    Route::get('users/fetch', [UserController::class, 'fetch']);
+    Route::get('users/fetch-edit/{id}', [UserController::class, 'fetch_edit']);
+    Route::get('users/delete/{id}', [UserController::class, 'delete']);
+
+    /* permission */
+    Route::get('permissions', [PermissionController::class, 'index']);
+    Route::post('permissions/store', [PermissionController::class, 'store']);
+    Route::get('permissions/fetch', [PermissionController::class, 'fetch']);
+    Route::get('permissions/fetch-edit/{id}', [PermissionController::class, 'fetch_edit']);
+    Route::get('permissions/delete/{id}', [PermissionController::class, 'delete']);
+
+    /* roles */
+    Route::get('roles', [RoleController::class, 'index']);
+    Route::post('roles/store', [RoleController::class, 'store']);
+    Route::get('roles/fetch', [RoleController::class, 'fetch']);
+    Route::get('roles/fetch-edit/{id}', [RoleController::class, 'fetch_edit']);
+    Route::get('roles/delete/{id}', [RoleController::class, 'delete']);
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
