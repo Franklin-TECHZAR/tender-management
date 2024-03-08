@@ -27,7 +27,7 @@
                             </nav>
                         </div>
                         <div class="col-6 text-right">
-                            <a href="{{ url('tender/payment-export')."/".$tender->id }}" class="btn btn-success">
+                            <a href="{{ url('tender/payment-export') . '/' . $tender->id }}" class="btn btn-success">
                                 <i class="bi bi-file-earmark-excel"></i> Export
                             </a>
                             <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#tender-modal">
@@ -37,21 +37,7 @@
                     </div>
                 </div>
                 <div class="pd-20 bg-white border-radius-4 box-shadow">
-                    <table class="table table-bordered table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>S.NO</th>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th class="text-right">Credit</th>
-                                <th class="text-right">Debit</th>
-                                <th class="text-right">Balance</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body">
-                        </tbody>
-                    </table>
+                    <div id="html_content"></div>
                     <br>
 
                 </div>
@@ -81,6 +67,14 @@
                             <input type="date" class="form-control" name="date" id="date" required>
                         </div>
                         <div class="form-group">
+                            <label>Amount For</label>
+                            <select class="form-control" name="amount_for" id="amount_for" required>
+                                <option value="">Select Amount For</option>
+                                <option>ED Amount</option>
+                                <option>PG Amount</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>Amount</label>
                             <input type="number" class="form-control" name="amount" id="amount" required>
                         </div>
@@ -91,6 +85,20 @@
                                 <option>Credit</option>
                                 <option>Debit</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="payment_mode">Payment Mode</label>
+                            <select class="form-control" name="payment_mode" id="payment_mode" required>
+                                <option value="" disabled selected hidden>Select Payment Mode</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Cheque">Cheque</option>
+                                <option value="Neft">Neft</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="payment_details">Payment Details</label>
+                            <textarea class="form-control" name="payment_details" id="payment_details" required></textarea>
                         </div>
                         <div class="form-group">
                             <label>Description</label>
@@ -175,10 +183,9 @@
         function fetch_table() {
             var tender_id = $("#tender_id").val();
 
-            var html_content = `<tr>
-                                <td class="text-center" colspan='7'>Please Wait</td>
-                            </tr>`;
-            $("#table-body").html(html_content);
+            var html_content = `<h5 class="text-center">Please Wait..</h5>`;
+
+            $("#html_content").html(html_content);
 
             $.ajax({
                 type: "GET",
@@ -187,38 +194,60 @@
                     tender_id: tender_id
                 },
                 dataType: "json",
-                success: function(data) {
+                success: function(main_array) {
                     html_content = '';
-                    if (data.length == 0) {
-                        html_content += `<tr>
-                                <td class="text-center" colspan='7'>No Payment Log Found</td>
-                            </tr>`;
+
+                    if (main_array.length == 0) {
+
+                        html_content = `<h5 class="text-center">No Payment Log Found</h5>`;
 
                     } else {
-                        for (var i = 0; i < (data.length - 1); i++) {
+
+                        for (var i = 0; i < (main_array.length); i++) {
+                            html_content += `<h5 class="text-center p-2">${main_array[i].payment_for}</h5>
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>S.NO</th>
+                                            <th>Date</th>
+                                            <th>Description</th>
+                                            <th class="text-right">Credit</th>
+                                            <th class="text-right">Debit</th>
+                                            <th class="text-right">Balance</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                <tbody>`;
+
+                            let data = main_array[i].data;
+
+                            for (var j = 0; j < (data.length - 1); j++) {
+                                html_content += `<tr>
+                                                <td>${j+1}</td>
+                                                <td>${data[j].date}</td>
+                                                <td>${data[j].description}</td>
+                                                <td>${data[j].credit}</td>
+                                                <td>${data[j].debit}</td>
+                                                <td>${data[j].balance}</td>
+                                                <td>
+                                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data[j].id}"><i class="fa fa-trash"></i></button>
+                                                </td>
+                                            </tr>`;
+                            }
+
                             html_content += `<tr>
-                                <td>${i+1}</td>
-                                <td>${data[i].date}</td>
-                                <td>${data[i].description}</td>
-                                <td>${data[i].credit}</td>
-                                <td>${data[i].debit}</td>
-                                <td>${data[i].balance}</td>
-                                <td>
-                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data[i].id}"><i class="fa fa-trash"></i></button>
-                                </td>
-                            </tr>`;
+                                    <td colspan='3'>${data[j].description}</td>
+                                    <td>${data[j].credit}</td>
+                                    <td>${data[j].debit}</td>
+                                    <td>${data[j].balance}</td>
+                                    <td></td>
+                                </tr>`;
+
+                            html_content += `</tbody>
+                            </table><br>`;
                         }
-
-                        html_content += `<tr>
-                                <td colspan='3'>${data[i].description}</td>
-                                <td>${data[i].credit}</td>
-                                <td>${data[i].debit}</td>
-                                <td>${data[i].balance}</td>
-                                <td></td>
-                            </tr>`;
-
                     }
-                    $("#table-body").html(html_content);
+                    $("#html_content").html(html_content);
                 },
                 error: function(code) {
                     toastr.error(code.statusText);

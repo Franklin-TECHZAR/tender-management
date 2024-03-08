@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('city');
             $table->text('address');
             $table->text('description')->nullable();
-            $table->float('budget', 10, 2);
+            $table->float('ed_amount', 10, 2);
+            $table->float('pg_amount', 10, 2);
             $table->integer('job_order');
             $table->integer('status');
 

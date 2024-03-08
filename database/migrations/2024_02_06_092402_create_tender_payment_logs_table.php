@@ -18,6 +18,9 @@ return new class extends Migration
             $table->float('amount', 10, 2);
             $table->string('type');
             $table->text('description');
+            $table->string('amount_for');
+            $table->string('payment_mode');
+            $table->text('payment_details');
 
             $table->foreign('tender_id')->references('id')->on('tenders')->onDelete('cascade');
 

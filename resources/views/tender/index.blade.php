@@ -51,7 +51,8 @@
                                 <th>S.NO</th>
                                 <th>Name</th>
                                 <th>City</th>
-                                <th>Budget</th>
+                                <th>ED Amount</th>
+                                <th>PG Amount</th>
                                 <th>Status</th>
                                 <th width="100px">Action</th>
                             </tr>
@@ -96,8 +97,12 @@
                             <textarea class="form-control" name="address" id="address" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Budget</label>
-                            <input type="number" class="form-control" name="budget" id="budget" required>
+                            <label>ED Amount</label>
+                            <input type="number" class="form-control" name="ed_amount" id="ed_amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label>PG Amount</label>
+                            <input type="number" class="form-control" name="pg_amount" id="pg_amount" required>
                         </div>
                         <div class="form-group">
                             <label>Description</label>
@@ -161,8 +166,12 @@
                     name: 'city'
                 },
                 {
-                    data: 'budget_text',
-                    name: 'budget'
+                    data: 'ed_amount_text',
+                    name: 'ed_amount_text'
+                },
+                {
+                    data: 'pg_amount_text',
+                    name: 'pg_amount_text'
                 },
                 {
                     data: 'status',
@@ -213,7 +222,9 @@
                     $("#name").val(response.name);
                     $("#city").val(response.city);
                     $("#address").val(response.address);
-                    $("#budget").val(response.budget);
+                    $("#ed_amount").val(response.ed_amount);
+                    $("#pg_amount").val(response.pg_amount);
+
                     $("#description").val(response.description);
 
                     $("#modal-title-label").html('Edit Tender');
