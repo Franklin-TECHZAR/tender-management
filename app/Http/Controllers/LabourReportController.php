@@ -22,18 +22,9 @@ class LabourReportController extends Controller
         $tenders = Tender::where('job_order', 1)
             ->where('status', 1)
             ->pluck('name', 'id');
-        $Labour = Labour::get('name');
+        $Labour = Labour::pluck('name', 'id');
         $labourReport = LabourReport::all();
         return view('daily_report.index', compact('tenders', 'Labour', 'labourReport'));
-    }
-
-    public function create()
-    {
-        $tenders = Tender::where('job_order', 1)
-            ->where('status', 1)
-            ->pluck('name', 'id');
-        $Labour = Labour::get('name');
-        return view('daily_report.create', compact('tenders', 'Labour'));
     }
 
     public function store(Request $request)
@@ -132,28 +123,32 @@ class LabourReportController extends Controller
 
     public function fetch()
     {
-        $data = LabourReport::orderBy('date', 'DESC')->get();
+        $data = LabourReport::with('labour')->orderBy('date', 'DESC')->get();
         $data->transform(function ($item) {
             $item->date = Carbon::parse($item->date)->format('d-m-Y');
             return $item;
         });
         return DataTables::of($data)
             ->addIndexColumn()
+            ->addColumn('labour', function ($row) {
+                return $row->labour ? $row->labour : '';
+            })
             ->addColumn('action', function ($row) {
                 $btn = '<div class="dropdown">
-                        <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                            <i class="dw dw-more"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
-                            <button data-id="' . $row->id . '" class="edit-btn dropdown-item"><i class="dw dw-edit2"></i> Edit</button>
-                            <button data-id="' . $row->id . '" class="delete-btn dropdown-item"><i class="dw dw-delete-3"></i> Delete</button>
-                        </div>
+                <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                <i class="dw dw-more"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                <button data-id="' . $row->id . '" class="edit-btn dropdown-item"><i class="dw dw-edit2"></i> Edit</button>
+                <button data-id="' . $row->id . '" class="delete-btn dropdown-item"><i class="dw dw-delete-3"></i> Delete</button>
+                </div>
                     </div>';
-                return $btn;
-            })
+                    return $btn;
+                })
             ->rawColumns(['action'])
             ->make(true);
     }
+
 
     public function fetch_edit($id)
     {
