@@ -16,7 +16,7 @@
                                         <a href="{{ url('admin/dashboard') }}">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">
-                                        Create Expenses
+                                        Expenses
                                     </li>
                                 </ol>
                             </nav>

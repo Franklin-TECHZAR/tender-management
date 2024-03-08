@@ -10,4 +10,10 @@ class LabourReport extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    public function labour()
+    {
+        return $this->belongsTo(Labour::class, 'id');
+    }
+
 }

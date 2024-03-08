@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('salaries', function (Blueprint $table) {
+        Schema::create('salaries_table', function (Blueprint $table) {
             $table->id();
             $table->string('job_order');
-            $table->string('labour');
+            $table->string('labour_id');
             $table->date('date');
             $table->decimal('amount', 10, 2);
             $table->text('description')->nullable();
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('salaries');
+        Schema::dropIfExists('salaries_table');
     }
 };

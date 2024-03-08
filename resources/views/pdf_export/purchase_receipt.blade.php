@@ -2,184 +2,202 @@
 <html lang="en">
 
 <head>
-    <title>Purchase Receipt</title>
-    <!-- Add your custom CSS styles here -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>View Invoice</title>
     <style>
+        body {
+            width: 100% !important;
+            font-size: 12px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+        }
+
         * {
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
+            font-family: DejaVu Sans, sans-serif;
         }
 
         .container {
-            border: 1px solid #000;
-            padding: 0px;
-            margin: 35px 35px;
+            width: 700px;
+            margin-top: 50px;
+            position: relative;
         }
 
-        .card-header {
-            padding-bottom: 30px;
-            /* Padding for the headline part */
+        .outer_border {
+            border: 1px solid #999999 !important;
+            padding: 4% !important;
+            margin-bottom: 2% !important;
         }
 
-        .card-body {
-            padding-bottom: 30px;
-            /* Padding for the body part */
-        }
-
-        .receipt-info p {
-            padding: 3px 0px 3px;
-            text-align: right;
-        }
-
-        .underline {
+        .top_box1 {
+            width: 52%;
+            padding: 0%;
+            width: calc(48% - 1%);
+            padding: 0%;
             display: inline-block;
-            padding: 5px;
-            border-bottom: 1px solid transparent;
-            width: 100%;
+            vertical-align: top;
         }
 
-        .underline span {
-            display: block;
-            text-align: left;
+        .top_box2 {
+            width: 47%;
+            padding: 0%;
+            display: inline-block;
+            vertical-align: top;
+            /* margin-left: 20%; */
         }
 
-        .text-center {
-            text-align: center;
-        }
-
-        table {
-            margin: 0 auto;
-            /* Center the table */
-            border-collapse: collapse;
-            width: 85%;
-            /* border: 1px solid #000; Add border to the table */
-        }
-
-        .Order {
-            margin: 0 auto;
-            /* Center the table */
-            border-collapse: collapse;
-            width: 95%;
-            /* border: 1px solid #000; Add border to the table */
-        }
-
-        .footer {
-            margin: 35px 110px 8px 150px;
-            border-collapse: collapse;
-            width: 100%;
+        .table_pad {
+            padding: 0% 2%;
         }
 
         .border {
-            padding: 0px;
-            border: none;
-            border-bottom: 1px solid #000;
+            border: 1px solid #CCCCCC !important;
         }
 
-        .colon {
-            width: 15%;
+        .small_text {
+            font-size: 10px !important;
         }
 
-        h2 {
-            margin-bottom: 10px;
+        .bg_color1 {
+            background: #3a5082;
+            color: #fff;
         }
 
-        .light-bold {
-            font-weight: 200;
-            /* or any other style you prefer */
+        .text_color1 {
+            color: #3a5082;
+        }
+
+        td {
+            padding: 4px;
+        }
+
+        .invoice-heading {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .col-sm-6 {
+            width: 100%;
         }
     </style>
 </head>
 
 <body>
-    <div class="container mt-5">
-        <div class="card mb-3">
-            <div class="card-header text-center border">
-                <h1>{{ $name }}</h1>
-                <p>{{ $address }}</p>
-                <p><span class="light-bold">Mobile No:</span> {{ $mobile }}, <span class="light-bold">Email:</span>
-                    {{ $email }}</p>
-                <h2>Purchase Receipt</h2>
-            </div>
-
-            <div class="card-body border">
-                <div class="row">
-                    <div class="col-md-12 border">
-                        <table class="Order">
-                            <tr>
-                                <td><strong>Job Order:</strong>
-                                    {{ $job_orders->first()->name }}</span></span></td>
-                                <td>
-                                    <div class="receipt-info">
-
-                                        <p><strong>Payment Voucher No:</strong>
-                                            <span><span>{{ $purchase->id }}</span></span></p>
-                                            <p><strong>Date:</strong> <span><span>{{ date('d-m-Y', strtotime($purchase->date)) }}</span></span></p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                        <div class="receipt-amount" style="padding: 1px 0px 4px;">
-                            <table class="Order">
-                                <tr>
-                                    <td><strong>Type</strong></td>
-                                    <td class="colon">:</td>
-                                    <td>{{ $purchase->type }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Invoice No</strong></td>
-                                    <td class="colon">:</td>
-                                    <td>{{ $purchase->invoice_no }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Vendor</strong></td>
-                                    <td class="colon">:</td>
-                                    <td>{{ $purchase->vendor->agency_name }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Material</strong></td>
-                                    <td class="colon">:</td>
-                                    <td>{{ $purchase->material->name }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Quantity</strong></td>
-                                    <td class="colon">:</td>
-                                    <td>{{ $purchase->quantity }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Amount</strong></td>
-                                    <td class="colon">:</td>
-                                    <td><span class="underline" style="font-family: DejaVu Sans, sans-serif; opacity: 0.9; font-size: 14px; margin-left: -5px;">&#8377;{{ number_format($purchase->amount, 2) }}</span></td>
-
-                                </tr>
-                                <tr>
-                                    <td><strong>GST</strong></td>
-                                    <td class="colon">:</td>
-                                    <td>{{ $purchase->gst }} %</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Total</strong></td>
-                                    <td class="colon">:</td>
-                                    <td><span class="underline"><span><span style="font-family: DejaVu Sans; sans-serif;opacity: 1; opacity: 0.9; font-size: 14px; margin-left: -5px;">&#8377;{{ number_format($purchase->total, 2) }} /-</span></span></td>
-                                </tr>
-
-                            </table>
-                        </div>
-                    </div>
+    {{-- <div class="invoice-heading">
+        <h2>INVOICE</h2>
+    </div> --}}
+    <div class="container">
+        <div class="outer_border">
+            <div class="row">
+                <div class="top_box1">
+                    <h2 class="text_color1" style="font-size: 30px;">{{ config('app.name') }}</h2>
+                    {{ $address }}<br>
+                    Phone: {{ $mobile }}<br>
+                    Email: {{ $email }}<br>
+                    Website: {{ config('app.url') }}
+                </div>
+                <div class="top_box2">
+                    <h2 style="color:#687cbf;font-weight: bold;font-size:30px; text-align:right; padding-right: 30px;"
+                        id="invoice">INVOICE</h2>
+                    <table width="100%" height="70" class="table_pad">
+                        <tr>
+                            <td>Date</td>
+                            <td>{{ date('d-m-Y', strtotime($purchase['date'])) }}</td>
+                        </tr>
+                        <tr>
+                            <td>Invoice #</td>
+                            <td>{{ $purchase['invoice_no'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Customer ID</td>
+                            <td>{{ $purchase['id'] }}</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
-            <div class="text-center">
-                <table class="footer">
+
+            <div class="row">
+                <table width="100%" border="0">
                     <tr>
-                        <td><strong>Authorized by</strong></td>
-                        <td><span class="underline"><span></span></span></td>
-                        <td><strong>Received by</strong></td>
-                        <td><span class="underline"><span></span></span></td>
+                        <td colspan="2">
+                            <div class="bg_color1"
+                                style="text-indent:10px;font-size: 14px;width: 50%;height: 26px;">
+                                BILL TO</div>
+                            <table width="100%" border="0">
+                                <tr>
+                                    <td width="18%">Name</td>
+                                    <td width="82%">{{ $company_settings->name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Phone</td>
+                                    <td>{{ $company_settings->mobile }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Address</td>
+                                    <td>{{ $company_settings->address }}</td>
+                                </tr>
+                                <tr>
+                                    <td>City</td>
+                                    <td>{{ $purchase['vendor']['city'] }}</td>
+                                </tr>
+                                {{-- <tr>
+                                    <td>State</td>
+                                    <td>{{ $purchase['vendor']['city'] }}</td>
+                                    <td>{{ $order->billing_state }}</td>
+                                </tr>
+                                <tr>
+                                    <td>ZIP</td>
+                                    <td>{{ $order->billing_zip }}</td>
+                                </tr> --}}
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
                     </tr>
                 </table>
             </div>
+            <dd style="clear: both;"></dd>
+            <div class="row">
+                <table height="82" class="" style="width: 100%;">
+                    <tr class="bg_color1">
+                        <td width="58%" height="12" style="padding-left: 10px;">DESCRIPTION</td>
+                        <td width="13%" style="padding-right: 10px;" width="15%" align="right">AMOUNT</td>
+                        <td width="13%" style="padding-right: 10px;" width="15%" align="right">GST</td>
+                        <td style="padding-right: 10px;" width="15%" align="right">TOTAL</td>
+                    </tr>
+                    @if ($purchase['invoiceProduct'] != null)
+                        @foreach ($purchase['invoiceProduct'] as $item)
+                            <tr class="">
+                                <td>{{ $item->title }} &#8377; {{ $item->amount }} X {{ $item->quantity }}</td>
+                                <td align="right">&#8377;{{ $item->amount }}</td>
+                                <td align="right">{{ $item->gst }}%</td>
+                                <td align="right">&#8377;{{ $item->total }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
+
+                    <tr class="">
+                        <td></td>
+                        <td></td>
+                        <td><strong>Total</strong></td>
+                        <td align="right">&#8377; {{ $final_total }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="row">
+                <div style="text-align: center">
+                    If you have any question about this invoice, please contact<br>
+                    {{ config('app.name') }}, {{ $mobile }}, {{ $email }}<br>
+                    <b>Thank You For Your Business!</b>
+                </div>
+            </div>
         </div>
+    </div>
 </body>
 
 </html>

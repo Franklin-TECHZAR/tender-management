@@ -10,8 +10,8 @@ class Vendor extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    public function purchases()
+    public function invoicePurchase()
         {
-            return $this->hasMany(Purchase::class);
+            return $this->hasMany(InvoicePurchase::class);
         }
 }

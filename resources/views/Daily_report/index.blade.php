@@ -8,7 +8,7 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="title">
-                                <h4>Labour Report Management</h4>
+                                <h4>Daily Work Management</h4>
                             </div>
                             <nav aria-label="breadcrumb" role="navigation">
                                 <ol class="breadcrumb">
@@ -16,7 +16,7 @@
                                         <a href="{{ url('admin/dashboard') }}">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">
-                                        Create Labour Report
+                                        Daily Work Management
                                     </li>
                                 </ol>
                             </nav>
@@ -90,7 +90,7 @@
                         <div class="form-group">
                             <label for="job_order">Job Order</label>
                             <select class="form-control" name="job_order" id="job_order" required>
-                                <option value="" disabled selected hidden>Select Job Order</option>
+                                <option value="" disabled selected>Select Job Order</option>
                                 @foreach ($tenders as $id => $tenderName)
                                     <option value="{{ $id }}">{{ $tenderName }}</option>
                                 @endforeach
@@ -100,8 +100,8 @@
                             <label for="labour">Labour</label>
                             <select class="form-control" name="labour[]" id="labour" required multiple>
                                 <option value="" disabled hidden>Select Labour</option>
-                                @foreach ($Labour as $labour)
-                                    <option value="{{ $labour->name }}">{{ $labour->name }}</option>
+                                @foreach ($Labour as $id => $name)
+                                    <option value="{{ $id }}">{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -233,7 +233,7 @@
                     },
                     {
                         data: 'labour',
-                        name: 'labour'
+                        name: 'labour',
                     },
                     {
                         data: 'date',
@@ -310,7 +310,7 @@
                     url: "{{ url('labour_report/fetch-edit') }}/" + edit_id,
                     dataType: "json",
                     success: function(response) {
-                        $("#job_order").val(response.job_order).prop('disabled', false);
+                        $("#job_order").val(response.job_order).prop('readonly', true);
                         var labours = response.labour.split(',').map(function(item) {
                             return item.trim();
                         });

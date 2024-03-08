@@ -10,7 +10,7 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="title">
-                                <h4>Purchase</h4>
+                                <h4>Purchase Management</h4>
                             </div>
                             <nav aria-label="breadcrumb" role="navigation">
                                 <ol class="breadcrumb">

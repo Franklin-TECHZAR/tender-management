@@ -154,40 +154,46 @@
             serverSide: true,
             ajax: "{{ url('purchase_dept/fetch') }}",
             columns: [{
-                data: 'DT_RowIndex',
-                name: 'DT_RowIndex'
-            },
-            {
-                data: 'job_order',
-                name: 'job_order'
-            },
-            {
-                data: 'labour',
-                name: 'labour'
-            },
-            {
-                data: 'date',
-                name: 'date'
-            },
-            {
-                data: 'amount',
-                name: 'amount'
-            },
-            {
-                data: 'payment_mode',
-                name: 'payment_mode'
-            },
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false,
-                searchable: false
-            }
-            ],
-            columnDefs: [{
-                targets: 1,
-                visible: false
-            }],
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex'
+                    },
+                    {
+                        data: 'job_order',
+                        name: 'job_order'
+                    },
+                    {
+                        data: 'payment_to',
+                        name: 'payment_to'
+                    },
+                    {
+                        data: 'date',
+                        name: 'date'
+                    },
+                    {
+                        data: 'type',
+                        name: 'type'
+                    },
+                    {
+                        data: 'amount',
+                        name: 'amount'
+                    },
+                    // { data: 'description', name: 'description' },
+                    {
+                        data: 'payment_mode',
+                        name: 'payment_mode'
+                    },
+                    // { data: 'payment_details', name: 'payment_details' },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                columnDefs: [{
+                    targets: 1,
+                    visible: false
+                }],
 
             footerCallback: function (row, data, start, end, display) {
                 var api = this.api();
@@ -289,7 +295,7 @@
 
         $(document).on("click", ".add-btn", function () {
             $("#edit_id").val("");
-            $("#payment-form")[0].reset();
+            // $("#payment-form")[0].reset();
             $("#job_order").prop('disabled', false);
             $("#labour").prop('disabled', false);
             $("#datepicker").prop('disabled', false);

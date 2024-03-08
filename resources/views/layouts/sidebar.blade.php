@@ -195,7 +195,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                         class="@if ($labour_report) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy fa fa-calendar" aria-hidden="true"></i>
-                        </span><span class="mtext">Daily Labour Report</span>
+                        </span><span class="mtext">Daily Work Report</span>
                     </a>
                 </li>
 

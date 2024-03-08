@@ -8,7 +8,7 @@
                         <div class="row">
                             <div class="col-6">
                                 <div class="title">
-                                    <h4>Salaries Management</h4>
+                                    <h4>Salary Management</h4>
                                 </div>
                                 <nav aria-label="breadcrumb" role="navigation">
                                     <ol class="breadcrumb">
@@ -16,7 +16,7 @@
                                             <a href="{{ url('admin/dashboard') }}">Home</a>
                                         </li>
                                         <li class="breadcrumb-item active" aria-current="page">
-                                            Create Salary
+                                            Salary
                                         </li>
                                     </ol>
                                 </nav>
@@ -107,13 +107,14 @@
                             </div>
                             <div class="form-group">
                                 <label for="labour">Labour</label>
-                                <select class="form-control" name="labour" id="labour" required>
+                                <select class="form-control" name="labour" id="labour">
                                     <option value="" disabled selected hidden>Select Labour</option>
-                                    @foreach ($Labour as $Labour)
-                                        <option value="{{ $Labour->name }}">{{ $Labour->name }}</option>
+                                    @foreach ($Labour as $id => $name)
+                                        <option value="{{ $id }}">{{ $name }}</option>
                                     @endforeach
                                 </select>
                             </div>
+
                             <div class="form-group">
                                 <label for="date">Date (Single / Multiple date Range)</label>
                                 <input type="text" id="datepicker" name="date" placeholder="Select Dates" multiple
@@ -161,7 +162,7 @@
             $(document).ready(function() {
                 flatpickr("#datepicker", {
                     mode: "multiple",
-                    dateFormat: "d-m-Y"
+                    dateFormat: "Y-m-d"
                 });
 
                 $('#date_range').daterangepicker({
@@ -333,7 +334,7 @@
                         dataType: "json",
                         success: function(response) {
                             $("#job_order").val(response.job_order).prop('disabled', false);
-                            $("#labour").val(response.labour).prop('disabled', false);
+                            $("#labour").val(response.labour_id).prop('disabled', false);
                             $("#datepicker").val(response.date).prop('disabled', false);
                             $("#amount").val(response.amount).prop('disabled', false);
                             $("#description").val(response.description).prop('disabled', false);
@@ -358,7 +359,7 @@
                         dataType: "json",
                         success: function(response) {
                             $("#job_order").val(response.job_order).prop('disabled', true);
-                            $("#labour").val(response.labour).prop('disabled', true);
+                            $("#labour").val(response.labour_id).prop('disabled', true);
                             $("#datepicker").val(response.date).prop('disabled', true);
                             $("#amount").val(response.amount).prop('disabled', true);
                             $("#description").val(response.description).prop('disabled', true);

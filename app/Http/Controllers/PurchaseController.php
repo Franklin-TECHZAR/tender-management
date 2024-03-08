@@ -126,36 +126,37 @@ class PurchaseController extends Controller
 
 
     public function fetch()
-{
-    $data = InvoicePurchase::with(['vendor:id,agency_name', 'material:id,name'])
-        ->orderBy('id', 'DESC')
-        ->get();
+    {
+        $data = InvoicePurchase::with(['vendor:id,agency_name', 'material:id,name'])
+            ->orderBy('id', 'DESC')
+            ->get();
         $data->transform(function ($item) {
             $item->date = Carbon::parse($item->date)->format('d-m-Y');
             return $item;
         });
-    return DataTables::of($data)
-        ->addIndexColumn()
-        ->addColumn('amount', function ($row) {
-            return "<span class='pull-right'>₹" . number_format($row->amount, 2) . "</span>";
-        })
-        ->addColumn('total', function ($row) {
-            return "<span class='pull-right'>₹" . number_format($row->total, 2) . " /-</span>";
-        })
-        ->addColumn('final_total', function ($row) {
-            return "<span class='pull-right'>₹" . number_format($row->final_total, 2) . "</span>";
-        })
-        ->addColumn('vendor', function ($row) {
-            return $row->vendor ? $row->vendor->agency_name : '';
-        })
-        ->addColumn('material', function ($row) {
-            return $row->material ? $row->material->name : '';
-        })
-        ->addColumn('invoice_no', function ($row) {
-            return $row->invoice_no;
-        })
-        ->addColumn('action', function ($row) {
-            $btn = '<div class="dropdown">
+        dd($data);
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('amount', function ($row) {
+                return "<span class='pull-right'>₹" . number_format($row->amount, 2) . "</span>";
+            })
+            ->addColumn('total', function ($row) {
+                return "<span class='pull-right'>₹" . number_format($row->total, 2) . " /-</span>";
+            })
+            ->addColumn('final_total', function ($row) {
+                return "<span class='pull-right'>₹" . number_format($row->final_total, 2) . "</span>";
+            })
+            ->addColumn('vendor', function ($row) {
+                return $row->vendor ? $row->vendor->agency_name : '';
+            })
+            ->addColumn('material', function ($row) {
+                return $row->material ? $row->material->name : '';
+            })
+            ->addColumn('invoice_no', function ($row) {
+                return $row->invoice_no;
+            })
+            ->addColumn('action', function ($row) {
+                $btn = '<div class="dropdown">
                 <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
                                 <i class="dw dw-more"></i>
                             </a>
@@ -165,11 +166,11 @@ class PurchaseController extends Controller
                                 <button data-id="' . $row->id . '" class="delete-btn dropdown-item"><i class="dw dw-delete-3"></i> Delete</button>
                                 </div>
                                 </div>';
-            return $btn;
-        })
-        ->rawColumns(['action', 'amount', 'total', 'final_total'])
-        ->make(true);
-}
+                return $btn;
+            })
+            ->rawColumns(['action', 'amount', 'total', 'final_total'])
+            ->make(true);
+    }
 
 
     public function fetch_edit($id)
@@ -198,7 +199,8 @@ class PurchaseController extends Controller
 
     public function generatePDF($id)
     {
-        $purchase = InvoicePurchase::findOrFail($id);
+        $purchase = InvoicePurchase::with('invoiceProduct')->findOrFail($id);
+        // $purchase = InvoicePurchase::findOrFail($id);
         $company_settings = CompanySetting::first();
         $job_orders = Tender::where("job_order", 1)->where("id", $purchase->job_order_id)->get();
         $Vendor = Vendor::where("id", $purchase->vendor_id)->first();
@@ -216,10 +218,15 @@ class PurchaseController extends Controller
             $total_gst += ($product->amount * $product->gst) / 100;
         }
 
+        // $totalAmountByPurchaseId = InvoiceProduct::where('invoice_purchase_id', $id)->pluck('amount')->toArray();
+        // foreach ($totalAmountByPurchaseId as &$amount) {
+        //     $amount *= 2;
+        // }
+        // dd($total_amount);
         $final_total = $purchase->final_total;
-
         $data = [
             'purchase' => $purchase,
+            'company_settings' => $company_settings,
             'job_orders' => $job_orders,
             'address' => $address,
             'mobile' => $mobile,

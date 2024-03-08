@@ -10,4 +10,14 @@ class Labour extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    public function labourReports()
+    {
+        return $this->hasMany(LabourReport::class, 'labour_id');
+    }
+
+    public function salaries()
+    {
+        return $this->hasMany(Salary::class);
+    }
 }

@@ -21,13 +21,14 @@ class SalaryController extends Controller
         $tenders = Tender::where('job_order', 1)
             ->where('status', 1)
             ->pluck('name', 'id');
-        $Labour = Labour::get('name');
+        $Labour = Labour::pluck('name', 'id');
         return view('salaries.create', compact('tenders', 'Labour'));
     }
 
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $this->validate($request, [
             'job_order' => 'required',
             'labour' => 'required',
@@ -44,7 +45,7 @@ class SalaryController extends Controller
             $message = "Salary Updated Successfully";
 
             $existingSalary->job_order = $request->job_order;
-            $existingSalary->labour = $request->labour;
+            $existingSalary->labour_id = $request->labour;
             $existingSalary->amount = $request->amount;
             $existingSalary->description = $request->description;
             $existingSalary->payment_mode = $request->payment_mode;
@@ -58,7 +59,7 @@ class SalaryController extends Controller
                     if ($date != $existingSalary->date) {
                         $newSalary = new Salary();
                         $newSalary->job_order = $request->job_order;
-                        $newSalary->labour = $request->labour;
+                        $newSalary->labour_id = $request->labour;
                         $newSalary->date = $date;
                         $newSalary->amount = $request->amount;
                         $newSalary->description = $request->description;
@@ -72,7 +73,7 @@ class SalaryController extends Controller
             foreach ($dates as $date) {
                 $newSalary = new Salary();
                 $newSalary->job_order = $request->job_order;
-                $newSalary->labour = $request->labour;
+                $newSalary->labour_id = $request->labour;
                 $newSalary->date = $date;
                 $newSalary->amount = $request->amount;
                 $newSalary->description = $request->description;
@@ -90,7 +91,11 @@ class SalaryController extends Controller
 
     public function fetch()
     {
-        $data = Salary::orderBy('date', "DESC")->get();
+        // $data = InvoicePurchase::with(['vendor:id,agency_name', 'material:id,name'])
+        // ->orderBy('id', 'DESC')
+        // ->get();
+        // $data = Salary::orderBy('date', "DESC")->get();
+        $data = Salary::with(['labour:id,name'])->orderBy('id', 'DESC')->get();
         $data->transform(function ($item) {
             $item->date = Carbon::parse($item->date)->format('d-m-Y');
             return $item;
@@ -99,6 +104,9 @@ class SalaryController extends Controller
             ->addIndexColumn()
             ->addColumn('amount', function ($row) {
                 return "<span class='pull-right'>₹" . number_format($row->amount, 2) . "</span>";
+            })
+            ->addColumn('labour', function ($row) {
+                return $row->labour ? $row->labour->name : '';
             })
             ->addColumn('action', function ($row) {
                 $btn = '<div class="dropdown">
