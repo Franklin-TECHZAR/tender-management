@@ -81,14 +81,14 @@ class LabourReportController extends Controller
             $message = "Labour Report Updated Successfully";
 
             $existingReport->job_order = $request->job_order;
-            $existingReport->labour = implode(',', $request->labour);
+            $existingReport->labour_id = implode(',', $request->labour);
             $existingReport->desc = $request->description;
             $existingReport->date = $request->date;
             $existingReport->save();
         } else {
             $labourReport = new LabourReport();
             $labourReport->job_order = $request->job_order;
-            $labourReport->labour = implode(',', $request->labour);
+            $labourReport->labour_id = implode(',', $request->labour);
             $labourReport->desc = $request->description;
             $labourReport->date = $request->date;
             $labourReport->save();
@@ -123,15 +123,24 @@ class LabourReportController extends Controller
 
     public function fetch()
     {
-        $data = LabourReport::with('labour')->orderBy('date', 'DESC')->get();
-        $data->transform(function ($item) {
+        $data = LabourReport::with('labour:id,name')->orderBy('date', 'DESC')->get();
+        $labourIds = $data->pluck('labour_id')->map(function ($ids) {
+            return explode(',', $ids);
+        })->flatten()->unique();
+
+        $labourNames = Labour::whereIn('id', $labourIds)->pluck('name', 'id');
+
+        $data->transform(function ($item) use ($labourNames) {
             $item->date = Carbon::parse($item->date)->format('d-m-Y');
+            $labourIds = explode(',', $item->labour_id);
+            $item->labour_names = $labourNames->only($labourIds)->implode(', ');
             return $item;
         });
+
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('labour', function ($row) {
-                return $row->labour ? $row->labour : '';
+                return $row->labour_names ?? '';
             })
             ->addColumn('action', function ($row) {
                 $btn = '<div class="dropdown">

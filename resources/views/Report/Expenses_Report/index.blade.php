@@ -48,8 +48,8 @@
                             <label for="type">Filter by Type:</label>
                             <select class="form-control" name="type" id="type" required>
                                 <option value="" selected>All</option>
-                                @foreach ($ExpenseType as $type)
-                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @foreach ($ExpenseType as $id => $name)
+                                    <option value="{{ $id }}">{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -74,9 +74,9 @@
                             <tr>
                                 <th>S.NO</th>
                                 <th class="job-order-column">Job Order</th>
-                                <th>Payment To</th>
-                                <th>Date</th>
-                                <th>Type</th>
+                                <th class="expenseType">Payment To</th>
+                                <th class="formattedDate">Date</th>
+                                <th class="format">Type</th>
                                 {{-- <th>Description</th> --}}
                                 <th>Payment Mode</th>
                                 <th>Payment Details</th>
@@ -117,12 +117,14 @@
 
                 $.each(data.expense, function(index, expense) {
                     var formattedDate = expense.date.split('-').reverse().join('-');
+                    var expenseType = data.expenseType[expense.type];
                     var row = '<tr>' +
                         '<td>' + (index + 1) + '</td>' +
                         '<td class="job-order-column">' + expense.job_order + '</td>' +
                         '<td>' + expense.payment_to + '</td>' +
-                        '<td>' + formattedDate + '</td>' +
-                        '<td>' + expense.type + '</td>' +
+                        '<td class="formattedDate">' + formattedDate + '</td>' +
+                        '<td class="expenseType">' + (expenseType ? expenseType :
+                                'Undefined') + '</td>' +
                         '<td>' + expense.payment_mode + '</td>' +
                         '<td>' + expense.payment_details + '</td>' +
                         '<td style="text-align: right;">₹' + parseFloat(expense.amount).toLocaleString(
@@ -168,41 +170,72 @@
             function calculateTotalAmount() {
                 var filteredJobOrder = $('#job_orders').val();
                 var filteredDateRange = $('#date_range').val();
-                var filteredType = $('#type').val();
+                var filteredPurchaseType = $('#type option:selected').text();
                 var total = 0;
 
                 $('#expenses_table tr').each(function() {
-                    var jobOrder = $(this).find('td:eq(1)').text();
-                    var date = $(this).find('td:eq(3)').text();
-                    var type = $(this).find('td:eq(4)').text();
+                    // debugger
+                    var jobOrder = $(this).find('.job-order-column').text().trim();
+                    var purchaseType = $(this).find('td.expenseType').text();
+                    var date = $(this).find('td.formattedDate').text();
                     var amountText = $(this).find('td:eq(7)').text().trim();
                     var amountValue = amountText.replace(/[^\d.-]/g, '');
                     var amount = parseFloat(amountValue);
 
-                    console.log("filteredJobOrder:", filteredJobOrder);
-                    console.log("filteredDateRange:", filteredDateRange);
-                    console.log("filteredType:", filteredType);
-                    console.log("Job Order:", jobOrder);
-                    console.log("Date:", date);
-                    console.log("Type:", type);
-                    console.log("Amount Text:", amountText);
-                    console.log("Parsed Amount:", amount);
-
                     if ((filteredJobOrder === '' || jobOrder === filteredJobOrder) &&
-                        (filteredDateRange === '' || isDateInRange(date, filteredDateRange)) &&
-                        (filteredType === '' || type === filteredType)) {
+                        (filteredDateRange === '' || isDateInRange(date, filteredDateRange) &&
+                            (filteredPurchaseType === '' || purchaseType === filteredPurchaseType || filteredPurchaseType === 'All'))) {
                         total += isNaN(amount) ? 0 : amount;
+                        console.log(total);
                     }
                 });
 
-                var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
+                var formattedTotal = '₹' + total.toLocaleString('en-IN', {
                     maximumFractionDigits: 2,
                     minimumFractionDigits: 2
                 }) + ' /-';
-                console.log("Total:", total);
                 $('#total_amount').val(formattedTotal);
             }
 
+            // function calculateTotalAmount() {
+            //     var filteredJobOrder = $('#job_orders').val();
+            //     var filteredDateRange = $('#date_range').val();
+            //     var filteredType = $('#type option:selected').text();
+            //     var total = 0;
+
+            //     $('#expenses_table tr').each(function() {
+            //         // debugger
+            //         var jobOrder = $(this).find('td:eq(1)').text();
+            //         var date = $(this).find('td:eq(3)').text();
+            //         var type = $(this).find('td:eq(4)').text();
+            //         var amountText = $(this).find('td:eq(7)').text().trim();
+            //         var amountValue = amountText.replace(/[^\d.-]/g, '');
+            //         var amount = parseFloat(amountValue);
+
+            //         // console.log("filteredJobOrder:", filteredJobOrder);
+            //         // console.log("filteredDateRange:", filteredDateRange);
+            //         // console.log("filteredType:", filteredType);
+            //         // console.log("Job Order:", jobOrder);
+            //         // console.log("Date:", date);
+            //         // console.log("Type:", type);
+            //         // console.log("Amount Text:", amountText);
+            //         // console.log("Parsed Amount:", amount);
+
+            //         if ((filteredJobOrder === '' || jobOrder === filteredJobOrder) &&
+            //             (filteredDateRange !== '' || isDateInRange(date, filteredDateRange)) &&
+            //             (filteredType === '' || type === filteredType || filteredType === 'All')) {
+            //             total += isNaN(amount) ? 0 : amount;
+            //             console.log(total);
+            //         }
+            //     });
+
+            //     var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
+            //         maximumFractionDigits: 2,
+            //         minimumFractionDigits: 2
+            //     }) + ' /-';
+            //     console.log("Total:", total);
+            //     $('#total_amount').val(formattedTotal);
+            // }
 
 
 
@@ -212,6 +245,74 @@
                 var currentDate = moment(date, 'DD-MM-YYYY');
                 return currentDate.isBetween(startDate, endDate, null, '[]');
             }
+
+            function applyTableFilters() {
+                var filteredJobOrder = $('#job_orders').val();
+                var filteredDateRange = $('#date_range').val();
+                var filteredType = $('#type option:selected').text();
+                console.log('Filtered Job Order:', filteredJobOrder);
+                console.log('Filtered Date Range:', filteredDateRange);
+
+                $('#expenses_table tr').each(function() {
+                    var jobOrder = $(this).find('td:eq(1)').text();
+                    var date = $(this).find('td:eq(3)').text();
+                    var purchaseType = $(this).find('td.expenseType')
+                        .text();
+                    var date = $(this).find('td.formattedDate')
+                        .text();
+
+                    if ((filteredJobOrder && jobOrder !== filteredJobOrder) ||
+                        (filteredType !== 'All' && purchaseType !== filteredType)
+                    ) {
+                        $(this).hide();
+                    } else if (filteredDateRange) {
+                        var startDate = moment(filteredDateRange.split(' - ')[0], 'YYYY-MM-DD');
+                        var endDate = moment(filteredDateRange.split(' - ')[1], 'YYYY-MM-DD');
+                        var currentDate = moment(date, 'YYYY-MM-DD');
+                        if (!currentDate.isBetween(startDate, endDate, null, '[]')) {
+                            $(this).hide();
+                        } else {
+                            $(this).show();
+                        }
+                    } else {
+                        $(this).show();
+                    }
+                });
+            }
+
+
+            //  function applyTableFilters() {
+            //     var filteredJobOrder = $('#job_orders').val();
+            //     var filteredExpenseType = $('#type option:selected').text();
+            //     var filteredDateRange = $('#date_range').val();
+
+            //     $('#expenses_table tr').each(function() {
+            //         debugger
+            //         var jobOrder = $(this).find('.job-order-column').text().trim();
+            //         var expenseType = $(this).find('td.expenseType')
+            //             .text();
+            //         var date = $(this).find('td.formattedDate')
+            //             .text();
+            //             console.log(filteredJobOrder);
+
+            //         if ((filteredJobOrder && jobOrder !== filteredJobOrder) || (filteredExpenseType !== 'All' && expenseType !== filteredExpenseType)
+            //         ) {
+            //             $(this).hide();
+            //         } else if (filteredDateRange) {
+            //             var startDate = moment(filteredDateRange.split(' - ')[0], 'YYYY-MM-DD');
+            //             var endDate = moment(filteredDateRange.split(' - ')[1], 'YYYY-MM-DD');
+            //             var currentDate = moment(date, 'YYYY-MM-DD');
+            //             if (!currentDate.isBetween(startDate, endDate, null, '[]')) {
+            //                 $(this).hide();
+            //             } else {
+            //                 $(this).show();
+            //             }
+            //         } else {
+            //             $(this).show();
+            //         }
+            //     });
+            //     calculateTotalAmount();
+            // }
 
 
             $('#type').on('change', function() {
@@ -225,34 +326,37 @@
             });
 
 
-            function applyTableFilters() {
-                var filteredJobOrder = $('#job_orders').val();
-                var filteredDateRange = $('#date_range').val();
-                var filteredType = $('#type').val();
+            // function applyTableFilters() {
+            //     var filteredJobOrder = $('#job_orders').val();
+            //     var filteredDateRange = $('#date_range').val();
+            //     // var filteredType = $('#type').val();
+            //     var filteredType = $('#type option:selected').text();
 
-                $('#expenses_table tr').each(function() {
-                    var jobOrder = $(this).find('td:eq(1)').text();
-                    var date = $(this).find('td:eq(3)').text();
-                    var type = $(this).find('td:eq(4)').text();
+            //     $('#expenses_table tr').each(function() {
+            //         debugger
+            //         var jobOrder = $(this).find('td:eq(1)').text();
+            //         var date = $(this).find('td:eq(3)').text();
+            //         var type = $(this).find('td:eq(4)').text();
 
-                    if ((filteredJobOrder && jobOrder !== filteredJobOrder) ||
-                        (filteredType && type !== filteredType)) {
-                        $(this).hide();
-                    } else if (filteredDateRange) {
-                        var startDate = moment(filteredDateRange.split(' - ')[0], 'DD-MM-YYYY');
-                        var endDate = moment(filteredDateRange.split(' - ')[1], 'DD-MM-YYYY');
-                        var currentDate = moment(date, 'DD-MM-YYYY');
+            //         if ((filteredJobOrder && jobOrder !== filteredJobOrder) ||
+            //             (filteredType !== 'All' && type !== filteredType)) {
+            //             $(this).hide();
+            //         } else if (filteredDateRange) {
+            //             var startDate = moment(filteredDateRange.split(' - ')[0], 'YYYY-MM-DD');
+            //             var endDate = moment(filteredDateRange.split(' - ')[1], 'YYYY-MM-DD');
+            //             var currentDate = moment(date, 'YYYY-MM-DD');
 
-                        if (!currentDate.isBetween(startDate, endDate, null, '[]')) {
-                            $(this).hide();
-                        } else {
-                            $(this).show();
-                        }
-                    } else {
-                        $(this).show();
-                    }
-                });
-            }
+            //             if (!currentDate.isBetween(startDate, endDate, null, '[]')) {
+            //                 $(this).hide();
+            //             } else {
+            //                 $(this).show();
+            //             }
+            //         } else {
+            //             $(this).show();
+            //         }
+            //     });
+            //     calculateTotalAmount();
+            // }
 
 
             $(document).on("click", ".expense_exports", function() {

@@ -52,9 +52,10 @@
                                 <select class="form-control" name="purchase_type" id="purchase_type" required>
                                     <option value="" selected>All</option>
                                     @foreach ($PurchaseTypes as $type)
-                                    <option value="{{ $type->id }}"
-                                        {{ $purchase->type == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
-                                @endforeach
+                                        <option value="{{ $type->id }}"
+                                            {{ $purchase->type == $type->id ? 'selected' : '' }}>{{ $type->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -180,36 +181,36 @@
             });
 
 
-             $('#date_range').daterangepicker({
-                    autoUpdateInput: false,
-                    locale: {
-                        cancelLabel: 'Clear'
-                    }
-                });
+            $('#date_range').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
 
-                $('#date_range').on('apply.daterangepicker', function(ev, picker) {
-                    var startDate = picker.startDate;
-                    var endDate = picker.endDate;
-                    var currentDate = startDate.clone();
-                    var dateRangeString = '';
+            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                var startDate = picker.startDate;
+                var endDate = picker.endDate;
+                var currentDate = startDate.clone();
+                var dateRangeString = '';
 
-                    while (currentDate.isSameOrBefore(endDate)) {
-                        dateRangeString += currentDate.format('DD-MM-YYYY') + '|';
-                        currentDate.add(1, 'day');
-                    }
+                while (currentDate.isSameOrBefore(endDate)) {
+                    dateRangeString += currentDate.format('DD-MM-YYYY') + '|';
+                    currentDate.add(1, 'day');
+                }
 
-                    dateRangeString = dateRangeString.slice(0, -1);
-                    $(this).val(startDate.format('DD-MM-YYYY') + ' - ' + endDate.format('DD-MM-YYYY'));
-                    $(this).trigger('change');
-                    table.column(3).search(dateRangeString, true).draw();
-                });
+                dateRangeString = dateRangeString.slice(0, -1);
+                $(this).val(startDate.format('DD-MM-YYYY') + ' - ' + endDate.format('DD-MM-YYYY'));
+                $(this).trigger('change');
+                table.column(3).search(dateRangeString, true).draw();
+            });
 
 
-                $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
-                    $(this).val('');
-                    table.column(3).search('').draw();
-                    calculateTotalAmount();
-                });
+            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+                table.column(3).search('').draw();
+                calculateTotalAmount();
+            });
 
             function calculateTotalAmount() {
                 $.ajax({
@@ -234,11 +235,14 @@
                                 if ((filteredJobOrder === '' || row.job_order_id ==
                                         filteredJobOrder) &&
                                     (filteredDateRange === '' || (rowDate >= startDate &&
-                                        rowDate <= endDate)) && (filteredPurchaseType === '' || row.type ==
+                                        rowDate <= endDate)) && (filteredPurchaseType === '' ||
+                                        row.type ==
                                         filteredPurchaseType)) {
                                     console.log("work fine");
-                                    console.log('amount', row.final_total.replace(/[^\d.]/g, ''));
-                                    var amount = parseFloat(row.final_total.replace(/[^\d.]/g, ''));
+                                    console.log('amount', row.final_total.replace(/[^\d.]/g,
+                                        ''));
+                                    var amount = parseFloat(row.final_total.replace(/[^\d.]/g,
+                                        ''));
                                     console.log(amount);
                                     total += isNaN(amount) ? 0 : amount;
                                 }
@@ -272,8 +276,8 @@
                         name: 'job_order_id'
                     },
                     {
-                        data: 'type',
-                        name: 'type'
+                        data: 'purchase_type',
+                        name: 'purchase_type'
                     },
                     {
                         data: 'date',
@@ -359,7 +363,7 @@
             $(document).on("click", ".delete-btn", function() {
                 var edit_id = $(this).data('id');
                 $("#edit_id").val(edit_id);
-                $("#delete-confirm-text").text("Are you sure you want to delete this Labour?");
+                $("#delete-confirm-text").text("Are you sure you want to delete this Purchase?");
                 $("#delete-confirm-modal").modal("show");
             });
 

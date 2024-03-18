@@ -89,7 +89,7 @@ class PurchaseController extends Controller
             $purchase = InvoicePurchase::find($request->edit_id);
             $purchase->job_order_id = $request->job_order;
             $purchase->invoice_no = $request->invoice_no;
-            $purchase->type = $request->type;
+            $purchase->type  = $request->type;
             $purchase->date = $request->date;
             $purchase->vendor_id = $request->vendor;
             $purchase->final_total = $request->final_total;
@@ -101,10 +101,11 @@ class PurchaseController extends Controller
             $purchase = new InvoicePurchase();
             $purchase->job_order_id = $request->job_order;
             $purchase->invoice_no = $request->invoice_no;
-            $purchase->type = $request->type;
+            $purchase->type  = $request->type;
             $purchase->date = $request->date;
             $purchase->vendor_id = $request->vendor;
             $purchase->final_total = $request->final_total;
+            // dd($purchase);
             $purchase->save();
             $message = "Purchase Created Successfully";
         }
@@ -127,15 +128,15 @@ class PurchaseController extends Controller
 
     public function fetch()
     {
-        $data = InvoicePurchase::with(['vendor:id,agency_name', 'material:id,name'])
-            ->orderBy('id', 'DESC')
-            ->get();
-        $data->transform(function ($item) {
-            $item->date = Carbon::parse($item->date)->format('d-m-Y');
-            return $item;
-        });
-        dd($data);
-        return DataTables::of($data)
+        $data = InvoicePurchase::with(['vendor:id,agency_name', 'material:id,name', 'purchaseType:id,name'])
+        ->orderBy('id', 'DESC')
+        ->get();
+
+            $data->transform(function ($item) {
+                $item->date = Carbon::parse($item->date)->format('d-m-Y');
+                return $item;
+            });
+            return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('amount', function ($row) {
                 return "<span class='pull-right'>₹" . number_format($row->amount, 2) . "</span>";
@@ -154,6 +155,9 @@ class PurchaseController extends Controller
             })
             ->addColumn('invoice_no', function ($row) {
                 return $row->invoice_no;
+            })
+            ->addColumn('purchase_type', function ($row) {
+                return $row->purchaseType ? $row->purchaseType->name : '';
             })
             ->addColumn('action', function ($row) {
                 $btn = '<div class="dropdown">

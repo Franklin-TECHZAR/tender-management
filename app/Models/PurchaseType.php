@@ -10,4 +10,10 @@ class PurchaseType extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    public function invoicePurchases()
+    {
+        return $this->hasMany(InvoicePurchase::class, 'type');
+    }
+
 }

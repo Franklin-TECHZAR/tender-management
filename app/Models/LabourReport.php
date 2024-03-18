@@ -13,7 +13,7 @@ class LabourReport extends Model
 
     public function labour()
     {
-        return $this->belongsTo(Labour::class, 'id');
+        return $this->belongsTo(Labour::class);
     }
 
 }

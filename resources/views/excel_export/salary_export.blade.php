@@ -56,7 +56,8 @@
             @if ($da['S.No'] == '')
                 <tr>
                     <td style="text-align: left;font-weight: 600;"><b>{{ $da['S.No'] }}</b></td>
-                    <td style="text-align: left;font-weight: 600;">{{ $da['Labour'] }}</td>
+                    <td style="text-align: left;font-weight: 600;">{{ is_object($da['Labour']) ? $da['Labour']->name : $da['Labour'] }}</td>
+                    {{-- <td style="text-align: left;font-weight: 600;">{{ $da['Labour'] }}</td> --}}
                     <td style="text-align: left;font-weight: 600;">{{ $da['Date'] }}</td>
                     <!-- Remove 'Type' column -->
                     <td style="text-align: left;font-weight: 600;">{{ $da['Description'] }}</td>
@@ -67,7 +68,8 @@
             @else
                 <tr>
                     <td style="text-align: left;">{{ $da['S.No'] }}</td>
-                    <td style="text-align: left;">{{ $da['Labour'] }}</td>
+                    <td style="text-align: left;font-weight: 600;">{{ is_object($da['Labour']) ? $da['Labour']->name : $da['Labour'] }}</td>
+                    {{-- <td style="text-align: left;">{{ $da['Labour'] }}</td> --}}
                     <td style="text-align: left;">{{ $da['Date'] }}</td>
                     <!-- Remove 'Type' column -->
                     <td style="text-align: left;">{{ $da['Description'] }}</td>

@@ -46,8 +46,8 @@
                             <label for="type">Filter by Type:</label>
                             <select class="form-control" name="type" id="type" required>
                                 <option value="" selected>All</option>
-                                @foreach ($ExpenseType as $type)
-                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @foreach ($ExpenseType as $id => $name)
+                                    <option value="{{ $id }}">{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -75,9 +75,9 @@
                                 <th>Payment To</th>
                                 <th>Date</th>
                                 <th>Type</th>
-                                <th>Amount</th>
                                 {{-- <th>Description</th> --}}
                                 <th>Payment Mode</th>
+                                <th>Amount</th>
                                 {{-- <th>Payment Details</th> --}}
                                 <th width="100px">Action</th>
                             </tr>
@@ -126,8 +126,8 @@
                             <label>Type</label>
                             <select class="form-control" name="type" id="type" required>
                                 <option value="" disabled selected hidden>Select Type</option>
-                                @foreach ($ExpenseType as $type)
-                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @foreach ($ExpenseType as $id => $name)
+                                    <option value="{{ $id }}">{{ $name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -211,38 +211,36 @@
                         var total = 0;
                         var filteredJobOrder = $('#job_orders').val();
                         var filteredDateRange = $('#date_range').val();
-                        var filteredType = $('#type').val();
+                        var filteredType = $('#type option:selected').text();
 
-                        console.log('filteredDateRange', filteredDateRange);
-                        console.log('response', response);
                         $.each(response.data, function(index, row) {
+                            debugger
                             if (!row.deleted_at) {
                                 var rowDate = new Date(row.date);
                                 var startDate = new Date(filteredDateRange.split(' - ')[0]);
                                 var endDate = new Date(filteredDateRange.split(' - ')[1]);
 
-                                if ((filteredJobOrder === '' || row.job_order ===
-                                        filteredJobOrder) &&
-                                    (filteredDateRange === '' || (rowDate >= startDate &&
-                                        rowDate <= endDate)) &&
-                                    (filteredType === '' || row.type === filteredType)) {
+                                if ((filteredJobOrder === '' || row.job_order === filteredJobOrder) &&
+                                (filteredDateRange === '' || (rowDate >= startDate || rowDate <= endDate)) &&
+                                    (filteredType === '' || row.type === filteredType || filteredType === 'All')) {
                                     var amount = parseFloat(row.amount.replace(/[^\d.]/g, ''));
                                     total += isNaN(amount) ? 0 : amount;
+                                    console.log('total', total);
                                 }
                             }
                         });
 
-                        var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
-                            maximumFractionDigits: 2,
-                            minimumFractionDigits: 2
-                        }) + ' /-';
-                        $('#total_amount').val(formattedTotal);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(error);
-                    }
-                });
-            }
+            var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            }) + ' /-';
+            $('#total_amount').val(formattedTotal);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
 
 
             var table = $('.data-table').DataTable({
@@ -270,14 +268,14 @@
                         name: 'type'
                     },
                     {
+                        data: 'payment_mode',
+                        name: 'payment_mode'
+                    },
+                    {
                         data: 'amount',
                         name: 'amount'
                     },
                     // { data: 'description', name: 'description' },
-                    {
-                        data: 'payment_mode',
-                        name: 'payment_mode'
-                    },
                     // { data: 'payment_details', name: 'payment_details' },
                     {
                         data: 'action',
@@ -356,7 +354,7 @@
                     url: "{{ url('expenses/fetch-edit') }}/" + edit_id,
                     dataType: "json",
                     success: function(response) {
-                        console.log('response', response);
+                        console.log('expenses response', response);
                         $("#job_order").val(response.job_order).prop('disabled', false);
                         $("#payment_to").val(response.payment_to).prop('disabled', false);
                         $("#date").val(response.date).prop('disabled', false);
@@ -453,10 +451,15 @@
 
 
             $('#type').on('change', function() {
-                var filterValue = $(this).val();
-                table.columns(4).search(filterValue).draw();
+                var filteredType = $('#type option:selected').text();
+                if (filteredType === 'All') {
+                    table.columns(4).search('').draw();
+                } else {
+                    table.columns(4).search(filteredType).draw();
+                }
                 calculateExpenseTotal();
             });
+
 
             $('#job_orders').on('change', function() {
                 var filterValue = $(this).val();

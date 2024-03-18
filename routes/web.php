@@ -18,6 +18,9 @@ use App\Http\Controllers\LabourReportController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\profileController;
+use App\Http\Controllers\VendorPaymentController;
+use App\Http\Controllers\ReturnBalanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +53,20 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('tender/remove-payment-log/{id}', [TenderController::class, 'remove_payment_log']);
     Route::get('tender/payment-export/{id}', [TenderController::class, 'payment_export']);
 
+
+    Route::get('purchase_dept/payments/{id}', [PaymentController::class, 'payments']);
+    Route::post('purchase_dept/payment-store', [PaymentController::class, 'payment_store']);
+    Route::get('purchase_dept/fetch-payment-log', [PaymentController::class, 'fetch_payment_log']);
+    Route::get('purchase_dept/remove-payment-log/{id}', [PaymentController::class, 'remove_payment_log']);
+    Route::get('purchase_dept/payment-export/{id}', [PaymentController::class, 'payment_export']);
+
+    Route::get('vendor_payment/payments/{id}', [VendorPaymentController::class, 'payments']);
+    Route::post('vendor_payment/payment-store', [VendorPaymentController::class, 'payment_store']);
+    Route::get('vendor_payment/fetch-payment-log', [VendorPaymentController::class, 'fetch_payment_log']);
+    Route::get('vendor_payment/remove-payment-log/{id}', [VendorPaymentController::class, 'remove_payment_log']);
+    Route::get('vendor_payment/payment-export/{id}', [VendorPaymentController::class, 'payment_export']);
+
+
     Route::get('purchase', [PurchaseController::class, 'index']);
     Route::get('purchase/create', [PurchaseController::class, 'create'])->name('purchase.create');
     Route::get('purchase/create/{id}', [PurchaseController::class, 'edit'])->name('purchase.edit');
@@ -80,6 +97,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('vendors/fetch', [VendorController::class, 'fetch']);
     Route::get('vendors/fetch-edit/{id}', [VendorController::class, 'fetch_edit']);
     Route::get('vendors/delete/{id}', [VendorController::class, 'delete']);
+
+    Route::get('return_balance', [ReturnBalanceController::class, 'index']);
+    Route::post('return_balance/store', [ReturnBalanceController::class, 'store']);
+    Route::get('return_balance/fetch', [ReturnBalanceController::class, 'fetch']);
+    Route::get('return_balance/fetch-edit/{id}', [ReturnBalanceController::class, 'fetch_edit']);
+    Route::get('return_balance/delete/{id}', [ReturnBalanceController::class, 'delete']);
 
     Route::get('expenses_type', [ExpenseTypeController::class, 'index']);
     Route::post('expenses_type/store', [ExpenseTypeController::class, 'store']);
@@ -125,9 +148,15 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('purchase_dept/fetch-edit/{id}', [PaymentController::class, 'fetch_edit']);
     Route::get('purchase_dept/delete/{id}', [PaymentController::class, 'delete']);
 
+    Route::get('/vendor_payment', [VendorPaymentController::class, 'create'])->name('vendor_payment.create');
+    Route::post('/vendor_payment/store', [VendorPaymentController::class, 'store'])->name('vendor_payment.store');
+    Route::get('vendor_payment/fetch', [VendorPaymentController::class, 'fetch']);
+    Route::get('vendor_payment/fetch-edit/{id}', [VendorPaymentController::class, 'fetch_edit']);
+    Route::get('vendor_payment/delete/{id}', [VendorPaymentController::class, 'delete']);
+
     Route::get('purchases_report', [ReportController::class, 'purchase_index']);
-    Route::get('report/purchase_fetch', [ReportController::class, 'purchase_fetch']);
-    Route::get('report/purchase_export', [PurchaseController::class, 'purchase_export']);
+    Route::get('report/purchase_fetch', [ReportController::class, 'purchase_fetch'])->name('purchases.fetch');
+    Route::get('purchases_export/report', [ReportController::class, 'purchase_export']);
 
     Route::get('salaries_report', [ReportController::class, 'salary_create']);
     Route::get('report/salary_fetch', [ReportController::class, 'salary_fetch'])->name('salaries.fetch');
@@ -152,6 +181,13 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('permissions/fetch', [PermissionController::class, 'fetch']);
     Route::get('permissions/fetch-edit/{id}', [PermissionController::class, 'fetch_edit']);
     Route::get('permissions/delete/{id}', [PermissionController::class, 'delete']);
+
+    /*profile*/
+    Route::get('profile', [profileController::class, 'index']);
+    Route::post('profile/store', [profileController::class, 'store']);
+    Route::get('profile/fetch', [profileController::class, 'fetch']);
+    Route::get('profile/fetch-edit/{id}', [profileController::class, 'fetch_edit']);
+
 
     /* roles */
     Route::get('roles', [RoleController::class, 'index']);

@@ -3,6 +3,11 @@
 
 @section('content')
 
+    <style>
+        .job-order-column {
+            display: none;
+        }
+    </style>
     <div class="main-container">
         <div class="pd-ltr-20 xs-pd-20-10">
             <div class="min-height-200px">
@@ -45,15 +50,16 @@
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label for="job_orders">Filter by Purchase Type:</label>
+                                <label for="purchase_type">Filter by Purchase Type:</label>
                                 <select class="form-control" name="purchase_type" id="purchase_type" required>
                                     <option value="" selected>All</option>
-                                    @foreach ($tenders as $id => $tenderName)
-                                        <option value="{{ $id }}">{{ $tenderName }}</option>
+                                    @foreach ($purchaseTypes as $id => $typeName)
+                                        <option value="{{ $id }}">{{ $typeName }}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label for="date_range">Date Range:</label>
@@ -74,20 +80,22 @@
                         <thead>
                             <tr>
                                 <th>S.NO</th>
-                                <th>Job Order</th>
-                                <th>Type</th>
-                                <th>Date</th>
+                                <th class="job-order-column">Job Order</th>
+                                <th class="purchaseType">Type</th>
+                                <th class="formattedDate">Date</th>
                                 {{-- <th>Invoice No</th> --}}
                                 <th>Vendor</th>
                                 <th>Product/Material</th>
                                 <th>Quantity</th>
-                                <th>Amount</th>
+                                <th style="text-align: right;">Amount</th>
                                 {{-- <th>GST</th> --}}
-                                <th>Total</th>
-                                <th width="100px">Action</th>
+                                {{-- <th>Total</th> --}}
+                                {{-- <th width="100px">Action</th> --}}
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody id="purchase_table_body">
+
+                        </tbody>
                     </table>
 
                 </div>
@@ -174,77 +182,13 @@
             flatpickr("#datepicker", {
                 dateFormat: "Y-m-d"
             });
+            fetchPurchases();
 
-
-            $('#date_range').daterangepicker({
-                autoUpdateInput: false,
-                locale: {
-                    cancelLabel: 'Clear'
-                }
-            });
-
-            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
-                var startDate = picker.startDate;
-                var endDate = picker.endDate;
-                var currentDate = startDate.clone();
-                var dateRangeString = '';
-
-                while (currentDate.isSameOrBefore(endDate)) {
-                    dateRangeString += currentDate.format('YYYY-MM-DD') + '|';
-                    currentDate.add(1, 'day');
-                }
-
-                dateRangeString = dateRangeString.slice(0, -1);
-                $(this).val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
-                $(this).trigger('change');
-                table.column(3).search(dateRangeString, true).draw();
-            });
-
-
-            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
-                $(this).val('');
-                table.column(3).search('').draw();
-                calculateTotalAmount();
-            });
-
-            function calculateTotalAmount() {
+            function fetchPurchases() {
                 $.ajax({
-                    url: "{{ url('purchase/fetch') }}",
+                    url: "{{ route('purchases.fetch') }}",
                     success: function(response) {
-                        var total = 0;
-                        var filteredJobOrder = $('#job_orders').val();
-                        console.log('filteredJobOrder', filteredJobOrder);
-                        var filteredDateRange = $('#date_range').val();
-
-                        console.log('filteredDateRange', filteredDateRange);
-                        console.log('response', response);
-                        $.each(response.data, function(index, row) {
-                            if (!row.deleted_at) {
-                                var rowDate = new Date(row.date);
-                                var startDate = new Date(filteredDateRange.split(' - ')[0]);
-                                var endDate = new Date(filteredDateRange.split(' - ')[1]);
-
-                                console.log('Row job ID', row.job_order_id, 'F_ID',
-                                    filteredJobOrder, 'S_D', startDate, 'E_D', endDate);
-                                if ((filteredJobOrder === '' || row.job_order_id ==
-                                        filteredJobOrder) &&
-                                    (filteredDateRange === '' || (rowDate >= startDate &&
-                                        rowDate <= endDate))) {
-                                    console.log("work fine");
-                                    console.log('amount', row.total.replace(/[^\d.]/g, ''));
-                                    var amount = parseFloat(row.total.replace(/[^\d.]/g, ''));
-                                    console.log(amount);
-                                    total += isNaN(amount) ? 0 : amount;
-                                }
-                            }
-                        });
-
-                        var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
-                            maximumFractionDigits: 2,
-                            minimumFractionDigits: 2
-                        }) + ' /-';
-                        $('#total_amount').val(formattedTotal);
-                        console.log('formattedTotal', formattedTotal);
+                        renderPurchases(response);
                     },
                     error: function(xhr, status, error) {
                         console.error(error);
@@ -252,91 +196,182 @@
                 });
             }
 
+            function renderPurchases(data) {
+                $('#purchase_table_body').empty();
+                console.log('Purchases:', data.purchases);
+                console.log('Vendors:', data.vendors);
 
-            table = $('.data-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ url('purchase/fetch') }}",
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex'
-                    },
-                    {
-                        data: 'job_order_id',
-                        name: 'job_order_id'
-                    },
-                    {
-                        data: 'type',
-                        name: 'type'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date'
-                    },
-                    // {
-                    //     data: 'invoice_no',
-                    //     name: 'invoice_no'
-                    // },
-                    {
-                        data: 'vendor',
-                        name: 'vendor',
-                        render: function(data, type, full, meta) {
-                            console.log('data', data);
-                            return data;
+                var totalAmount = 0;
+
+                $.each(data.purchases, function(index, purchase) {
+                    console.log('purchase:', purchase);
+                    var vendorName = data.vendors[purchase.vendor_id];
+                    var purchaseType = data.purchaseType[purchase.type];
+                    console.log('Vendor Name:', vendorName);
+                    console.log('purchaseType Name:', purchaseType);
+
+                    var formattedDate = purchase.date.split('-').reverse().join('-');
+                    var invoiceProducts = purchase.invoice_product;
+                    console.log('invoiceProducts:', invoiceProducts);
+                    var rows = '';
+
+                    invoiceProducts.forEach(function(product, productIndex) {
+                        console.log('Product:', product);
+                        var material = '';
+                        console.log('Material ID:', product.material_id);
+                        console.log('Materials Name:', data.materials[product.material_id]);
+
+                        if (product.material_id && data.materials[product.material_id]) {
+                            material = data.materials[product.material_id];
+                        } else {
+                            console.error('Material ID not found or invalid for product:', product);
                         }
-                    },
-                    {
-                        data: 'material',
-                        name: 'material',
-                        render: function(data, type, full, meta) {
-                            return data;
-                        }
-                    },
-                    {
-                        data: 'quantity',
-                        name: 'quantity'
-                    },
-                    {
-                        data: 'amount',
-                        name: 'amount'
-                    },
-                    // {
-                    //     data: 'gst',
-                    //     name: 'gst'
-                    // },
-                    {
-                        data: 'total',
-                        name: 'total'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ],
-                columnDefs: [{
-                    targets: 1,
-                    visible: false
-                }],
-                footerCallback: function(row, date, end, display) {
-                    calculateTotalAmount();
-                }
+
+                        console.log('material:', material);
+
+                        var row = '<tr>' +
+                            '<td>' + (index + 1) + '</td>' +
+                            '<td class="job-order-column">' + purchase.job_order_id + '</td>' +
+                            '<td class="purchaseType">' + (purchaseType ? purchaseType :
+                                'Undefined') + '</td>' +
+                            '<td class="formattedDate">' + formattedDate + '</td>' +
+                            '<td>' + (vendorName ? vendorName : 'Undefined') + '</td>' +
+                            '<td>' + (material ? material : 'Undefined') + '</td>' +
+                            '<td style="text-align: right;">' + product.quantity + '</td>' +
+                            '<td style="text-align: right;">₹' + parseFloat(product.total)
+                            .toLocaleString(
+                                'en-IN', {
+                                    maximumFractionDigits: 2,
+                                    minimumFractionDigits: 2
+                                }) + '</td>' +
+                            // '<td>' + product.total + '</td>' +
+                            '</tr>';
+
+                        totalAmount += parseFloat(product.total);
+                        rows += row;
+                    });
+
+                    $('#purchase_table_body').append(rows);
+                });
+
+                var totalRow = '<tr>' +
+                    '<td colspan="6" style="text-align: right;"><b>Total:</b></td>' +
+                    '<td style="text-align: right;"><b>₹' + totalAmount.toLocaleString(
+                        'en-IN', {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        }) + '</b></td>' +
+                    '</tr>';
+                $('#purchase_table_body').append(totalRow);
+                calculateTotalAmount();
+            }
+
+            $('#date_range').daterangepicker({
+                autoUpdateInput: true,
+                locale: {
+                    cancelLabel: 'Clear',
+                    format: 'DD-MM-YYYY'
+                },
+                startDate: moment().startOf('month'),
+                endDate: moment().endOf('month')
             });
+
+            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('DD-MM-YYYY') + ' - ' + picker.endDate.format(
+                    'DD-MM-YYYY'));
+                calculateTotalAmount();
+                applyTableFilters();
+            });
+
 
             $('#job_orders').on('change', function() {
-                var filterValue = $(this).val();
-                table.columns(1).search(filterValue).draw();
                 calculateTotalAmount();
+                applyTableFilters();
+            });
+
+            $('#purchase_type').on('change', function() {
+                calculateTotalAmount();
+                applyTableFilters();
             });
 
 
+            function calculateTotalAmount() {
+                var filteredJobOrder = $('#job_orders').val();
+                var filteredDateRange = $('#date_range').val();
+                var filteredPurchaseType = $('#purchase_type option:selected').text();
+                var total = 0;
+
+                $('#purchase_table_body tr').each(function() {
+                    // debugger
+                    var jobOrder = $(this).find('.job-order-column').text().trim();
+                    var purchaseType = $(this).find('td.purchaseType').text();
+                    var date = $(this).find('td.formattedDate').text();
+                    var amountText = $(this).find('td:eq(7)').text().trim();
+                    var amountValue = amountText.replace(/[^\d.-]/g, '');
+                    var amount = parseFloat(amountValue);
+
+                    if ((filteredJobOrder === '' || jobOrder === filteredJobOrder) &&
+                        (filteredDateRange === '' || isDateInRange(date, filteredDateRange) &&
+                            (filteredPurchaseType === '' || purchaseType === filteredPurchaseType || filteredPurchaseType === 'All'))) {
+                        total += isNaN(amount) ? 0 : amount;
+                        console.log(total);
+                    }
+                });
+
+                var formattedTotal = '₹' + total.toLocaleString('en-IN', {
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2
+                }) + ' /-';
+                $('#total_amount').val(formattedTotal);
+            }
+
+
+            function isDateInRange(date, dateRange) {
+                var startDate = moment(dateRange.split(' - ')[0], 'DD-MM-YYYY');
+                var endDate = moment(dateRange.split(' - ')[1], 'DD-MM-YYYY');
+                var currentDate = moment(date, 'DD-MM-YYYY');
+                return currentDate.isBetween(startDate, endDate, null, '[]');
+            }
+
+
+            function applyTableFilters() {
+                var filteredJobOrder = $('#job_orders').val();
+                var filteredPurchaseType = $('#purchase_type option:selected').text();
+                var filteredDateRange = $('#date_range').val();
+
+                $('#purchase_table_body tr').each(function() {
+                    debugger
+                    var jobOrder = $(this).find('.job-order-column').text().trim();
+                    var purchaseType = $(this).find('td.purchaseType')
+                        .text();
+                    var date = $(this).find('td.formattedDate')
+                        .text();
+
+                    if ((filteredJobOrder && jobOrder !== filteredJobOrder) ||
+                        (filteredPurchaseType !== 'All' && purchaseType !== filteredPurchaseType)
+                    ) {
+                        $(this).hide();
+                    } else if (filteredDateRange) {
+                        var startDate = moment(filteredDateRange.split(' - ')[0], 'YYYY-MM-DD');
+                        var endDate = moment(filteredDateRange.split(' - ')[1], 'YYYY-MM-DD');
+                        var currentDate = moment(date, 'YYYY-MM-DD');
+                        if (!currentDate.isBetween(startDate, endDate, null, '[]')) {
+                            $(this).hide();
+                        } else {
+                            $(this).show();
+                        }
+                    } else {
+                        $(this).show();
+                    }
+                });
+                calculateTotalAmount();
+            }
 
 
             $(document).on("click", ".purchase_export", function() {
                 var job_order = $('#job_orders').val();
                 var date_range = $('#date_range').val();
-                var export_url = "{{ url('purchase_export') }}";
+                var export_url = "{{ url('purchases_export/report') }}";
                 if (date_range) {
                     export_url += "?date_range=" + date_range;
                 }
@@ -345,6 +380,7 @@
                 }
                 window.location.href = export_url;
             });
+
 
             $(document).on("click", ".delete-btn", function() {
                 var edit_id = $(this).data('id');

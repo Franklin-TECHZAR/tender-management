@@ -9,7 +9,7 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="title">
-                                <h4>Purchase Dept Management</h4>
+                                <h4>Vendor Payment Management</h4>
                             </div>
                             <nav aria-label="breadcrumb" role="navigation">
                                 <ol class="breadcrumb">
@@ -17,13 +17,13 @@
                                         <a href="{{ url('admin/dashboard') }}">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">
-                                        Create Purchase Dept
+                                        Create Vendor Payment
                                     </li>
                                 </ol>
                             </nav>
                         </div>
                         <div class="col-md-6 d-flex justify-content-end align-items-center">
-                            <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#purchase-dept-modal">
+                            <button class="btn btn-primary add-btn" data-toggle="modal" data-target="#vendor-payment-modal">
                                 <i class="bi bi-plus"></i> Create New
                             </button>
                         </div>
@@ -61,9 +61,10 @@
                             <tr>
                                 <th>S.NO</th>
                                 <th>Job Order</th>
-                                <th>Payment For</th>
                                 <th>Date</th>
+                                <th>Description</th>
                                 <th>Payment Mode</th>
+                                <th>Payment details</th>
                                 <th>Amount</th>
                                 <th width="100px">Action</th>
                             </tr>
@@ -75,13 +76,13 @@
         </div>
     </div>
 
-    <div class="modal fade" id="purchase-dept-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+    <div class="modal fade" id="vendor-payment-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="modal-title-label">
-                        Create Purchase Dept
+                        Create Vendor Payment
                     </h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         ×
@@ -101,16 +102,16 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="payment_for">Payment For</label>
-                            <input type="text" class="form-control" name="payment_for" id="payment_for" required>
-                        </div>
-                        <div class="form-group">
                             <label>Date</label>
                             <input type="date" class="form-control" name="date" id="date" required>
                         </div>
                         <div class="form-group">
                             <label for="amount">Amount</label>
                             <input type="number" class="form-control" name="amount" id="amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea type="text" class="form-control" name="description" id="description" required></textarea>
                         </div>
                         <div class="form-group">
                             <label for="payment_mode">Payment Mode</label>
@@ -146,17 +147,12 @@
 @section('addscript')
     <script type="text/javascript">
         $(document).ready(function() {
-            flatpickr("#datepicker", {
-                mode: "multiple",
-                dateFormat: "Y-m-d"
-            });
-
             $("#payment-form").validate({
                 submitHandler: function(form) {
                     $("#submit-btn").prop("disabled", true);
                     var data = new FormData(form);
                     console.log(data);
-                    var url = "{{ url('purchase_dept/store') }}";
+                    var url = "{{ url('vendor_payment/store') }}";
                     var csrfToken = $('meta[name="csrf-token"]').attr('content');
                     $.ajax({
                         type: "POST",
@@ -168,7 +164,7 @@
                             'X-CSRF-TOKEN': csrfToken
                         },
                         success: function() {
-                            $("#purchase-dept-modal").modal("hide");
+                            $("#vendor-payment-modal").modal("hide");
                             table.clear().draw();
                             $("#submit-btn").prop("disabled", false);
                         },
@@ -184,35 +180,35 @@
             var table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ url('purchase_dept/fetch') }}",
+                ajax: "{{ url('vendor_payment/fetch') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex'
                     },
                     {
-                        data: 'job_order',
-                        name: 'job_order'
-                    },
-                    {
-                        data: 'payment_for',
-                        name: 'payment_for'
+                        data: 'job_order_id',
+                        name: 'job_order_id'
                     },
                     {
                         data: 'date',
                         name: 'date'
                     },
                     {
+                        data: 'description',
+                        name: 'description'
+                    },
+                    {
                         data: 'payment_mode',
                         name: 'payment_mode'
+                    },
+                    {
+                        data: 'payment_details',
+                        name: 'payment_details'
                     },
                     {
                         data: 'amount',
                         name: 'amount'
                     },
-                    // {
-                    //     data: 'payment_details',
-                    //     name: 'payment_details'
-                    // },
                     {
                         data: 'action',
                         name: 'action',
@@ -220,15 +216,14 @@
                         searchable: false
                     }
                 ],
-                 columnDefs: [{
+                columnDefs: [{
                     targets: 1,
                     visible: false
                 }],
-
                 footerCallback: function(row, data, start, end, display) {
                     var api = this.api();
                     var total = api
-                        .column(5, {
+                        .column(6, {
                             page: 'current'
                         })
                         .data()
@@ -244,102 +239,30 @@
                     console.log('Formatted Total:', formattedTotal);
                     $('#total_amount').val(formattedTotal);
                 }
+
             });
 
             $('#job_orders').on('change', function() {
-                debugger
                 var filterValue = $(this).val();
                 table.columns(1).search(filterValue).draw();
             });
-
-
-            // var table = $('.data-table').DataTable({
-            //     processing: true,
-            //     serverSide: true,
-            //     ajax: "{{ url('purchase_dept/fetch') }}",
-            //     columns: [{
-            //             data: 'DT_RowIndex',
-            //             name: 'DT_RowIndex'
-            //         },
-            //         {
-            //             data: 'job_order',
-            //             name: 'job_order'
-            //         },
-            //         {
-            //             data: 'payment_for',
-            //             name: 'payment_for'
-            //         },
-            //         {
-            //             data: 'date',
-            //             name: 'date'
-            //         },
-            //         {
-            //             data: 'amount',
-            //             name: 'amount'
-            //         },
-            //         // { data: 'description', name: 'description' },
-            //         {
-            //             data: 'payment_mode',
-            //             name: 'payment_mode'
-            //         },
-            //         {
-            //             data: 'payment_details',
-            //             name: 'payment_details'
-            //         },
-            //         // { data: 'payment_details', name: 'payment_details' },
-            //         {
-            //             data: 'action',
-            //             name: 'action',
-            //             orderable: false,
-            //             searchable: false
-            //         }
-            //     ],
-            //     // columnDefs: [{
-            //     //     targets: 1,
-            //     //     visible: false
-            //     // }],
-            //     // footerCallback: function(row, date, end, display) {
-            //     //     // calculateTotalAmount();
-            //     // }
-
-                // footerCallback: function(row, data, start, end, display) {
-                //     var api = this.api();
-                //     var total = api
-                //         .column(4, {
-                //             page: 'current'
-                //         })
-                //         .data()
-                //         .reduce(function(acc, val) {
-                //             var num = parseFloat(val.replace(/[^\d.]/g, ''));
-                //             return isNaN(num) ? acc : acc + num;
-                //         }, 0);
-
-                //     var formattedTotal = '₹ ' + total.toLocaleString('en-IN', {
-                //         maximumFractionDigits: 2,
-                //         minimumFractionDigits: 2
-                //     }) + ' /-';
-                //     console.log('Formatted Total:', formattedTotal);
-                //     $('#total_amount').val(formattedTotal);
-                // }
-            // });
-
 
             $(document).on("click", ".edit-btn", function() {
                 var edit_id = $(this).data('id');
                 $("#edit_id").val(edit_id);
                 $.ajax({
-                    url: "{{ url('purchase_dept/fetch-edit') }}/" + edit_id,
+                    url: "{{ url('vendor_payment/fetch-edit') }}/" + edit_id,
                     dataType: "json",
                     success: function(response) {
-                        $("#job_order").val(response.job_order).prop('disabled', false);
-                        $("#payment_for").val(response.payment_for).prop('disabled', false);
+                        $("#job_order").val(response.job_order_id).prop('disabled', false);
                         $("#date").val(response.date).prop('disabled', false);
                         $("#amount").val(response.amount).prop('disabled', false);
+                        $("#description").val(response.description).prop('disabled', false);
                         $("#payment_mode").val(response.payment_mode).prop('disabled', false);
                         $("#payment_details").val(response.payment_details).prop('disabled',
                             false);
                         $("#modal-title-label").html('Edit Payment');
-                        $("#purchase-dept-modal").modal("show");
+                        $("#vendor-payment-modal").modal("show");
                         $("#modal-footer-buttons").show();
                     },
                     error: function(code) {
@@ -352,19 +275,18 @@
                 var edit_id = $(this).data('id');
                 $("#edit_id").val(edit_id);
                 $.ajax({
-                    url: "{{ url('purchase_dept/fetch-edit') }}/" + edit_id,
+                    url: "{{ url('vendor_payment/fetch-edit') }}/" + edit_id,
                     dataType: "json",
                     success: function(response) {
                         $("#job_order").val(response.job_order).prop('disabled', true);
-                        $("#labour").val(response.labour).prop('disabled', true);
-                        $("#datepicker").val(response.date).prop('disabled', true);
+                        $("#date").val(response.date).prop('disabled', true);
                         $("#amount").val(response.amount).prop('disabled', true);
                         $("#description").val(response.description).prop('disabled', true);
                         $("#payment_mode").val(response.payment_mode).prop('disabled', true);
                         $("#payment_details").val(response.payment_details).prop('disabled',
                             true);
                         $("#modal-title-label").html('View Payment');
-                        $("#purchase-dept-modal").modal("show");
+                        $("#vendor-payment-modal").modal("show");
                         $("#modal-footer-buttons").hide();
                     },
                     error: function(code) {
@@ -377,8 +299,7 @@
                 $("#edit_id").val("");
                 $("#payment-form")[0].reset();
                 $("#job_order").prop('disabled', false);
-                $("#labour").prop('disabled', false);
-                $("#datepicker").prop('disabled', false);
+                $("#date").prop('disabled', false);
                 $("#amount").prop('disabled', false);
                 $("#description").prop('disabled', false);
                 $("#payment_mode").prop('disabled', false);
@@ -398,7 +319,7 @@
                 var edit_id = $("#edit_id").val();
                 $("#confirm-yes-btn").prop("disabled", true);
                 $.ajax({
-                    url: "{{ url('purchase_dept/delete') }}/" + edit_id,
+                    url: "{{ url('vendor_payment/delete') }}/" + edit_id,
                     method: "GET",
                     dataType: "json",
                     success: function(response) {

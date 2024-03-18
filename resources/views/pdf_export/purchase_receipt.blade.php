@@ -140,15 +140,14 @@
                                     <td>Address</td>
                                     <td>{{ $company_settings->address }}</td>
                                 </tr>
-                                <tr>
+                                {{-- <tr>
                                     <td>City</td>
                                     <td>{{ $purchase['vendor']['city'] }}</td>
-                                </tr>
-                                {{-- <tr>
-                                    <td>State</td>
-                                    <td>{{ $purchase['vendor']['city'] }}</td>
-                                    <td>{{ $order->billing_state }}</td>
-                                </tr>
+                                </tr> --}}
+                                <tr>
+                                    <td>Gst Number</td>
+                                    <td>{{ $company_settings->gst_number }}</td>
+                                {{-- </tr>
                                 <tr>
                                     <td>ZIP</td>
                                     <td>{{ $order->billing_zip }}</td>
@@ -165,28 +164,46 @@
             <div class="row">
                 <table height="82" class="" style="width: 100%;">
                     <tr class="bg_color1">
-                        <td width="58%" height="12" style="padding-left: 10px;">DESCRIPTION</td>
+                        <td width="30%" height="12" style="padding-left: 10px;">DESCRIPTION</td>
+                        <td width="10%" height="12" style="padding-left: 5px;">QTY</td>
+                        <td width="20%" height="12" style="padding-left: 5px;">UNIT PRICE</td>
                         <td width="13%" style="padding-right: 10px;" width="15%" align="right">AMOUNT</td>
                         <td width="13%" style="padding-right: 10px;" width="15%" align="right">GST</td>
-                        <td style="padding-right: 10px;" width="15%" align="right">TOTAL</td>
+                        <td style="padding-right: 10px;" width="15%" align="right">SUB TOTAL</td>
                     </tr>
                     @if ($purchase['invoiceProduct'] != null)
+                        @php
+                            $total_gst = 0;
+                            $total_amount = 0;
+                        @endphp
                         @foreach ($purchase['invoiceProduct'] as $item)
-                            <tr class="">
-                                <td>{{ $item->title }} &#8377; {{ $item->amount }} X {{ $item->quantity }}</td>
-                                <td align="right">&#8377;{{ $item->amount }}</td>
-                                <td align="right">{{ $item->gst }}%</td>
-                                <td align="right">&#8377;{{ $item->total }}</td>
-                            </tr>
+                        <tr class="">
+                            @if ($job_orders->isNotEmpty())
+                            @foreach ($job_orders as $jobOrder)
+                            <td>{{ $jobOrder->description }} &#8377;{{ $item->unit }} X {{ $item->quantity }}</td>
+                            @endforeach
+                            @endif
+                            <td align="center">{{ number_format($item->quantity) }}</td>
+                            <td align="right">&#8377;{{ number_format($item->unit) }}</td>
+                            <td align="right">&#8377;{{ number_format($item->unit * $item->quantity, 2) }}</td>
+                            <td align="right">{{ $item->gst }}</td>
+                            <td align="right">&#8377;{{ $item->total }}</td>
+                            @php
+                                $total_gst += $item->gst;
+                                $total_amount += ($item->unit * $item->quantity);
+                            @endphp
+                        </tr>
                         @endforeach
+                        <tr><td colspan="6"><hr></td></tr>
+                        <tr class="">
+                            <td></td>
+                            <td></td>
+                            <td><strong>Final Total</strong></td>
+                            <td align="right">&#8377;{{ number_format($total_amount, 2) }}</td>
+                            <td align="right">&#8377;{{ number_format($total_gst, 2) }}</td>
+                            <td align="right">&#8377;{{ $final_total }}</td>
+                        </tr>
                     @endif
-
-                    <tr class="">
-                        <td></td>
-                        <td></td>
-                        <td><strong>Total</strong></td>
-                        <td align="right">&#8377; {{ $final_total }}</td>
-                    </tr>
                 </table>
             </div>
             <div class="row">

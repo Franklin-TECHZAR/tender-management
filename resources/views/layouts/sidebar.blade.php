@@ -7,25 +7,29 @@ $tender = '';
 
 $purchase = '';
 $expenses = '';
+$purchase_dept = '';
+$vendor_payment = '';
+$salaries = '';
+$labour_report = '';
+$return_balance = '';
+$permissions = '';
 
 $masters = '';
 $materials = '';
 $labours = '';
 $expenses_type = '';
 $purchase_type = '';
-$purchase_dept = '';
-$salaries = '';
 $vendors = '';
 
 $users = '';
 $users_roles = '';
+$roles = '';
 
 $report = '';
 $expenses_report = '';
 $salaries_report = '';
 $purchases_report = '';
 
-$labour_report = '';
 
 if (isset($url_segments[0]) && $url_segments[0] == 'dashboard') {
     $dashboard = 'active';
@@ -36,18 +40,37 @@ if (isset($url_segments[0]) && $url_segments[0] == 'tender') {
 if (isset($url_segments[0]) && $url_segments[0] == 'expenses') {
     $expenses = 'active';
 }
+if (isset($url_segments[0]) && $url_segments[0] == 'salaries') {
+    $salaries = 'active';
+}
+if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
+    $purchase_dept = 'active';
+}
+if (isset($url_segments[0]) && $url_segments[0] == 'vendor_payment') {
+    $vendor_payment = 'active';
+}
 if (isset($url_segments[0]) && $url_segments[0] == 'purchase') {
     $purchase = 'active';
 }
-if (isset($url_segments[0]) && $url_segments[0] == '$labour_report') {
-    $$labour_report = 'active';
+if (isset($url_segments[0]) && $url_segments[0] == 'labour_report') {
+    $labour_report = 'active';
+}
+if (isset($url_segments[0]) && $url_segments[0] == 'return_balance') {
+    $return_balance = 'active';
 }
 
 if (isset($url_segments[0]) && $url_segments[0] == 'users') {
     $users_roles = 'active';
     $users = 'active';
 }
-
+if (isset($url_segments[0]) && $url_segments[0] == 'roles') {
+    $users_roles = 'active';
+    $roles = 'active';
+}
+if (isset($url_segments[0]) && $url_segments[0] == 'permissions') {
+    $users_roles = 'active';
+    $permissions = 'active';
+}
 if (isset($url_segments[0]) && $url_segments[0] == 'labours') {
     $masters = 'active';
     $labours = 'active';
@@ -73,10 +96,6 @@ if (isset($url_segments[0]) && $url_segments[0] == 'purchase_type') {
     $purchase_type = 'active';
 }
 
-if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
-    $report = 'active';
-    $purchase_dept = 'active';
-}
 
 if (isset($url_segments[0]) && $url_segments[0] == 'salaries_report') {
     $report = 'active';
@@ -199,14 +218,35 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                     </a>
                 </li>
 
-                {{-- <li>
+                <li>
+                    <a href="{{ url('return_balance') }}"
+                        class="@if ($return_balance) active @endif dropdown-toggle no-arrow">
+                        <span class="micon">
+                            <i class="icon-copy fa fa-undo" aria-hidden="true"></i>
+                        </span><span class="mtext">Return Balance</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ url('purchase_dept') }}"
                         class="@if ($purchase_dept) active @endif dropdown-toggle no-arrow">
                         <span class="micon">
                             <i class="icon-copy bi bi-credit-card" aria-hidden="true"></i>
                         </span><span class="mtext">Purchase Dept</span>
                     </a>
-                </li> --}}
+                </li>
+              {{-- {{dd(Auth::user()->hasPermissionTo('tender-view'));}}
+                @if(Auth::user()->user_type == 1 || Auth::user()->hasPermissionTo('vendor_view')) --}}
+                <li>
+                    <a href="{{ url('vendor_payment') }}"
+                        class="@if ($vendor_payment) active @endif dropdown-toggle no-arrow">
+                        <span class="micon">
+                            <i class="icon-copy bi bi-cash" aria-hidden="true"></i>
+                        </span><span class="mtext">Vendor Payment</span>
+                    </a>
+                </li>
+                {{-- @endif --}}
+
                 <li>
                 </li>
 
@@ -226,14 +266,11 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                         <li><a class="@if ($expenses_report) active @endif"
                                 href="{{ url('expenses_report') }}">Expenses</a></li>
                     </ul>
-                    {{-- <ul class="submenu" style="display:@if ($report) block; @else none; @endif">
+                    <ul class="submenu" style="display:@if ($report) block; @else none; @endif">
                         <li><a class="@if ($purchases_report) active @endif"
                                 href="{{ url('purchases_report') }}">Purchase</a></li>
-                    </ul> --}}
+                    </ul>
                 </li>
-
-                {{-- <li class="dropdown @if ($users_roles) show @endif">
-
 
                 <li class="dropdown @if ($users_roles) show @endif">
                     <a href="javascript:;" class="dropdown-toggle">
@@ -244,11 +281,21 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                         </svg>
                         <span class="mtext">Users & Roles</span>
                     </a>
-                    <ul class="submenu" style="display:@if ($users) block; @else none; @endif">
+                    <ul class="submenu" style="display:@if ($users_roles) block; @else none; @endif">
                         <li><a class="@if ($users) active @endif"
                                 href="{{ url('users') }}">Users</a></li>
                     </ul>
-                </li> --}}
+                    <ul class="submenu" style="display:@if ($users_roles) block; @else none; @endif">
+                        <li><a class="@if ($roles) active @endif"
+                                href="{{ url('roles') }}">Roles</a></li>
+                    </ul>
+                    <ul class="submenu" style="display:@if ($users_roles) block; @else none; @endif">
+                        <li><a class="@if ($permissions) active @endif"
+                                href="{{ url('permissions') }}">Permissions</a></li>
+                    </ul>
+                </li>
+
+
                 <li class="dropdown @if ($masters) show @endif">
                     <a href="javascript:;" class="dropdown-toggle">
                         <span class="micon">

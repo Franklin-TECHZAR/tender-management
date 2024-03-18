@@ -23,7 +23,10 @@ class ExpenseController extends Controller
         $tenders = Tender::where('job_order', 1)
             ->where('status', 1)
             ->pluck('name', 'id');
-        $ExpenseType = ExpenseType::get()->pluck('name');
+        // $ExpenseType = ExpenseType::get()->pluck('name','id');
+        $ExpenseType = ExpenseType::get()->pluck('name', 'id')->toArray();
+        // var_dump($ExpenseType);
+        // dd($ExpenseType);
         $Expense = Expense::get()->pluck('type');
         return view('Expense.create.index', compact('tenders', 'ExpenseType', 'Expense'));
     }
@@ -69,9 +72,13 @@ class ExpenseController extends Controller
         return array("status" => 1, "message" => $message);
     }
 
+
     public function fetch()
     {
-        $data = Expense::orderBy('date', "DESC")->get();
+        $data = Expense::with(['expenseType:id,name'])
+        ->orderBy('date', 'DESC')
+        ->get();
+        // $data = Expense::orderBy('date', "DESC")->get();
         $data->transform(function ($item) {
             $item->date = Carbon::parse($item->date)->format('d-m-Y');
             return $item;
@@ -80,6 +87,9 @@ class ExpenseController extends Controller
             ->addIndexColumn()
             ->addColumn('amount', function ($row) {
                 return "<span class='pull-right'>₹" . number_format($row->amount, 2) . "</span>";
+            })
+            ->addColumn('type', function ($row) {
+                return $row->expenseType ? $row->expenseType->name : '';
             })
             ->addColumn('action', function ($row) {
                 $btn = '<div class="dropdown">
@@ -101,7 +111,8 @@ class ExpenseController extends Controller
 
     public function fetch_edit($id)
     {
-        $Expense = Expense::find($id);
+        $Expense = Expense::with('expenseType:id,name')->find($id);
+        // $Expense = Expense::find($id);
         return $Expense;
     }
 

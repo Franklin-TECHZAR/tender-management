@@ -13,7 +13,7 @@ class Labour extends Model
 
     public function labourReports()
     {
-        return $this->hasMany(LabourReport::class, 'labour_id');
+        return $this->hasMany(LabourReport::class);
     }
 
     public function salaries()

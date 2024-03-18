@@ -66,9 +66,9 @@
                                     <th>Job Order</th>
                                     <th>Labour</th>
                                     <th>Date</th>
-                                    <th>Amount</th>
                                     {{-- <th>Description</th> --}}
                                     <th>Payment Mode</th>
+                                    <th>Amount</th>
                                     {{-- <th>Payment Details</th> --}}
                                     <th width="100px">Action</th>
                                 </tr>
@@ -257,12 +257,12 @@
                             name: 'date'
                         },
                         {
-                            data: 'amount',
-                            name: 'amount'
-                        },
-                        {
                             data: 'payment_mode',
                             name: 'payment_mode'
+                        },
+                        {
+                            data: 'amount',
+                            name: 'amount'
                         },
                         {
                             data: 'action',

@@ -10,4 +10,10 @@ class Expense extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    public function expenseType()
+    {
+        return $this->belongsTo(ExpenseType::class, 'type');
+    }
+
 }

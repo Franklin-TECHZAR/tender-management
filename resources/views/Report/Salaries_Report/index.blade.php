@@ -114,14 +114,15 @@
                 var totalAmount = 0;
 
                 $.each(data.salaries, function(index, salary) {
-                    var labourName = salary.labour;
-                    console.log('Labour Name:', labourName);
+                    var labourName = salary.labour_id;
+                    var labourId = labourName ? data.labours[labourName] : 'Undefined';
+                    console.log('Labour Name:', labourId);
 
                     var formattedDate = salary.date.split('-').reverse().join('-');
                     var row = '<tr>' +
                         '<td>' + (index + 1) + '</td>' +
                         '<td class="job-order-column">' + salary.job_order + '</td>' +
-                        '<td>' + (labourName ? labourName : 'Undefined') + '</td>' +
+                        '<td>' + (labourId ? labourId : 'Undefined') + '</td>' +
                         '<td>' + formattedDate + '</td>' +
                         '<td>' + salary.payment_mode + '</td>' +
                         '<td>' + salary.payment_details + '</td>' +
@@ -140,10 +141,10 @@
                 var totalRow = '<tr>' +
                     '<td colspan="5" style="text-align: right;"><b>Total:</b></td>' +
                     '<td style="text-align: right;"><b>₹' + totalAmount.toLocaleString(
-                            'en-IN', {
-                                maximumFractionDigits: 2,
-                                minimumFractionDigits: 2
-                            }) + '</b></td>' +
+                        'en-IN', {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        }) + '</b></td>' +
                     '</tr>';
                 $('#salary_table_body').append(totalRow);
                 calculateTotalAmount();
@@ -167,6 +168,12 @@
                 applyTableFilters();
             });
 
+
+
+            $('#job_orders').on('change', function() {
+                calculateTotalAmount();
+                applyTableFilters();
+            });
 
             function calculateTotalAmount() {
                 var filteredJobOrder = $('#job_orders').val();
@@ -193,16 +200,9 @@
                     maximumFractionDigits: 2,
                     minimumFractionDigits: 2
                 }) + ' /-';
-                console.log("Total:", total);
                 $('#total_amount').val(formattedTotal);
             }
 
-
-
-            $('#job_orders').on('change', function() {
-                calculateTotalAmount();
-                applyTableFilters();
-            });
 
             function isDateInRange(date, dateRange) {
                 var startDate = moment(dateRange.split(' - ')[0], 'DD-MM-YYYY');
@@ -218,6 +218,7 @@
                 console.log('Filtered Date Range:', filteredDateRange);
 
                 $('#salary_table_body tr').each(function() {
+                    debugger
                     var jobOrder = $(this).find('td:eq(1)').text();
                     var date = $(this).find('td:eq(3)').text();
                     console.log('Job Order in Row:', jobOrder);

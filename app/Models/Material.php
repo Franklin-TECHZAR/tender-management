@@ -15,4 +15,10 @@ class Material extends Model
         return $this->hasMany(InvoicePurchase::class);
     }
 
+    public function invoiceProduct()
+    {
+        return $this->hasMany(InvoiceProduct::class);
+    }
+
+
 }

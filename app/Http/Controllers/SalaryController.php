@@ -39,7 +39,6 @@ class SalaryController extends Controller
         ]);
 
         $dates = explode(', ', $request->date);
-
         if ($request->edit_id) {
             $existingSalary = Salary::find($request->edit_id);
             $message = "Salary Updated Successfully";
@@ -95,7 +94,7 @@ class SalaryController extends Controller
         // ->orderBy('id', 'DESC')
         // ->get();
         // $data = Salary::orderBy('date', "DESC")->get();
-        $data = Salary::with(['labour:id,name'])->orderBy('id', 'DESC')->get();
+        $data = Salary::with(['labour:id,name'])->orderBy('date', 'DESC')->get();
         $data->transform(function ($item) {
             $item->date = Carbon::parse($item->date)->format('d-m-Y');
             return $item;

@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('labour_reports', function (Blueprint $table) {
+        Schema::create('vendor_payments', function (Blueprint $table) {
             $table->id();
-            $table->string('job_order')->nullable();
-            $table->string('labour_id')->nullable();
-            $table->text('desc');
+            $table->unsignedBigInteger('job_order_id')->nullable();
             $table->date('date');
+            $table->decimal('amount', 10, 2);
+            $table->text('description');
+            $table->string('payment_mode');
+            $table->string('payment_details');
             $table->timestamps();
             $table->dateTime('deleted_at')->nullable();
+            $table->foreign('job_order_id')->references('id')->on('tenders')->onDelete('set null');
         });
     }
 
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('labour_reports');
+        Schema::dropIfExists('vendor_payments');
     }
 };
