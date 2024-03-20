@@ -100,8 +100,8 @@
                             <label for="labour">Labour</label>
                             <select class="form-control" name="labour[]" id="labour" required multiple>
                                 <option value="" disabled hidden>Select Labour</option>
-                                @foreach ($Labour as $id => $name)
-                                    <option value="{{ $id }}">{{ $name }}</option>
+                                @foreach ($Labour as $lab)
+                                    <option value="{{ $lab->id }}">{{ $lab->name }}</option>
                                 @endforeach
                             </select>
                         </div>
