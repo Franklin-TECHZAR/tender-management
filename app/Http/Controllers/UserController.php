@@ -37,8 +37,12 @@ class UserController extends Controller
 
         $user->name = $request->input('name');
         $user->email = $request->input('email');
-
-        $user->assignRole($request->input('roles'));
+        if ($request->has('roles')) {
+            $role = Role::findOrFail($request->input('roles')[0]);
+            $user->assignRole($role->name);
+            // $user->assignRole($role);
+        }
+        // $user->assignRole($request->input('roles'));
 
         $user->save();
 
@@ -69,10 +73,16 @@ class UserController extends Controller
     }
     public function fetch_edit($id)
     {
-        $user = User::select('id', 'name', 'mobile_no', 'email', 'latitude', 'longitude', 'address')->find($id);
-        $userRole = $user->roles->pluck('name')->all();
-        return ['user' => $user, 'role' => $userRole];
+        $user = User::select('id', 'name', 'email', 'role_id')->find($id);
+        $roleId = $user->role_id;
+        $roleIds = [];
+
+        if ($roleId) {
+            $roleIds[] = $roleId;
+        }
+        return ['user' => $user, 'role' => $roleIds];
     }
+
 
     public function delete($id)
     {

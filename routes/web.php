@@ -15,6 +15,7 @@ use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\LabourReportController;
+use App\Http\Controllers\BalanceLogController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -132,6 +133,15 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('labour_report/delete/{id}', [LabourReportController::class, 'delete']);
     Route::get('labour_export', [LabourReportController::class, 'export']);
     Route::post('labour_report/check_date', [LabourReportController::class, 'checkDate'])->name('labour_report.check_date');
+
+
+    Route::get('balance_log', [BalanceLogController::class, 'index'])->name('Balance_log.index');
+    Route::post('balance_log/store', [BalanceLogController::class, 'store']);
+    Route::get('balance_log/fetch', [BalanceLogController::class, 'fetch']);
+    Route::get('balance_log/fetch-edit/{id}', [BalanceLogController::class, 'fetch_edit']);
+    Route::get('balance_log/delete/{id}', [BalanceLogController::class, 'delete']);
+    Route::get('balance_log/report', [BalanceLogController::class, 'export']);
+    Route::post('balance_log/check_date', [BalanceLogController::class, 'checkDate'])->name('balance_log.check_date');
 
 
     Route::get('/salaries', [SalaryController::class, 'create'])->name('salaries.create');

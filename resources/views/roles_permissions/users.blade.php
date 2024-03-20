@@ -80,7 +80,7 @@
                             <select class="form-control selectpicker" name="roles[]" id="roles" style="width: 100%;">
                                 <option value="">Select Role</option>
                                 @foreach ($role as $row)
-                                    <option value="{{ $row->name }}">{{ $row->name }}</option>
+                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -181,11 +181,12 @@
                 url: "{{ url('users/fetch-edit') }}/" + edit_id,
                 dataType: "json",
                 success: function(response) {
+                    console.log('response',response);
                     var role = response.role;
                     var user = response.user;
 
                     $("#name").val(user.name);
-                    $("#mobile").val(user.mobile_no);
+                    // $("#mobile").val(user.mobile_no);
                     $("#email").val(user.email);
 
                     $("#roles").val(role[0]).trigger('change');
