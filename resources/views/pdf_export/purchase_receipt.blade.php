@@ -164,7 +164,7 @@
             <div class="row">
                 <table height="82" class="" style="width: 100%;">
                     <tr class="bg_color1">
-                        <td width="30%" height="12" style="padding-left: 10px;">DESCRIPTION</td>
+                        <td width="30%" height="12" style="padding-left: 10px;">Material / Product</td>
                         <td width="10%" height="12" style="padding-left: 5px;">QTY</td>
                         <td width="20%" height="12" style="padding-left: 5px;">UNIT PRICE</td>
                         <td width="13%" style="padding-right: 10px;" width="15%" align="right">AMOUNT</td>
@@ -178,11 +178,7 @@
                         @endphp
                         @foreach ($purchase['invoiceProduct'] as $item)
                         <tr class="">
-                            @if ($job_orders->isNotEmpty())
-                            @foreach ($job_orders as $jobOrder)
-                            <td>{{ $jobOrder->description }} &#8377;{{ $item->unit }} X {{ $item->quantity }}</td>
-                            @endforeach
-                            @endif
+                            <td>{{ $item->material->name }}</td>
                             <td align="center">{{ number_format($item->quantity) }}</td>
                             <td align="right">&#8377;{{ number_format($item->unit) }}</td>
                             <td align="right">&#8377;{{ number_format($item->unit * $item->quantity, 2) }}</td>
