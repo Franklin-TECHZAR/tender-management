@@ -229,20 +229,20 @@
             });
         });
 
-        $(document).on("change", ".material", function() {
-            var material_id = this.value;
-            var row_id = $(this).data("row_no");
-            $.ajax({
-                url: "{{ url('materials/fetch-edit') }}/" + material_id,
-                dataType: "json",
-                success: function(response) {
-                    $("#unit" + row_id).val(response.unit_type);
-                },
-                error: function(code) {
-                    alert(code.statusText);
-                },
-            });
-        });
+        // $(document).on("change", ".material", function() {
+        //     var material_id = this.value;
+        //     var row_id = $(this).data("row_no");
+        //     $.ajax({
+        //         url: "{{ url('materials/fetch-edit') }}/" + material_id,
+        //         dataType: "json",
+        //         success: function(response) {
+        //             $("#unit" + row_id).val(response.unit_type);
+        //         },
+        //         error: function(code) {
+        //             alert(code.statusText);
+        //         },
+        //     });
+        // });
 
 
         $(document).on("input", ".amount, .qty", function() {
@@ -282,16 +282,16 @@
             count();
         });
 
-        // $(document).on("change", ".gst", function() {
-        //     var row_id = $(this).data("row_no");
-        //     var gst_value = this.value;
-        //     var amount = $("#amount" + row_id).val();
-        //     var total_amount = parseFloat(amount) + parseFloat(gst_value);
-        //     $("#total" + row_id).val(total_amount);
-        //     calculate();
-        //     count();
-        // });
-
+        $(document).on("change", ".gst", function() {
+            var row_id = $(this).data("row_no");
+            var gst_value = this.value;
+            $(this).val(parseFloat(gst_value).toFixed(2));
+            var amount = $("#amount" + row_id).val();
+            var total_amount = parseFloat(amount) + parseFloat(gst_value);
+            $("#total" + row_id).val(parseFloat(total_amount).toFixed(2));
+            calculate();
+            count();
+        });
 
 
         // $(document).on("input", ".amount, .qty", function() {
