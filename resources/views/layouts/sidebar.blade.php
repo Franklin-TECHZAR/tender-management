@@ -183,7 +183,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                 {{-- {{ dd(Auth::user()->hasAnyPermission('tender-view')) }} --}}
                 {{-- {{ dd(Auth::user()->getAllPermissions()->pluck('name')) }} --}}
                 {{-- {{ dd(Auth::user()->getAllPermissions()->pluck('name')) }} --}}
-                @if (Auth::user()->role_id == 1 && Auth::user()->hasPermissionTo('tender-view'))
+                @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('tender-view'))
                     <li>
                         <a href="{{ url('tender') }}?show=New"
                             class="@if ($tender) active @endif dropdown-toggle no-arrow">
@@ -194,7 +194,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                     </li>
                 @endif
 
-                @if (Auth::user()->role_id == 1 && Auth::user()->hasPermissionTo('purchase-view'))
+                @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('purchase-view'))
                     <li>
                         <a href="{{ url('purchase') }}"
                             class="@if ($purchase) active @endif dropdown-toggle no-arrow">
@@ -205,7 +205,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                     </li>
                 @endif
 
-                @if (Auth::user()->role_id == 1 && Auth::user()->hasPermissionTo('expenses-view'))
+                @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('expenses-view'))
                     <li>
                         <a href="{{ url('expenses') }}"
                             class="@if ($expenses) active @endif dropdown-toggle no-arrow">
@@ -216,7 +216,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                     </li>
                 @endif
 
-                @if (Auth::user()->role_id == 1 && Auth::user()->hasPermissionTo('salaries-view'))
+                @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('salaries-view'))
                     <li>
                         <a href="{{ url('salaries') }}"
                             class="@if ($salaries) active @endif dropdown-toggle no-arrow">
@@ -227,7 +227,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                     </li>
                 @endif
 
-                @if (Auth::user()->role_id == 1 && Auth::user()->hasPermissionTo('labour_report-view'))
+                @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('labour_report-view'))
                     <li>
                         <a href="{{ url('labour_report') }}"
                             class="@if ($labour_report) active @endif dropdown-toggle no-arrow">
@@ -238,7 +238,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                     </li>
                 @endif
 
-                @if (Auth::user()->role_id == 1 && Auth::user()->hasPermissionTo('balance_log-view'))
+                @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('balance_log-view'))
                     <li>
                         <a href="{{ url('balance_log') }}"
                             class="@if ($balance_log) active @endif dropdown-toggle no-arrow">
@@ -250,7 +250,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                 @endif
 
 
-                @if (Auth::user()->role_id == 1 && Auth::user()->hasPermissionTo('return_balance-view'))
+                @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('return_balance-view'))
                     <li>
                         <a href="{{ url('return_balance') }}"
                             class="@if ($return_balance) active @endif dropdown-toggle no-arrow">
@@ -261,7 +261,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                     </li>
                 @endif
 
-                @if (Auth::user()->role_id == 1 && Auth::user()->hasPermissionTo('purchase_dept-view'))
+                @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('purchase_dept-view'))
                     <li>
                         <a href="{{ url('purchase_dept') }}"
                             class="@if ($purchase_dept) active @endif dropdown-toggle no-arrow">
@@ -272,7 +272,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                     </li>
                 @endif
 
-                @if (Auth::user()->role_id == 1 && Auth::user()->hasPermissionTo('vendor_payment-view'))
+                @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('vendor_payment-view'))
                     <li>
                         <a href="{{ url('vendor_payment') }}"
                             class="@if ($vendor_payment) active @endif dropdown-toggle no-arrow">
@@ -289,7 +289,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                         Auth::user()->hasPermissionTo('expense_report-view') ||
                         Auth::user()->hasPermissionTo('purchase_report-view'))
 
-                    @if (Auth::user()->hasPermissionTo('report-view'))
+                    @if (Auth::user()->role_id == 1 ||  Auth::user()->hasPermissionTo('report-view'))
                         <li class="dropdown @if ($report) show @endif">
                             <a href="javascript:;" class="dropdown-toggle">
                                 <span class="micon">
@@ -298,7 +298,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                                 <span class="mtext">Report</span>
                             </a>
 
-                            @if (Auth::user()->hasPermissionTo('salary_report-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('salary_report-view'))
                                 <ul class="submenu"
                                     style="display:@if ($report) block; @else none; @endif">
                                     <li><a class="@if ($salaries_report) active @endif"
@@ -306,7 +306,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                                 </ul>
                             @endif
 
-                            @if (Auth::user()->hasPermissionTo('expense_report-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('expense_report-view'))
                                 <ul class="submenu"
                                     style="display:@if ($report) block; @else none; @endif">
                                     <li><a class="@if ($expenses_report) active @endif"
@@ -314,7 +314,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                                 </ul>
                             @endif
 
-                            @if (Auth::user()->hasPermissionTo('purchase_report-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('purchase_report-view'))
                                 <ul class="submenu"
                                     style="display:@if ($report) block; @else none; @endif">
                                     <li><a class="@if ($purchases_report) active @endif"
@@ -330,7 +330,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                         Auth::user()->hasPermissionTo('users-view') ||
                         Auth::user()->hasPermissionTo('permissions-view') ||
                         Auth::user()->hasPermissionTo('roles-view'))
-                    @if (Auth::user()->hasPermissionTo('users-roles-view'))
+                    @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('users-roles-view'))
                         <li class="dropdown @if ($users_roles) show @endif">
                             <a href="javascript:;" class="dropdown-toggle">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 5px" width="10"
@@ -341,21 +341,21 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                                 </svg>
                                 <span class="mtext">Users & Roles</span>
                             </a>
-                            @if (Auth::user()->hasPermissionTo('users-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('users-view'))
                                 <ul class="submenu"
                                     style="display:@if ($users_roles) block; @else none; @endif">
                                     <li><a class="@if ($users) active @endif"
                                             href="{{ url('users') }}">Users</a></li>
                                 </ul>
                             @endif
-                            @if (Auth::user()->hasPermissionTo('permissions-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('permissions-view'))
                                 <ul class="submenu"
                                     style="display:@if ($users_roles) block; @else none; @endif">
                                     <li><a class="@if ($permissions) active @endif"
                                             href="{{ url('permissions') }}">Permissions</a></li>
                                 </ul>
                             @endif
-                            @if (Auth::user()->hasPermissionTo('roles-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('roles-view'))
                                 <ul class="submenu"
                                     style="display:@if ($users_roles) block; @else none; @endif">
                                     <li><a class="@if ($roles) active @endif"
@@ -374,7 +374,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                         Auth::user()->hasPermissionTo('vendors/dealer-view') ||
                         Auth::user()->hasPermissionTo('expenses_type-view') ||
                         Auth::user()->hasPermissionTo('purchase_type-view'))
-                    @if (Auth::user()->hasPermissionTo('master-view'))
+                    @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('master-view'))
                         <li class="dropdown @if ($masters) show @endif">
                             <a href="javascript:;" class="dropdown-toggle">
                                 <span class="micon">
@@ -382,35 +382,35 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                                 </span>
                                 <span class="mtext">Masters</span>
                             </a>
-                            @if (Auth::user()->hasPermissionTo('labours-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('labours-view'))
                                 <ul class="submenu"
                                     style="display:@if ($masters) block; @else none; @endif">
                                     <li><a class="@if ($labours) active @endif"
                                             href="{{ url('labours') }}">Labours</a></li>
                                 </ul>
                             @endif
-                            @if (Auth::user()->hasPermissionTo('materials-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('materials-view'))
                                 <ul class="submenu"
                                     style="display:@if ($masters) block; @else none; @endif">
                                     <li><a class="@if ($materials) active @endif"
                                             href="{{ url('materials') }}">Material</a></li>
                                 </ul>
                             @endif
-                            @if (Auth::user()->hasPermissionTo('vendors/dealer-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('vendors/dealer-view'))
                                 <ul class="submenu"
                                     style="display:@if ($masters) block; @else none; @endif">
                                     <li><a class="@if ($vendors) active @endif"
                                             href="{{ url('vendors') }}">Vendors / Dealer</a></li>
                                 </ul>
                             @endif
-                            @if (Auth::user()->hasPermissionTo('expenses_type-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('expenses_type-view'))
                                 <ul class="submenu"
                                     style="display:@if ($masters) block; @else none; @endif">
                                     <li><a class="@if ($expenses_type) active @endif"
                                             href="{{ url('expenses_type') }}">Expenses Type</a></li>
                                 </ul>
                             @endif
-                            @if (Auth::user()->hasPermissionTo('purchase_type-view'))
+                            @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('purchase_type-view'))
                                 <ul class="submenu"
                                     style="display:@if ($masters) block; @else none; @endif">
                                     <li><a class="@if ($purchase_type) active @endif"

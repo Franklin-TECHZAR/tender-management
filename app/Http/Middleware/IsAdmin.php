@@ -19,7 +19,7 @@ class IsAdmin
         $auth_user = Auth::user();
         if (!$auth_user) {
             return redirect('/login');
-        } else if ($auth_user &&  ($auth_user->user_type == 1)) {
+        } else if ($auth_user &&  ($auth_user->role_id == 1)) {
             return $next($request);
         }
         return redirect('/login')->with('error', "You don't have that access");
