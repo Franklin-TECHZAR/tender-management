@@ -22,7 +22,7 @@ class LabourReportController extends Controller
         $tenders = Tender::where('job_order', 1)
             ->where('status', 1)
             ->pluck('name', 'id');
-        $Labour = Labour::pluck('name', 'id');
+        $Labour = Labour::get();
         $labourReport = LabourReport::all();
         return view('daily_report.index', compact('tenders', 'Labour', 'labourReport'));
     }
