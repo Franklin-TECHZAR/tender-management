@@ -145,6 +145,9 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
         font-family: Georgia,
             serif;
     }
+    .left-side-bar .menu-block {
+        height: calc(100vh - 135px);
+    }
 </style>
 <div class="left-side-bar">
     <div class="my-brand-logo">
