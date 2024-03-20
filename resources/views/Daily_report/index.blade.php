@@ -311,9 +311,9 @@
                     dataType: "json",
                     success: function(response) {
                         $("#job_order").val(response.job_order).prop('readonly', true);
-                        var labours = response.labour_id.split(',').map(function(item) {
-                            return item.trim();
-                        });
+
+                        var labours = response.labour_id.split(',');
+
                         $("#labour").val(labours).trigger('change').prop('disabled', false);
                         $("#date").val(response.date).prop('readonly', true);
                         $("#description").val(response.desc).prop('disabled', false);
