@@ -12,9 +12,12 @@ use App\Models\InvoicePurchase;
 use App\Models\PurchaseType;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
+use App\Exports\ExpenseExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BalanceLogController extends Controller
 {
+
     public function index(Request $request)
     {
         $tenderLogs = TenderPaymentLog::with('tender')->get();
@@ -22,72 +25,124 @@ class BalanceLogController extends Controller
         $expenses = Expense::all();
         $purchases = InvoicePurchase::with('purchaseType')->get();
         $tenders = Tender::pluck('name', 'id');
-        return view('balance_log.index', compact('tenders', 'tenderLogs', 'salaries', 'expenses', 'purchases'));
-    }
-
-    public function export(Request $request)
-    {
-        // $query = Salary::orderBy('date', 'ASC')->get();
-        $query = Salary::query();
-        if ($request->has('date_range')) {
-            $dates = explode(' - ', $request->date_range);
-
-            $start_date = date('Y-m-d', strtotime($dates[0]));
-            $end_date = date('Y-m-d', strtotime($dates[1]));
-
-            $query->whereBetween('date', [$start_date, $end_date]);
-        }
-
-        if ($request->has('job_order')) {
-            $query->where('job_order', $request->job_order);
-        }
-
-        $salary = $query->orderBy('date', 'ASC')->get();
-        $date_range = $request->date_range;
-        if ($salary->isEmpty()) {
-            return redirect()->back()->with('error', 'No data found based on the selected criteria.');
-        }
-
-        $total_amount = $salary->sum('amount');
-
-        $export_data = $salary->map(function ($salary, $index) {
-            $jobOrderName = Tender::find($salary->job_order)->name;
-            $payment_to = Labour::find($salary->labour_id)->name;
+        $tenderLogsTransformed = $tenderLogs->map(function ($log) {
             return [
-                'S.No' => $index + 1,
-                'Job Order' => $jobOrderName,
-                'Labour' => $salary->labour,
-                'Date' => date("d-m-Y", strtotime($salary->date)),
-                'Type' => $salary->type,
-                'Description' => $salary->description,
-                'Payment Mode' => $salary->payment_mode,
-                'Payment To' => $salary->payment_to,
-                'Payment Details' => $salary->payment_details,
-                'Amount' => '₹' . number_format($salary->amount, 2),
+                'type' => 'Tender',
+                'amount' => $log->amount,
+                'description' => $log->description,
+                'date' => $log->date,
+                'job_order' => isset($log->job_order) ? $log->job_order : null,
             ];
         });
 
-        $total_amount = "₹" . number_format($total_amount, 2);
+        $allLogs = array_merge($tenderLogs->toArray(), $salaries->toArray(), $expenses->toArray(), $purchases->toArray());
+        // dd($allLogs);
+        return view('balance_log.index', compact('tenders', 'allLogs'));
+    }
 
-        $export_data[] = [
-            'S.No' => '',
-            'Job Order' => '',
-            'Labour' => '',
-            'Date' => '',
-            'Type' => '',
-            'Description' => '',
-            'Payment Mode' => '',
-            'Payment To' => '',
-            'Payment Details' => 'Total',
-            'Amount' => $total_amount,
-        ];
+
+    public function export(Request $request)
+    {
+        $tenderLogs = TenderPaymentLog::with('tender')->get();
+        $salaries = Salary::all();
+        $expenses = Expense::all();
+        $purchases = InvoicePurchase::with('purchaseType')->get();
+
+        $tenderQuery = TenderPaymentLog::with('tender');
+        $salaryQuery = Salary::query();
+        $expenseQuery = Expense::query();
+        $purchaseQuery = InvoicePurchase::with('purchaseType');
+
+        if ($request->has('date_range')) {
+            $dates = explode(' - ', $request->date_range);
+            $start_date = date('Y-m-d', strtotime($dates[0]));
+            $end_date = date('Y-m-d', strtotime($dates[1]));
+
+            $tenderQuery->whereBetween('date', [$start_date, $end_date]);
+            $salaryQuery->whereBetween('date', [$start_date, $end_date]);
+            $expenseQuery->whereBetween('date', [$start_date, $end_date]);
+            $purchaseQuery->whereBetween('date', [$start_date, $end_date]);
+        }
+
+        if ($request->has('job_order')) {
+            $job_order = $request->job_order;
+
+            $tenderQuery->where('id', $job_order);
+            $salaryQuery->where('job_order', $job_order);
+            $expenseQuery->where('job_order', $job_order);
+            $purchaseQuery->where('job_order_id', $job_order);
+        }
+
+        // Retrieve data from each model
+        $tenderLogs = $tenderQuery->get();
+        $salaries = $salaryQuery->get();
+        $expenses = $expenseQuery->get();
+        $purchases = $purchaseQuery->get();
+
+        // Merge data from all models
+        $allLogs = $tenderLogs->merge($salaries)->merge($expenses)->merge($purchases)->toArray();
+
+
+        $allLogs = array_merge(
+            $tenderLogs->toArray(),
+            $salaries->toArray(),
+            $expenses->toArray(),
+            $purchases->toArray()
+        );
+
+        $exportData = [];
+        $totalCredit = 0;
+        $totalDebit = 0;
+
+        foreach ($allLogs as $index => $log) {
+            $jobOrder = '';
+            if(isset($log['tender'])) {
+                $jobOrder = $log['tender']['id'];
+            } elseif(isset($log['job_order'])) {
+                $jobOrder = $log['job_order'];
+            } elseif(isset($log['job_order_id'])) {
+                $jobOrder = $log['job_order_id'];
+            }
+
+            // Fetch name from the database based on the job order ID
+            $name = '';
+            if (!empty($jobOrder)) {
+                $tender = Tender::find($jobOrder);
+                if ($tender) {
+                    $name = $tender->name;
+                }
+            }
+
+            $description = isset($log['description']) ? $log['description'] : (isset($log['purchase_type']['name']) ? $log['purchase_type']['name'] : '');
+
+            $credit = isset($log['type']) && $log['type'] === 'Credit' && isset($log['amount']) ? $log['amount'] : 0;
+            $debit = isset($log['final_total']) ? $log['final_total'] : (!isset($log['type']) || $log['type'] !== 'Credit' && isset($log['amount']) ? $log['amount'] : 0);
+
+            $totalCredit += $credit;
+            $totalDebit += $debit;
+
+
+            $exportData[] = [
+                'S.No' => $index + 1,
+                'Job Order' => $name,
+                'Date' => date("d-m-Y", strtotime($log['date'])),
+                'Description' => $description,
+                'Credit' => $credit,
+                'Debit' => $debit,
+            ];
+        }
+
+        usort($exportData, function($a, $b) {
+            return strtotime($a['Date']) - strtotime($b['Date']);
+        });
 
         $data = [
-            'view_file' => 'excel_export.salary_export',
-            'export_data' => $export_data,
-            'date_range' =>  $date_range,
+            'view_file' => 'excel_export.balance_log',
+            'export_data' => $exportData,
+            'date_range' => $request->date_range,
+            'total_credit' => $totalCredit,
+            'total_debit' => $totalDebit,
         ];
-
-        return Excel::download(new ExpenseExport($data), 'salaries.xlsx');
+        return Excel::download(new ExpenseExport($data), 'balance_log.xlsx');
     }
-}
+    }
