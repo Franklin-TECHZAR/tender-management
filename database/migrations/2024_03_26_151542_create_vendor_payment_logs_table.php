@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('vendor_payment_logs', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('vendor_payment_id')->unsigned();
+            $table->bigInteger('vendor_balance_id')->unsigned();
+            $table->bigInteger('job_order_id')->unsigned();
             $table->date('date');
             $table->float('amount', 10, 2);
             $table->string('type');
@@ -22,7 +23,7 @@ return new class extends Migration
             $table->string('payment_mode');
             $table->text('payment_details');
 
-            $table->foreign('vendor_payment_id')->references('id')->on('vendor_payments')->onDelete('cascade');
+            $table->foreign('vendor_balance_id')->references('id')->on('vendor_balance')->onDelete('cascade');
 
             $table->timestamps();
             $table->dateTime('deleted_at')->nullable();

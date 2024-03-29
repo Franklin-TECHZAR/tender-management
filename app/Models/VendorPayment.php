@@ -10,15 +10,12 @@ class VendorPayment extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    protected $table = 'vendor_payments';
+    protected $table = 'vendor_balance';
     protected $fillable = [
-        'job_order_id',
-        'date',
-        'amount',
-        'description',
-        'payment_for',
-        'payment_mode',
-        'payment_details',
+        'vendor_id',
+        'vendor_name',
+        'gst_number',
+        'out_standing',
     ];
 
 }

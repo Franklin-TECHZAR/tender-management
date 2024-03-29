@@ -22,6 +22,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\profileController;
 use App\Http\Controllers\VendorPaymentController;
 use App\Http\Controllers\ReturnBalanceController;
+use App\Http\Controllers\VendorLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,8 @@ Route::post('/login_submit', [AuthController::class, 'login_submit'])->name('log
 Route::group(['middleware' => ['admin']], function () {
     Route::get('/', [HomeController::class, 'dashboard']);
     Route::get('dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+    Route::get('/fetch-data', [HomeController::class, 'fetchData'])->name('fetchData');
+
 
     Route::get('tender', [TenderController::class, 'index']);
     Route::post('tender/store', [TenderController::class, 'store']);
@@ -65,7 +68,9 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('vendor_payment/payment-store', [VendorPaymentController::class, 'payment_store']);
     Route::get('vendor_payment/fetch-payment-log', [VendorPaymentController::class, 'fetch_payment_log']);
     Route::get('vendor_payment/remove-payment-log/{id}', [VendorPaymentController::class, 'remove_payment_log']);
-    Route::get('vendor_payment/payment-export/{id}', [VendorPaymentController::class, 'payment_export']);
+    // Route::get('vendor_payment/payment-export/{id}', [VendorPaymentController::class, 'payment_export']);
+    Route::get('vendor_log', [VendorLogController::class, 'index'])->name('Vendor_log.index');
+    Route::get('vendor_log/report', [VendorLogController::class, 'payment_export']);
 
 
     Route::get('purchase', [PurchaseController::class, 'index']);
@@ -136,12 +141,7 @@ Route::group(['middleware' => ['admin']], function () {
 
 
     Route::get('balance_log', [BalanceLogController::class, 'index'])->name('Balance_log.index');
-    Route::post('balance_log/store', [BalanceLogController::class, 'store']);
-    Route::get('balance_log/fetch', [BalanceLogController::class, 'fetch']);
-    Route::get('balance_log/fetch-edit/{id}', [BalanceLogController::class, 'fetch_edit']);
-    Route::get('balance_log/delete/{id}', [BalanceLogController::class, 'delete']);
     Route::get('balance_log/report', [BalanceLogController::class, 'export']);
-    Route::post('balance_log/check_date', [BalanceLogController::class, 'checkDate'])->name('balance_log.check_date');
 
 
     Route::get('/salaries', [SalaryController::class, 'create'])->name('salaries.create');

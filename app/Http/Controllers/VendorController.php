@@ -10,7 +10,7 @@ class VendorController extends Controller
 {
     public function index(Request $request)
     {
-        return view('vendor.index');
+        return view('vendor_payment.index');
     }
 
     public function store(Request $request)

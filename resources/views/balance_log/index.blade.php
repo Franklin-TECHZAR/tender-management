@@ -27,11 +27,11 @@
                                 </ol>
                             </nav>
                         </div>
-                        {{-- <div class="col-md-6 d-flex justify-content-end align-items-center">
+                        <div class="col-md-6 d-flex justify-content-end align-items-center">
                             <button class="btn btn-success export-btn mr-2">
                                 <i class="bi bi-file-earmark-excel"></i> Export
                             </button>
-                        </div> --}}
+                        </div>
                     </div>
                 </div>
                 <div class="page-header">
@@ -70,48 +70,47 @@
                         </thead>
                         <tbody>
                             <?php $counter = 1; ?>
-                            @foreach ($tenderLogs as $log)
+                            {{-- Sort $allLogs array by date --}}
+                            <?php usort($allLogs, function($a, $b) {
+                                return strtotime($a['date']) - strtotime($b['date']);
+                            }); ?>
+                            {{-- Iterate over sorted $allLogs --}}
+                            @foreach ($allLogs as $log)
                                 <tr>
                                     <td>{{ $counter++ }}</td>
-                                    <td class="hidden">{{ $log->tender->job_order ?? '' }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($log->date)->format('d-m-Y') }}</td>
-                                    <td>{{ $log->description }}</td>
-                                    <td style="text-align: right;">{{ $log->type === 'Credit' ? '₹' . number_format($log->amount, 2) : '' }}</td>
-                                    <td style="text-align: right;">{{ $log->type === 'Debit' ? '₹' . number_format($log->amount, 2) : '' }}</td>
-                                    {{-- <td></td> --}}
-                                </tr>
-                            @endforeach
-                            @foreach ($salaries as $salary)
-                                <tr>
-                                    <td>{{ $counter++ }}</td>
-                                    <td class="hidden">{{ $salary->job_order }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($salary->date)->format('d-m-Y') }}</td>
-                                    <td>{{ $salary->description }}</td>
-                                    <td></td>
-                                    <td style="text-align: right;">₹{{ number_format($salary->amount, 2) }}</td>
-                                    {{-- <td style="text-align: right;"></td> --}}
-                                </tr>
-                            @endforeach
-                            @foreach ($expenses as $expense)
-                                <tr>
-                                    <td>{{ $counter++ }}</td>
-                                    <td class="hidden">{{ $expense->job_order }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($expense->date)->format('d-m-Y') }}</td>
-                                    <td>{{ $expense->description }}</td>
-                                    <td></td>
-                                    <td style="text-align: right;">₹{{ number_format($expense->amount, 2) }}</td>
-                                    {{-- <td style="text-align: right;"></td> --}}
-                                </tr>
-                            @endforeach
-                            @foreach ($purchases as $purchase)
-                                <tr>
-                                    <td>{{ $counter++ }}</td>
-                                    <td class="hidden">{{ $purchase->job_order_id }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($purchase->date)->format('d-m-Y') }}</td>
-                                    <td>{{ $purchase->purchaseType->name }}</td>
-                                    <td></td>
-                                    <td style="text-align: right;">₹{{ number_format($purchase->final_total, 2) }}</td>
-                                    {{-- <td style="text-align: right;"></td> --}}
+                                    <td class="hidden">
+                                        @if(isset($log['tender']))
+                                            {{ $log['tender']['id'] }}
+                                        @elseif(isset($log['job_order']))
+                                            {{ $log['job_order'] }}
+                                        @elseif(isset($log['job_order_id']))
+                                            {{ $log['job_order_id'] }}
+                                        @else
+                                            ''
+                                        @endif
+                                    </td>
+                                    <td>{{ \Carbon\Carbon::parse($log['date'])->format('d-m-Y') }}</td>
+                                    <td>
+                                        @if(isset($log['description']))
+                                            {{ $log['description'] }}
+                                        @elseif(isset($log['purchase_type']['name']))
+                                            {{ $log['purchase_type']['name'] }}
+                                        @else
+                                            ''
+                                        @endif
+                                    </td>
+                                    <td style="text-align: right;">
+                                        @if(isset($log['type']) && $log['type'] === 'Credit' && isset($log['amount']))
+                                            {{ '₹' . number_format($log['amount'], 2) }}
+                                        @endif
+                                    </td>
+                                    <td style="text-align: right;">
+                                        @if(isset($log['final_total']))
+                                            {{ '₹' . number_format($log['final_total'], 2) }}
+                                        @elseif(!isset($log['type']) || $log['type'] !== 'Credit' && isset($log['amount']))
+                                            {{ '₹' . number_format($log['amount'], 2) }}
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -129,6 +128,7 @@
         </div>
     </div>
 @endsection
+
 
 
 @section('addscript')
@@ -199,10 +199,10 @@
                     balanceCell.text('₹' + balance.toFixed(2));
                 });
 
-        $('#creditTotal').text('₹' + creditTotal.toFixed(2));
-        $('#debitTotal').text('₹' + debitTotal.toFixed(2));
-        $('#balanceTotal').text('₹' + balanceTotal.toFixed(2));
-    }
+            $('#creditTotal').text('₹' + creditTotal.toFixed(2));
+            $('#debitTotal').text('₹' + debitTotal.toFixed(2));
+            $('#balanceTotal').text('₹' + balanceTotal.toFixed(2));
+        }
 
 
 
@@ -216,17 +216,18 @@
 
         function filterJobOrder(jobOrderId) {
             $('#balance_log_table tbody tr').each(function() {
-                var jobOrderCell = $(this).find('td.hidden');
-                if (jobOrderId === '' || jobOrderCell.text() === jobOrderId) {
+                var jobOrderCell = $(this).find('td.hidden').text().trim();
+                if (jobOrderId === '' || jobOrderCell === jobOrderId) {
                     $(this).show();
                 } else {
                     $(this).hide();
                 }
             });
             calculateTotals();
-        }
+}
 
         $('#job_orders').on('change', function() {
+            debugger
             var selectedJobOrderId = $(this).val();
             filterJobOrder(selectedJobOrderId);
         });

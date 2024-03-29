@@ -13,7 +13,7 @@ class VendorLog extends Model
 
     protected $table = 'vendor_payment_logs';
     protected $fillable = [
-        'vendor_payment_id ',
+        'vendor_balance_id ',
         'date',
         'amount',
         'type',
@@ -24,6 +24,6 @@ class VendorLog extends Model
     ];
     public function vendorpayment()
     {
-        return $this->belongsTo(VendorPayment::class, 'vendor_payment_id', 'id');
+        return $this->belongsTo(VendorPayment::class, 'vendor_balance_id', 'id');
     }
 }

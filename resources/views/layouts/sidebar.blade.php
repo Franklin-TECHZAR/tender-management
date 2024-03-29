@@ -8,7 +8,9 @@ $tender = '';
 $purchase = '';
 $expenses = '';
 $purchase_dept = '';
+$vendor_payment_log = '';
 $vendor_payment = '';
+$vendor_log = '';
 $salaries = '';
 $labour_report = '';
 $return_balance = '';
@@ -46,8 +48,16 @@ if (isset($url_segments[0]) && $url_segments[0] == 'salaries') {
 if (isset($url_segments[0]) && $url_segments[0] == 'purchase_dept') {
     $purchase_dept = 'active';
 }
+if (isset($url_segments[0]) && $url_segments[0] == 'vendor_payment_log') {
+    $vendor_payment_log = 'active';
+}
 if (isset($url_segments[0]) && $url_segments[0] == 'vendor_payment') {
+    $vendor_payment_log = 'active';
     $vendor_payment = 'active';
+}
+if (isset($url_segments[0]) && $url_segments[0] == 'vendor_log') {
+    $vendor_payment_log = 'active';
+    $vendor_log = 'active';
 }
 if (isset($url_segments[0]) && $url_segments[0] == 'purchase') {
     $purchase = 'active';
@@ -145,6 +155,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
         font-family: Georgia,
             serif;
     }
+
     .left-side-bar .menu-block {
         height: calc(100vh - 135px);
     }
@@ -276,15 +287,26 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                 @endif
 
                 @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('vendor_payment-view'))
-                    <li>
-                        <a href="{{ url('vendor_payment') }}"
-                            class="@if ($vendor_payment) active @endif dropdown-toggle no-arrow">
+                    <li class="dropdown @if ($vendor_payment_log) show @endif">
+                        <a href="javascript:;" class="dropdown-toggle">
                             <span class="micon">
                                 <i class="icon-copy bi bi-cash" aria-hidden="true"></i>
-                            </span><span class="mtext">Vendor Payment</span>
+                            </span>
+                            <span class="mtext">Vendor Payment</span>
                         </a>
+                        <ul class="submenu"
+                            style="display:@if ($vendor_payment_log) block; @else none; @endif">
+                            <li><a class="@if ($vendor_payment) active @endif"
+                                    href="{{ url('vendor_payment') }}">Vendor Balance</a></li>
+                        </ul>
+                        <ul class="submenu"
+                            style="display:@if ($vendor_payment_log) block; @else none; @endif">
+                            <li><a class="@if ($vendor_log) active @endif"
+                                    href="{{ url('vendor_log') }}">Payment Log</a></li>
+                        </ul>
                     </li>
                 @endif
+
 
                 @if (Auth::user()->role_id == 1 ||
                         Auth::user()->hasPermissionTo('report-view') ||
@@ -292,7 +314,7 @@ if (isset($url_segments[0]) && $url_segments[0] == 'report') {
                         Auth::user()->hasPermissionTo('expense_report-view') ||
                         Auth::user()->hasPermissionTo('purchase_report-view'))
 
-                    @if (Auth::user()->role_id == 1 ||  Auth::user()->hasPermissionTo('report-view'))
+                    @if (Auth::user()->role_id == 1 || Auth::user()->hasPermissionTo('report-view'))
                         <li class="dropdown @if ($report) show @endif">
                             <a href="javascript:;" class="dropdown-toggle">
                                 <span class="micon">

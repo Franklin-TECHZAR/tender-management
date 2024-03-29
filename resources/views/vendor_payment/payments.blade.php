@@ -21,7 +21,7 @@
                                         <a href="{{ url('vendor_payment') }}?show=New">Vendor Payment</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">
-                                        {{ $tender_name }}
+                                        {{ $vendor_payment->agency_name }}
                                     </li>
                                 </ol>
                             </nav>

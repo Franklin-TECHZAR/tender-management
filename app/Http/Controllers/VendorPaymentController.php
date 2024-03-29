@@ -8,6 +8,8 @@ use App\Models\VendorPayment;
 use App\Models\VendorLog;
 use Carbon\Carbon;
 use App\Exports\ExcelExport;
+use App\Models\InvoicePurchase;
+use App\Models\Vendor;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -17,70 +19,121 @@ class VendorPaymentController extends Controller
     public function create()
     {
         $tenders = Tender::where('job_order', 1)
-                        ->where('status', 1)
-                        ->pluck('name', 'id');
-        return view('vendor_payment.vendor', compact('tenders'));
+            ->where('status', 1)
+            ->pluck('name', 'id');
+        $vendors = Vendor::get()->pluck('agency_name', 'id');
+        return view('vendor_payment.vendor', compact('tenders', 'vendors'));
     }
+
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'job_order' => 'required',
-            'date' => 'required|date',
-            'amount' => 'required|numeric',
-            'description' => 'required',
-            'payment_mode' => 'required',
-            'payment_details' => 'required',
-        ]);
+        if ($request->has('data') && !empty($request->input('data'))) {
+            $this->validate($request, [
+                'data.*.agency_name' => 'required',
+                'data.*.gst_number' => 'required',
+                'data.*.out_standing' => 'required|string',
+            ]);
 
-        if ($request->edit_id) {
-            $vendor = VendorPayment::findOrFail($request->edit_id);
-            $message = "Payment updated successfully";
+            foreach ($request->input('data') as $rowData) {
+                $outStanding = str_replace('₹', '', $rowData['out_standing']);
+
+                $existingVendor = VendorPayment::where('vendor_id', $rowData['id'])->first();
+
+                if (!$existingVendor) {
+                    VendorPayment::create([
+                        'vendor_id' => $rowData['id'],
+                        'vendor_name' => $rowData['agency_name'],
+                        'gst_number' => $rowData['gst_number'],
+                        'out_standing' => $outStanding,
+                    ]);
+                } else {
+                    $existingVendor->update([
+                        'out_standing' => $outStanding,
+                    ]);
+                }
+            }
+
+            return response()->json(["status" => 1, "message" => "Data stored successfully"]);
         } else {
-            $vendor = new VendorPayment();
-            $message = "Payment created successfully";
+            return response()->json(["status" => 0, "message" => "No data provided"]);
         }
-
-        $vendor->job_order_id = $request->job_order;
-        $vendor->date = $request->date;
-        $vendor->amount = $request->amount;
-        $vendor->description = $request->description;
-        $vendor->payment_mode = $request->payment_mode;
-        $vendor->payment_details = $request->payment_details;
-        $vendor->save();
-
-        return response()->json(['status' => 1, 'message' => $message]);
     }
+
 
     public function fetch()
     {
-        $data = VendorPayment::orderBy('date', "DESC")->get();
-        $data->transform(function ($item) {
-            $item->date = Carbon::parse($item->date)->format('d-m-Y');
-            return $item;
-        });
-        return DataTables::of($data)
-            ->addIndexColumn()
-            ->addColumn('amount', function ($row) {
-                return "<span class='pull-right'>₹" . number_format($row->amount, 2) . "</span>";
-            })
-            ->addColumn('action', function ($row) {
-                $btn = '<div class="dropdown">
-                            <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                                <i class="dw dw-more"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
-                            <a href="' . url('vendor_payment/payments') . '/' . $row->id . '" class="dropdown-item"><i class="bi bi-cash-stack"></i> Payments</a>
-                            <button data-id="' . $row->id . '" class="edit-btn dropdown-item"><i class="dw dw-edit2"></i> Edit</button>
-                            <button data-id="' . $row->id . '" class="delete-btn dropdown-item"><i class="dw dw-delete-3"></i> Delete</button>
-                            </div>
-                        </div>';
+        $vendors = Vendor::orderBy('id', 'ASC')->get();
+        $main_array = [];
 
-                return $btn;
-            })
-            ->rawColumns(['action', 'amount'])
-            ->make(true);
+        foreach ($vendors as $vendor) {
+            $vendor_id = $vendor->id;
+            $VendorPayment = VendorPayment::where('vendor_id', $vendor_id)->first();
+
+            if ($VendorPayment) {
+                $VendorPayment_id = $VendorPayment->id;
+
+                $total_credit = VendorLog::where('vendor_balance_id', $VendorPayment_id)
+                    ->where('type', 'Credit')
+                    ->sum('amount');
+
+                $total_invoice_amount = InvoicePurchase::where('vendor_id', $vendor_id)
+                    ->sum('final_total');
+
+                $total_debit = VendorLog::where('vendor_balance_id', $VendorPayment_id)
+                    ->where('type', 'Debit')
+                    ->sum('amount');
+
+                $balance = $total_credit + $total_invoice_amount - $total_debit;
+
+                $data = [
+                    'vendor_id' => $vendor->id,
+                    'agency_name' => $vendor->agency_name,
+                    'gst_number' => $vendor->gst_number,
+                    'VendorPayment_id' => $VendorPayment_id,
+                    'balance' => $balance,
+                ];
+            } else {
+                $data = [
+                    'vendor_id' => $vendor->id,
+                    'agency_name' => $vendor->agency_name,
+                    'gst_number' => $vendor->gst_number,
+                    'VendorPayment_id' => null,
+                    'balance' => 0,
+                ];
+            }
+
+            $main_array[] = [
+                'data' => [$data],
+            ];
+        }
+
+        return response()->json(['main_array' => $main_array]);
     }
+
+
+
+
+    //     return DataTables::of($data)
+    //         ->addIndexColumn()
+    //         ->addColumn('out_standing', function ($row) {
+    //             return $row->out_standing;
+    //         })
+    //         ->addColumn('action', function ($row) {
+    //             $btn = '<div class="dropdown">
+    //                             <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+    //                                 <i class="dw dw-more"></i>
+    //                             </a>
+    //                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+    //                             <button data-id="' . $row->id . '" data-vendor-id="' . $row->id . '" class="payments-btn dropdown-item"><i class="bi bi-cash-stack"></i> Payments</button>
+    //                             </div>
+    //                         </div>';
+    //             return $btn;
+    //         })
+    //         ->rawColumns(['action', 'out_standing'])
+    //         ->make(true);
+    // }
+
 
     public function fetch_edit($id)
     {
@@ -98,7 +151,8 @@ class VendorPaymentController extends Controller
 
     public function payments($id)
     {
-        $vendor_payment = VendorPayment::find($id);
+        // dd($id);
+        $vendor_payment = Vendor::find($id);
         $job_order = $vendor_payment->job_order_id;
 
         $tender = Tender::find($job_order);
@@ -114,21 +168,20 @@ class VendorPaymentController extends Controller
     {
         $this->validate($request, [
             'date' => 'required',
-            'payment_for' => 'required',
             'amount' => 'required',
-            'type' => 'required',
             'payment_mode' => 'required',
             'payment_details' => 'required',
             'description' => 'required',
-            'vendor_payment_id ' => '1',
         ]);
 
         $vendor_log = new VendorLog();
-        $vendor_log->vendor_payment_id  = $request->vendor_payment_id ;
+        $vendor_log->vendor_balance_id  = $request->vendor_balance_id;
+        $vendor_log->job_order_id  = $request->job_order;
         $vendor_log->date = $request->date;
-        $vendor_log->payment_for = $request->payment_for;
+        $vendor_name = Vendor::where('id', $vendor_log->vendor_balance_id)->pluck('agency_name');
+        $vendor_log->payment_for = $vendor_name;
         $vendor_log->amount = $request->amount;
-        $vendor_log->type = $request->type;
+        $vendor_log->type = 'Debit';
         $vendor_log->payment_mode = $request->payment_mode;
         $vendor_log->payment_details = $request->payment_details;
         $vendor_log->description = $request->description;
@@ -141,11 +194,11 @@ class VendorPaymentController extends Controller
     public function fetch_payment_log(Request $request)
     {
         $this->validate($request, [
-            'vendor_payment_id' => 'required',
+            'vendor_balance_id' => 'required',
         ]);
 
-        $vendor_payment_id = $request->vendor_payment_id;
-        $payment_logs = VendorLog::where('vendor_payment_id', $vendor_payment_id)->orderBy('date', "ASC")->get()->groupBy('payment_for');
+        $vendor_balance_id = $request->vendor_balance_id;
+        $payment_logs = VendorLog::where('vendor_balance_id', $vendor_balance_id)->orderBy('date', "ASC")->get()->groupBy('payment_for');
 
         $main_array = [];
 
@@ -195,13 +248,13 @@ class VendorPaymentController extends Controller
 
     public function remove_payment_log($id)
     {
-        VendorLog::find($id)->delete(); // Changed model name
+        VendorLog::find($id)->delete();
         return ['status' => 1, 'message' => 'Log deleted successfully'];
     }
 
-    public function payment_export($vendor_payment_id)
+    public function payment_export($vendor_balance_id)
     {
-        $vendor_logs = VendorLog::where('vendor_payment_id', $vendor_payment_id)->orderBy('date', 'ASC')->get()->groupBy('payment_for'); // Changed model name
+        $vendor_logs = VendorLog::where('vendor_balance_id', $vendor_balance_id)->orderBy('date', 'ASC')->get()->groupBy('payment_for'); // Changed model name
         $main_array = [];
 
         foreach ($vendor_logs as $index => $logs) {
@@ -245,7 +298,7 @@ class VendorPaymentController extends Controller
             }
         }
 
-        $vendor = VendorPayment::findOrFail($vendor_payment_id);
+        $vendor = VendorPayment::findOrFail($vendor_balance_id);
         $job_order = $vendor->job_order_id;
 
         $tender = Tender::find($job_order);
